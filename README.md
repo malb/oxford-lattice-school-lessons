@@ -9,17 +9,21 @@
 
 ## Lectures & Labs ##
 
-### Lecture (Léo, 90 minutes)
+### Lecture 1 (Léo ?, 60 minutes, Mon 11:30-12:30)
 
-- pruning
+### Lecture 2 (Martin ?, 60 minutes, Mon 13:30-13:30)
 
-### Lesson 1 (Martin, 90 minutes)
+### Homework (Monday)
 
-### Homework
+### Lecture 3 (Léo ?, 60 minutes, Tue 11:30-12:30)
 
-### Lesson 2 (90 Minutes)
+### Homework (Tuesday)
 
-### Homework
+### Lesson 1 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+
+### Homework (Wednsday)
+
+### Lesson 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
 
 ## Other ##
 
