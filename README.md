@@ -19,7 +19,7 @@ Lattice based Crypto basics:
 
 - Enumeration (no pruning...)
 - BKZ, and quality prediction
-- Mounting simple attacks on SIS and LWE
+- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP)
 
 ### Homework 1 (Monday)
 
@@ -50,6 +50,20 @@ Make a script that compute the security level in practice
 ### Homework (Wednsday)
 
 ### Lab 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+
+1. Experimenting with LLL / BKZ :
+Measure Root-Hermite factors, plot GS norms, check GSA's validity, measure cost
+Do it for both BKZ and BKZ2. Compare statitistics
+
+2.a. Given a SIS instance, mount the best attack according to the model
+b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
+
+3. Given an LWE instance, mount the best attack according to the model
+
+4. Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
+
+5. Improve the following using more clever stategies
+
 
 ## Other ##
 
