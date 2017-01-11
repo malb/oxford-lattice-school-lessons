@@ -18,8 +18,8 @@ Lattice based Crypto basics:
 ### Lecture 2 (Martin ?, 60 minutes, Mon 13:30-13:30)
 
 - Enumeration (no pruning...)
-- BKZ, and quality prediction
-- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP)
+- BKZ, and quality prediction (root hermiite factor, GSA, ...)
+- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) [No BDD because not supported in sage yet]
 
 ### Homework 1 (Monday)
 
@@ -36,9 +36,11 @@ Stickelberger Class relation and application to Ideal-SVP
 
 ### Homework (Tuesday)
 
+Prepare for Lab 1.
+
 ### Lab 1 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
 
-Implemn of HW 1:
+Implem of HW 1:
 
 1.
 Make a script that compute the security level in practice
@@ -49,20 +51,23 @@ Make a script that compute the security level in practice
 
 ### Homework (Wednsday)
 
+Prepare for lab 2.
+
 ### Lab 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
 
 1. Experimenting with LLL / BKZ :
 Measure Root-Hermite factors, plot GS norms, check GSA's validity, measure cost
 Do it for both BKZ and BKZ2. Compare statitistics
 
-2.a. Given a SIS instance, mount the best attack according to the model
+2.
+a. Given a SIS instance, mount the best attack according to the model
 b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
 
 3. Given an LWE instance, mount the best attack according to the model
 
-4. Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
+4. (opt) Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
-5. Improve the following using more clever stategies
+5. (opt) Improve the following using more clever stategies
 
 
 ## Other ##
