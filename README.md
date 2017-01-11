@@ -11,19 +11,45 @@
 
 ### Lecture 1 (Léo ?, 60 minutes, Mon 11:30-12:30)
 
+Lattice based Crypto basics:
+- SIS and LWE. 
+- Basic primitive (Encryption, KE, Signature)
+
 ### Lecture 2 (Martin ?, 60 minutes, Mon 13:30-13:30)
 
-### Homework (Monday)
+- Enumeration (no pruning...)
+- BKZ, and quality prediction
+- Mounting simple attacks on SIS and LWE
+
+### Homework 1 (Monday)
+
+1. 
+Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
+
+2. 
+Optimize parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
+
 
 ### Lecture 3 (Léo ?, 60 minutes, Tue 11:30-12:30)
 
+Stickelberger Class relation and application to Ideal-SVP
+
 ### Homework (Tuesday)
 
-### Lesson 1 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+### Lab 1 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+
+Implemn of HW 1:
+
+1.
+Make a script that compute the security level in practice
+
+2.
+- Re-optimize the parameters using a script
+- Implement the scheme
 
 ### Homework (Wednsday)
 
-### Lesson 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+### Lab 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
 
 ## Other ##
 
