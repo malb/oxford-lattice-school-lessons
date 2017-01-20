@@ -2,19 +2,16 @@
 
 ## Outline ##
 
-1. Intro to Sage
-2. Constructing (Ring-)LWE instance (matrices, polynomials, cyclotomic rings, conversions)
-3. SIS attack (simple)
-4. BDD attack including pruned enumeration
+(Outline seemed outdated...)
 
 ## Lectures & Labs ##
 
 ### Lecture 1 (Léo, 60 minutes, Mon 11:30-12:30)
 
-Lattice-based Crypto basics:
-- Signatures from lattices
-- Gaussian Sampling: why and how.
-- Check with *Nigel* what he wants to cover
+Signatures from lattices
+- The Hash-then-Sign approach
+- Gaussian Sampling: why (Nguyen-Regev attack) and how
+- The Fiat-Shamir approach
 
 ### Lecture 2 (Martin, 60 minutes, Mon 13:30-13:30)
 
@@ -23,15 +20,16 @@ Lattice-based Crypto basics:
 - Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) 
 - Need to check with *Phong* what he’ll cover
 
-### Homework 1 (Monday)
+### Homework 1 (Tuesday ?)
 
 1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
 2. Optimise parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
 
 Prerequisite: LWE, and LWE-based encryption
 
-### Lecture 3 (Martin & Léo, 60 minutes, Overstreched NTRU)
+### Lecture 3 (Martin & Léo, 60 minutes, ???)
 
+Overstreched NTRU
 - Martin: Lattice-subfield attack
 - Léo: Kirchner-Fouque generalization [KF16]
 
@@ -39,8 +37,7 @@ Prerequisite: LWE, and LWE-based encryption
 
 - Stickelberger Class relation and application to Ideal-SVP
 
-prerequisite : 
-CGS-BS-CDPR attack (Need to check with *Dan*).
+prerequisite : CGS-BS-CDPR attack (Need to check with *Dan*).
 
 ### Lab 1 (Martin+Leo, 120 minutes, Wed 15:00-17:00)
 
