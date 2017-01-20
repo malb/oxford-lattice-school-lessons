@@ -12,31 +12,35 @@
 ### Lecture 1 (Léo, 60 minutes, Mon 11:30-12:30)
 
 Lattice-based Crypto basics:
-- SIS and LWE. 
-- Basic primitive (Encryption, KE, Signature)
+- Signatures from lattices
+- Gaussian Sampling: why and how.
 - Check with *Nigel* what he wants to cover
 
 ### Lecture 2 (Martin, 60 minutes, Mon 13:30-13:30)
 
-- short: Enumeration (no pruning …)
-- short: BKZ, and quality prediction (root Hermite factor, GSA, …)
-- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) [No BDD because not supported in sage yet]
+- [overview/reminder] Finkle-Pohst Enumeration (no pruning …)
+- [overview/reminder] short: BKZ, and quality prediction (root Hermite factor, GSA, …)
+- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) 
 - Need to check with *Phong* what he’ll cover
 
 ### Homework 1 (Monday)
 
 1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
-
 2. Optimise parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
 
-### Lecture 3 (Martin & Léo, Subfields)
+Prerequisite: LWE, and LWE-based encryption
 
-- Martin: subfield attack
-- Léo: KF16
+### Lecture 3 (Martin & Léo, 60 minutes, Overstreched NTRU)
+
+- Martin: Lattice-subfield attack
+- Léo: Kirchner-Fouque generalization [KF16]
 
 ### Lecture 4 (Léo, 60 minutes, Tue 11:30-12:30)
 
-Stickelberger Class relation and application to Ideal-SVP
+- Stickelberger Class relation and application to Ideal-SVP
+
+prerequisite : 
+CGS-BS-CDPR attack (Need to check with *Dan*).
 
 ### Homework (Tuesday)
 
