@@ -42,19 +42,20 @@ Prerequisite: LWE, and LWE-based encryption
 prerequisite : 
 CGS-BS-CDPR attack (Need to check with *Dan*).
 
-### Homework (Tuesday)
-
-Prepare for Lab 1.
-
 ### Lab 1 (Martin+Leo, 120 minutes, Wed 15:00-17:00)
 
 Implem of HW 1:
+1. Implement generation of LWE and SIS instances
 
-1. Make a script that compute the security level in practice
+2. Design and Implementation of LWE Encryption
+  a. Make a script that compute the security level in practice
+  b. Optimize in practice the parameter for the scheme designe in HW 1
+  c. Implement the full scheme: KeyGen, Enc, Dec
 
-2. 
-  - Re-optimize the parameters using a script
-  - Implement the scheme
+3. (opt) Gaussian Sampling
+  a. Implement a Gaussian Sampler of ZZ (arbitrary center)
+  b. Implement the Klein / GPV Gaussian Sampling algorithm
+  c. Implement a full signature scheme, using NTRU-type lattice
 
 ### Homework (Wednesday)
 
@@ -71,11 +72,9 @@ Do it for both BKZ and BKZ2. Compare statitistics
   b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
 
 3. Given an LWE instance, mount the best attack according to the model
-
 4. (opt) Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
-
 5. (opt) Improve the following using more clever stategies
-
+6. (opt) Get your name up there [https://www.latticechallenge.org/lwe_challenge/challenge.php]
 
 ## Other ##
 
