@@ -9,26 +9,32 @@
 
 ## Lectures & Labs ##
 
-### Lecture 1 (Léo ?, 60 minutes, Mon 11:30-12:30)
+### Lecture 1 (Léo, 60 minutes, Mon 11:30-12:30)
 
-Lattice based Crypto basics:
+Lattice-based Crypto basics:
 - SIS and LWE. 
 - Basic primitive (Encryption, KE, Signature)
+- Check with *Nigel* what he wants to cover
 
-### Lecture 2 (Martin ?, 60 minutes, Mon 13:30-13:30)
+### Lecture 2 (Martin, 60 minutes, Mon 13:30-13:30)
 
-- Enumeration (no pruning …)
-- BKZ, and quality prediction (root hermiite factor, GSA, …)
+- short: Enumeration (no pruning …)
+- short: BKZ, and quality prediction (root Hermite factor, GSA, …)
 - Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) [No BDD because not supported in sage yet]
+- Need to check with *Phong* what he’ll cover
 
 ### Homework 1 (Monday)
 
 1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
 
-2. Optimize parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
+2. Optimise parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
 
+### Lecture 3 (Martin & Léo, Subfields)
 
-### Lecture 3 (Léo ?, 60 minutes, Tue 11:30-12:30)
+- Martin: subfield attack
+- Léo: KF16
+
+### Lecture 4 (Léo, 60 minutes, Tue 11:30-12:30)
 
 Stickelberger Class relation and application to Ideal-SVP
 
@@ -36,7 +42,7 @@ Stickelberger Class relation and application to Ideal-SVP
 
 Prepare for Lab 1.
 
-### Lab 1 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+### Lab 1 (Martin+Leo, 120 minutes, Wed 15:00-17:00)
 
 Implem of HW 1:
 
@@ -46,13 +52,13 @@ Implem of HW 1:
   - Re-optimize the parameters using a script
   - Implement the scheme
 
-### Homework (Wednsday)
+### Homework (Wednesday)
 
 Prepare for lab 2.
 
 ### Lab 2 (Martin+Leo, 90 minutes, Wed 15:00-16:30)
 
-1. Experimenting with LLL / BKZ :
+1. Experimenting with LLL / BKZ:
 Measure Root-Hermite factors, plot GS norms, check GSA's validity, measure cost
 Do it for both BKZ and BKZ2. Compare statitistics
 
