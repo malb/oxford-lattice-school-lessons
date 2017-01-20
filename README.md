@@ -17,17 +17,15 @@ Lattice based Crypto basics:
 
 ### Lecture 2 (Martin ?, 60 minutes, Mon 13:30-13:30)
 
-- Enumeration (no pruning...)
-- BKZ, and quality prediction (root hermiite factor, GSA, ...)
+- Enumeration (no pruning …)
+- BKZ, and quality prediction (root hermiite factor, GSA, …)
 - Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) [No BDD because not supported in sage yet]
 
 ### Homework 1 (Monday)
 
-1. 
-Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
+1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
 
-2. 
-Optimize parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
+2. Optimize parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
 
 
 ### Lecture 3 (Léo ?, 60 minutes, Tue 11:30-12:30)
@@ -42,12 +40,11 @@ Prepare for Lab 1.
 
 Implem of HW 1:
 
-1.
-Make a script that compute the security level in practice
+1. Make a script that compute the security level in practice
 
-2.
-- Re-optimize the parameters using a script
-- Implement the scheme
+2. 
+  - Re-optimize the parameters using a script
+  - Implement the scheme
 
 ### Homework (Wednsday)
 
@@ -59,9 +56,9 @@ Prepare for lab 2.
 Measure Root-Hermite factors, plot GS norms, check GSA's validity, measure cost
 Do it for both BKZ and BKZ2. Compare statitistics
 
-2.
-a. Given a SIS instance, mount the best attack according to the model
-b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
+2. 
+  a. Given a SIS instance, mount the best attack according to the model
+  b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
 
 3. Given an LWE instance, mount the best attack according to the model
 
