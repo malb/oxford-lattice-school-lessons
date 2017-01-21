@@ -1,0 +1,856 @@
+#+TITLE: Sage for Lattice-based Cryptography
+#+OPTIONS: H:2 toc:t num:t
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+
+#+LaTeX_CLASS: mbeamer
+
+#+AUTHOR: Martin R. Albrecht and Léo Ducas
+#+EMAIL: martin.albrecht@royalholloway.ac.uk and leo.ducas@cwi.nl
+#+DATE: Oxford Lattice School
+#+STARTUP: beamer indent
+#+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
+
+#+LATEX_HEADER: \usepackage{etoolbox}
+#+LATEX_HEADER: \makeatletter
+#+LATEX_HEADER: \patchcmd{\@verbatim}
+#+LATEX_HEADER:   {\verbatim@font}
+#+LATEX_HEADER:   {\verbatim@font\scriptsize}
+#+LATEX_HEADER:   {}{}
+#+LATEX_HEADER: \makeatother
+#+LATEX_HEADER: \newcommand{\cR}{\ensuremath{\mathcal{R}}\xspace}
+#+LATEX_HEADER: \newcommand{\Z}{\ensuremath{\mathbb Z}\xspace}
+#+LATEX_HEADER: \renewcommand{\C}{\ensuremath{\mathbb C}\xspace}
+#+LATEX_HEADER: \newcommand{\R}{\ensuremath{\mathbb R}\xspace}
+#+LATEX_HEADER: \newcommand{\K}{\ensuremath{\mathbb K}\xspace}
+#+LATEX_HEADER: \renewcommand{\L}{\ensuremath{\mathbb L}\xspace}
+#+LATEX_HEADER: \newcommand{\Q}{\ensuremath{\mathbb Q}\xspace}
+#+LATEX_HEADER: \newcommand{\OK}{\ensuremath{\mathcal O_{\K}}\xspace}
+#+LATEX_HEADER: \newcommand{\OL}{\ensuremath{\mathcal O_{\L}}\xspace}
+
+
+# :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw
+
+* Sage
+** Blurb
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:END:
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.15
+:END:
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :height 0.9\textwidth
+[[./sage-logo.png]]
+#+END_CENTER
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.8
+:END:
+
+***** Sage open-source mathematical software system
+“Creating a viable free open source alternative to Magma, Maple, Mathematica and Matlab.”
+
+***                                                          :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+
+Sage is a free open-source mathematics software system licensed under the GPL. It combines the power of many existing open-source packages into a common Python-based interface.
+
+** How to use it
+
+- command line
+- webapp hosted on your local computer
+- webapp hosted on https://cloud.sagemath.com 
+- embedded on any website
+
+** Python & Cython
+
+#+BEGIN_CENTER
+#+BEAMER: \centering
+#+ATTR_LATEX: :width 0.6\textwidth
+[[./python-and-cython.png]]
+#+END_CENTER
+
+Sage does *not* come with yet-another ad-hoc mathematical programming language, it uses *Python* instead.
+
+- one of the most widely used programming languages (Google, IML, NASA, Dropbox),
+- easy for you to define your own data types and methods on it (bitstreams, lattices, cyclotomic rings),
+- very clean language that results in easy to read code,
+- a *huge number of libraries*: statistics, networking, databases, bioinformatic, physics, video games, 3d graphics, numerical computation (SciPy), and pure mathematic
+- easy to use existing C/C++ libraries from Python (via *Cython*)
+
+** Sage ≠ Python
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.45
+:END:
+
+_Sage_
+
+#+BEGIN_SRC sage
+1/2
+#+END_SRC
+
+#+RESULTS:
+: 1/2
+
+#+BEGIN_SRC sage
+2^3
+#+END_SRC
+
+#+RESULTS:
+: 8
+
+#+BEGIN_SRC sage
+type(2)
+#+END_SRC
+
+#+RESULTS:
+: <type 'sage.rings.integer.Integer'>
+
+#+BEGIN_SRC sage
+type(2r)
+#+END_SRC
+
+#+RESULTS:
+: <type 'int'>
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.45
+:END:
+
+_Python_
+
+#+BEGIN_SRC python :session :exports both
+1/2
+#+END_SRC
+
+#+RESULTS:
+: 0
+
+#+BEGIN_SRC python :session :exports both
+2^3
+#+END_SRC
+
+#+RESULTS:
+: 1
+
+#+BEGIN_SRC python :session :exports both
+type(2)
+#+END_SRC
+
+#+RESULTS:
+: <type 'int'>
+
+** Naive RSA
+:PROPERTIES:
+:BEAMER_OPT: allowframebreaks
+:END:
+
+#+BEGIN_SRC sage
+sage: p, q = random_prime(2^512), random_prime(2^512)
+sage: n = p*q
+sage: ZZn = IntegerModRing(n)
+
+sage: r = (p-1)*(q-1)
+sage: ZZr = IntegerModRing(r)
+
+sage: e = ZZ.random_element(r)
+sage: while gcd(e, r) != 1:
+         e = ZZ.random_element(r)
+#+END_SRC
+
+#+RESULTS:
+
+#+BEAMER: \framebreak{}
+
+#+BEGIN_SRC sage :results verbatim
+sage: type(e)
+#+END_SRC
+
+#+RESULTS:
+: <type 'sage.rings.integer.Integer'>
+
+#+BEGIN_SRC sage
+sage: type(ZZr(e))
+#+END_SRC
+
+#+RESULTS:
+: <type 'sage.rings.finite_rings.integer_mod.IntegerMod_gmp'>
+
+#+BEGIN_SRC sage
+sage: d = ZZr(e)^-1
+sage: m = ZZn.random_element()
+sage: s = m^e
+sage: s^d == m
+#+END_SRC
+
+#+RESULTS:
+: True
+
+** Sage has Algebraic Types
+:PROPERTIES:
+:BEAMER_OPT: allowframebreaks
+:END:
+
+- Objects know the field, ring, group etc. where they live. We say that *elements* know their *parents*:
+
+  #+BEGIN_SRC sage
+sage: parent(2)
+  #+END_SRC
+
+  #+RESULTS:
+  : Integer Ring
+
+  #+BEGIN_SRC sage
+sage: K = GF(3)
+sage: e = K(2)
+sage: parent(e)
+  #+END_SRC
+
+  #+RESULTS:
+  : Finite Field of size 3
+
+#+BEAMER: \framebreak
+
+- Objects follow the rules of their parents:
+
+  #+BEGIN_SRC sage
+sage: 2 + 3
+  #+END_SRC
+
+  #+RESULTS:
+  : 5
+
+  #+BEGIN_SRC sage
+sage: e, f = K(2), K(3)
+sage: e + f
+  #+END_SRC
+
+  #+RESULTS:
+  : 2
+
+  #+BEAMER: \framebreak
+
+- If there is a canonical map between parents it is applied automatically 
+
+  #+BEGIN_SRC sage
+sage: e + 3
+  #+END_SRC
+
+  #+RESULTS:
+  : 2
+
+  #+BEGIN_SRC sage
+sage: v = random_vector(ZZ['x'], 2)
+sage: w = random_vector(GF(7), 2)
+sage: v + w
+  #+END_SRC
+
+  #+RESULTS:
+  : (2*x^2 + 6, 4*x + 5)
+
+- Otherwise, an error is raised:
+
+  #+BEGIN_SRC sage
+sage: L = GF(5)
+sage: K(2) + L(3)
+  #+END_SRC
+
+  #+RESULTS:
+  : TypeError: unsupported operand parent(s) for '+': 
+  : 'Finite Field of size 3' and 'Finite Field of size 5'
+
+  #+BEAMER: \framebreak
+
+- Somewhat annoyingly for lattice-based cryptography, Sage likes to normalise to $[0,\ldots,q-1]$ instead of $[-\lceil q/2 \rceil,\ldots, \lfloor q/2 \rfloor]$
+
+  #+BEGIN_SRC sage
+sage: K = GF(101)
+sage: K(-1)
+  #+END_SRC
+
+  #+RESULTS:
+  : 100
+
+  #+BEGIN_SRC sage
+sage: ZZ(K(-1))
+  #+END_SRC
+
+  #+RESULTS:
+  : 100
+
+  #+BEAMER: \framebreak
+
+#+BEGIN_SRC sage :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw list
+def balance(e, q=None):
+    try:
+        p = parent(e).change_ring(ZZ)
+        return p([balance(e_) for e_ in e])
+    except (TypeError, AttributeError):
+        if q is None:
+            try:
+                q = parent(e).order()
+            except AttributeError:
+                q = parent(e).base_ring().order()
+        return ZZ(e)-q if ZZ(e)>q/2 else ZZ(e)
+
+balance(GF(101)(60))
+balance(random_vector(GF(101), 2))
+balance(PolynomialRing(GF(101), 'x').random_element(degree=3))
+#+END_SRC
+
+#+RESULTS:
+- \(-41\)
+- \(\left(-47,\,31\right)\)
+- \(34x^{3} - 20x^{2} + 11x - 48\)
+
+** Symbolic Manipulation
+
+Symbolic manipulation is also possible
+
+#+BEGIN_SRC sage :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw
+n, alpha, q, epsilon, delta_0 = var("n, alpha, q, epsilon, delta_0")
+assume(alpha<1)
+
+e = alpha*q/sqrt(2*pi) # stddev
+m = 2*n # lattice dimension
+v = e * delta_0^m * q^(n/m)  # norm of the vector
+
+# epsilon = exp(-pi*(|v|^2/q^2)), [RSA:LinPei11]
+f = log(1/epsilon)/pi == (v/q)^2
+
+# solve
+f = f.solve(delta_0**(2*m))[0]
+f = f.log().canonicalize_radical()
+f = f.solve(log(delta_0))[0]
+f.simplify_log()
+#+END_SRC
+
+#+BEGIN_CENTER
+#+RESULTS:
+\(\log\left(\delta_{0}\right) = \frac{\log\left(-\frac{2 \, \log\left(\epsilon\right)}{\alpha^{2} q}\right)}{4 \, n}\)
+#+END_CENTER
+
+** Dense Linear Algebra
+
+#+BEGIN_SRC sage
+sage: for p in (2,3,4,7,8,9,11):
+         K = GF(p, 'a')
+         A = random_matrix(K, 2000, 2000)
+         B = random_matrix(K, 2000, 2000)
+         t = cputime()
+         C = A*B
+         print "%32s %7.3f"%(K,cputime(t))
+#+END_SRC
+
+| Field                           |        Time | Implementation |
+|---------------------------------+-------------+----------------|
+|                                 |         <r> |                |
+| Finite Field of size 2          |     0.008 s | [[https://bitbucket.org/malb/m4rie][M4RI]]           |
+| Finite Field of size 3          |     0.208 s | [[http://www.linalg.org][LinBox]]         |
+| Finite Field in a of size $2^2$ |     0.024 s | [[https://bitbucket.org/malb/m4rie][M4RIE]]          |
+| Finite Field of size 7          |     0.204 s | [[http://www.linalg.org][LinBox]]         |
+| Finite Field in a of size $2^3$ |     0.044 s | [[https://bitbucket.org/malb/m4rie][M4RIE]]          |
+| Finite Field in a of size $3^2$ | *782.044 s* | Naive          |
+| Finite Field of size 11         |     0.212 s | [[http://www.linalg.org][LinBox]]         |
+
+* Lattices
+** Integer Matrices
+
+#+BEGIN_SRC sage
+sage: A = random_matrix(ZZ, 100, 100, x=-2^32, y=2^32)
+sage: A.norm().log(2).n()
+#+END_SRC
+
+#+RESULTS:
+: 35.5104899382539
+
+#+BEGIN_SRC sage
+sage: abs(A.det()).log(2).n()
+#+END_SRC
+
+#+RESULTS:
+: 3380.27922058012
+
+** Bases for q-ary Lattices
+
+#+BEGIN_SRC sage :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw
+m = 5
+q = 101
+A = random_matrix(GF(q), 3, m)
+A.echelonize()
+
+n = A.rank()
+N = A.change_ring(ZZ)
+S = matrix(ZZ, m-n, n).augment(q * identity_matrix(m-n))
+N.stack(S, subdivide=True)
+#+END_SRC
+
+#+RESULTS:
+
+\(\left(\begin{array}{rrrrr}
+1 & 0 & 0 & 3 & 68 \\
+0 & 1 & 0 & 4 & 96 \\
+0 & 0 & 1 & 30 & 16 \\
+\hline
+ 0 & 0 & 0 & 101 & 0 \\
+0 & 0 & 0 & 0 & 101
+\end{array}\right)\)
+
+** Instance Generator
+
+#+BEGIN_SRC sage
+sage: sage.crypto.gen_lattice(m=10, seed=42, type="modular")
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+[11  0  0  0  0  0  0  0  0  0]
+[ 0 11  0  0  0  0  0  0  0  0]
+[ 0  0 11  0  0  0  0  0  0  0]
+[ 0  0  0 11  0  0  0  0  0  0]
+[ 2  4  3  5  1  0  0  0  0  0]
+[ 1 -5 -4  2  0  1  0  0  0  0]
+[-4  3 -1  1  0  0  1  0  0  0]
+[-2 -3 -4 -1  0  0  0  1  0  0]
+[-5 -5  3  3  0  0  0  0  1  0]
+[-4 -3  2 -5  0  0  0  0  0  1]
+#+end_example
+
+** LLL
+
+#+BEGIN_SRC sage
+sage: A = sage.crypto.gen_lattice(m=10, seed=42, type="modular")
+sage: A.LLL(delta=0.99, eta=0.51) # calls fplll
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+[ 0  0  1  1  0 -1 -1 -1  1  0]
+[-1  1  0  1  0  1  1  0  1  1]
+[-1  0  0  0 -1  1  1 -2  0  0]
+[-1 -1  0  1  1  0  0  1  1 -1]
+[ 1  0 -1  0  0  0 -2 -2  0  0]
+[ 2 -1  0  0  1  0  1  0  0 -1]
+[-1  1 -1  0  1 -1  1  0 -1 -2]
+[ 0  0 -1  3  0  0  0 -1 -1 -1]
+[ 0 -1  0 -1  2  0 -1  0  0  2]
+[ 0  1  1  0  1  1 -2  1 -1 -2]
+#+end_example
+
+** BKZ
+
+#+BEGIN_SRC sage
+sage: A = sage.crypto.gen_lattice(m=100, seed=42, q=next_prime(2^20)); A
+#+END_SRC
+
+#+RESULTS:
+: 100 x 100 dense matrix over Integer Ring 
+: (use the '.str()' method to see the entries)
+
+#+BEGIN_SRC sage
+sage: B = A.BKZ(block_size=60, proof=False) # calls fplll's BKZ 2.0
+sage: B[0].norm().log(2).n()
+#+END_SRC
+
+#+RESULTS:
+: 2.26178097802851
+
+** Lattices
+
+Sometimes it is more natural to work with a lattice object directly, instead of a basis matrix[fn:1]
+
+#+BEGIN_SRC sage
+sage: from sage.modules.free_module_integer import IntegerLattice
+sage: A = random_matrix(ZZ, 80, 80, x=-2000, y=2000)
+sage: L = IntegerLattice(A); L
+#+END_SRC
+
+#+RESULTS:
+: Free module of degree 80 and rank 80 over Integer Ring
+: User basis matrix:
+: 80 x 80 dense matrix over Integer Ring
+
+#+BEGIN_SRC sage
+sage: L.shortest_vector().norm().log(2).n()
+#+END_SRC
+
+#+RESULTS:
+: 13.1049884393931
+
+** Discrete Gaussians: Integers
+
+#+BEGIN_SRC sage :file discrete-gaussian-integer.png
+sage: from sage.stats.distributions.discrete_gaussian_integer import \
+  DiscreteGaussianDistributionIntegerSampler
+sage: D = DiscreteGaussianDistributionIntegerSampler(3.2)
+sage: histogram([D() for _ in range(2^16)], color="orange")
+#+END_SRC
+
+#+ATTR_LATEX: :width 0.5\textwidth
+#+RESULTS:
+[[file:discrete-gaussian-integer.png]]
+
+** Discrete Gaussians: Lattices
+
+#+BEGIN_SRC sage
+sage: from sage.stats.distributions.discrete_gaussian_lattice import \
+   DiscreteGaussianDistributionLatticeSampler
+sage: A = random_matrix(ZZ, 2, 2)
+sage: D = DiscreteGaussianDistributionLatticeSampler(A, 20.0)
+sage: S = [D() for _ in range(2^12)]
+sage: l = [vector(v.list() + [S.count(v)]) for v in set(S)]
+sage: list_plot3d(l, point_list=True, interpolation='nn')
+#+END_SRC
+
+#+ATTR_LATEX: :width 0.5\textwidth
+[[./discrete-gaussian-lattice.png]]
+
+** Learning with Errors
+
+#+BEGIN_SRC sage
+sage: from sage.crypto.lwe import LWE
+sage: D = DiscreteGaussianDistributionIntegerSampler(3.2) # stddev
+sage: lwe = LWE(n=10, q=101, D=D)
+sage: a,c = lwe()
+sage: balance(c - a*lwe._LWE__s)
+#+END_SRC
+
+#+RESULTS:
+: -4
+
+** fpylll
+
+#+BEGIN_SRC sage
+sage: from fpylll import *
+sage: A = IntegerMatrix(50, 50)
+sage: A.randomize("ntrulike", bits=50, q=127)
+sage: A[0].norm()
+#+END_SRC
+
+#+RESULTS:
+: 394.37418779631105
+
+#+BEGIN_SRC sage
+sage: M = GSO.Mat(A)
+sage: _ = M.update_gso()
+sage: M.get_mu(1,0)
+#+END_SRC
+
+#+RESULTS:
+: 0.7982010017295588
+
+#+BEGIN_SRC sage
+sage: L = LLL.Reduction(M)
+sage: L()
+sage: M.get_mu(1,0)
+#+END_SRC
+
+#+RESULTS:
+: 0.24
+
+#+BEGIN_SRC sage
+sage: A[0].norm()
+#+END_SRC
+
+#+RESULTS:
+: 5.0
+
+* Rings
+** Polynomial Rings
+:PROPERTIES:
+:BEAMER_OPT: allowframebreaks
+:END:
+
+- Sage has polynomial rings …
+
+  #+BEGIN_SRC sage
+sage: P = ZZ['x']; x = P.gen()
+sage: P = PolynomialRing(ZZ, 'x'); x = P.gen()
+sage: P, x = PolynomialRing(ZZ, 'x').objgen()
+sage: P.<x> = PolynomialRing(ZZ) # not valid Python, Magma-style
+  #+END_SRC
+
+- … over arbitrary rings
+
+  #+BEGIN_SRC sage
+sage: R = PolynomialRing(P, 'y'); R
+sage: R = PolynomialRing(IntegerModRing(100), 'y'); R
+sage: R = PolynomialRing(GF(2^8,'a'), 'x'); R
+  #+END_SRC
+
+  #+RESULTS:
+  : Univariate Polynomial Ring in y over \
+  :   Univariate Polynomial Ring in x over Integer Ring
+  : Univariate Polynomial Ring in y over Ring of integers modulo 100
+  : Univariate Polynomial Ring in x over Finite Field in a of size 2^8
+
+#+BEAMER: \framebreak
+
+- It also supports multivariate polynomial rings
+
+  #+BEGIN_SRC sage
+sage: R = PolynomialRing(QQ, 'x,y'); R
+sage: R.<x,y> = PolynomialRing(QQ); R
+sage: R = PolynomialRing(QQ, 2, 'x'); R
+sage: names = ["x%02d"%i for i in range(3)]
+sage: R = PolynomialRing(IntegerModRing(100), names); R
+  #+END_SRC
+
+  #+RESULTS:
+  : Multivariate Polynomial Ring in x, y over Rational Field
+  : Multivariate Polynomial Ring in x, y over Rational Field
+  : Multivariate Polynomial Ring in x0, x1 over Rational Field
+  : Multivariate Polynomial Ring in x00, x01, x02 \
+  :  over Ring of integers modulo 100
+** Quotient Rings
+
+- You can construct quotient rings:
+
+  #+BEGIN_SRC sage
+sage: P.<x> = PolynomialRing(ZZ)
+sage: Q = P.quotient(x^4 + 1); Q
+  #+END_SRC
+
+  #+RESULTS:
+  : Univariate Quotient Polynomial Ring in xbar \
+  :   over Integer Ring with modulus x^4 + 1
+
+- But I usually don’t bother and do modular reductions “by hand”:
+
+  #+BEGIN_SRC sage
+sage: P.<x> = PolynomialRing(ZZ)
+sage: f = P.random_element(degree=5); f
+sage: f % (x^4 + 1)
+  #+END_SRC
+
+  #+RESULTS:
+  : x^5 + 9*x^4 + x^3 + x^2 + 2
+  : x^3 + x^2 - x - 7
+
+** Number Fields
+
+- Relative and absolute number fields are a thing:
+
+  #+BEGIN_SRC sage
+sage: z = QQ['z'].0
+sage: K = NumberField(z^2 - 2,'s'); K
+  #+END_SRC
+
+  #+RESULTS:
+  : Number Field in s with defining polynomial z^2 - 2
+
+  #+BEGIN_SRC sage
+sage: s = K.0; s
+  #+END_SRC
+
+  #+RESULTS:
+  : s
+
+  #+BEGIN_SRC sage
+sage: s^2
+  #+END_SRC
+
+  #+RESULTS:
+  : 2
+
+** Cyclotomic Number Fields
+
+- Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
+
+  #+BEGIN_SRC sage
+sage: K.<zeta> = CyclotomicField(8)
+sage: OK = K.ring_of_integers()
+sage: K.polynomial()
+  #+END_SRC
+
+  #+RESULTS:
+  : x^4 + 1
+
+** Cyclotomic Number Fields: Subfields
+
+- Let $\L = \Q(ζ_{m'})$ with $m' | m$ be a subfield of $\K$.
+
+- The ring of integers of $\L$ is $\cR' ≃ \Z[X]/(X^{n'} + 1)$ with $n' = m'/2$.
+
+- We write the canonical inclusion $\cR' \subset \cR$ explicitly as $L : \cR' \rightarrow \cR$.
+
+  #+BEGIN_SRC sage
+sage: KK, L = K.subfield(zeta^2)
+sage: zeta_ = KK.gen()
+sage: L(zeta_)
+  #+END_SRC
+
+  #+RESULTS:
+  : zeta^2
+
+** Cyclotomic Number Fields: Galois Group
+
+- $\K$ is a Galois extension of $\Q$, and its Galois group $G$ is isomorphic to $\Z_m^*$: $i \in \Z_m^* \leftrightarrow (X \mapsto X^i) \in G$.
+
+  #+BEGIN_SRC sage
+sage: G = K.galois_group(); G
+  #+END_SRC
+
+  #+RESULTS:
+  : Galois group of Cyclotomic Field of order 8 and degree 4
+
+** Cyclotomic Number Fields: Galois Group
+
+- There is a one-to-one correspondence between the subgroups $G'$ of $G$, and the subfields $\L$ of $\K$.
+- $\L$ is the subfield such that an automorphism of $a \in G$ is the identity on $\L$ if an only if $a \in G'$.
+
+  #+BEGIN_SRC sage
+sage: G_ = [a for a in G if a(zeta_) == zeta_]
+sage: G_ = G.subgroup(G_); G_
+  #+END_SRC
+
+  #+RESULTS:
+  : Subgroup [(), (1,3)(2,4)] of Galois group of \
+  :   Cyclotomic Field of order 8 and degree 4
+
+** Cyclotomic Number Fields: Norms
+
+- The norm $\Norm_{\K/\L}: \K \rightarrow \L$ is the multiplicative map defined by \[\Norm_{\K/\L} : f \mapsto  \prod_{\psi \in G'} \psi(f).\]
+
+  #+BEGIN_SRC sage
+sage: f = OK.random_element(); f
+  #+END_SRC
+
+  #+RESULTS:
+  : -10*zeta^3 + 2*zeta + 28
+
+  #+BEGIN_SRC sage
+sage: f.norm(KK) == prod([a(f) for a in G_])
+  #+END_SRC
+
+  #+RESULTS:
+  : True
+
+  #+BEGIN_SRC sage
+sage: ff = f.norm(KK);
+sage: ff, L(ff)
+  #+END_SRC
+
+  #+RESULTS:
+  : (96*zeta0 + 744, 96*zeta^2 + 744)
+
+** Cyclotomic Number Fields: Lattices
+
+- Converting number field elements to matrices/lattice bases:
+
+  #+BEGIN_SRC sage
+sage: from sage.modules.free_module_integer import IntegerLattice
+sage: f
+sage: IntegerLattice(f).basis_matrix()
+  #+END_SRC
+
+  #+RESULTS:
+  : -10*zeta^3 + 2*zeta + 28
+  : 
+  : [ 28   2   0 -10]
+  : [ 10  28   2   0]
+  : [  0  10  28   2]
+  : [ -2   0  10  28]
+ 
+- We can use this to find small elements
+
+  #+BEGIN_SRC sage
+sage: K = CyclotomicField(128)
+sage: OK = K.ring_of_integers()
+sage: f = OK.random_element(x=-128, y=128)
+sage: L = IntegerLattice(f)
+sage: _ = L.BKZ(block_size=50, proof=False)
+sage: L.shortest_vector().norm().log(2).n()
+  #+END_SRC
+
+  #+RESULTS:
+  : 9.23365749434346
+
+** Cyclotomic Number Fields: Class Group
+
+- The first Cyclotomic field with $m=2^k$ and a non-trivial class group is $m=2^6$.
+
+  #+BEGIN_SRC sage
+sage: K.<zeta> = CyclotomicField(2^6)
+sage: K.class_number(proof=False)
+  #+END_SRC
+
+  #+RESULTS:
+  : 17
+
+** Fin
+
+#+BEGIN_CENTER
+@@beamer:{\Huge@@ *Thank You* @@beamer:}@@
+#+END_CENTER
+
+* Footnotes
+
+[fn:1] Lattices are still represented by bases, though.
+
+* Build Artefacts                                                     :noexport:
+
+** Emacs Config
+
+#+BEGIN_SRC emacs-lisp :tangle .dir-locals.el
+((magit-mode .
+             ((eval .
+                    (and
+                     (visual-line-mode 1)))))
+ (bibtex-mode . ((fill-column . 10000)))
+ (org-mode .
+           ((org-tags-column . -80)
+            (eval .
+                  (and
+                   (flyspell-mode t))))))
+#+END_SRC
+
+** Makefile
+
+#+BEGIN_SRC makefile :tangle Makefile
+EMACS=emacs
+EMACSFLAGS=--batch -l ~/.emacs.d/org-export-init.el
+LATEXMK=latexmk
+LATEXMKFLAGS=-xelatex
+
+%.pdf: %.tex
+	$(LATEXMK) $(LATEXMKFLAGS) $<
+
+%.tex: %.org
+	$(EMACS) $(EMACSFLAGS) $< -f org-latex-export-to-latex
+
+clean:
+	rm -f *.bbl *.aux *.out *.synctex.gz *.log *.run.xml *.blg *-blx.bib *.fdb_latexmk *.fls *.toc *.vrb *.snm *.nav
+
+.PHONY: clean all
+.PRECIOUS: %.tex
+#+END_SRC
+
+** Autoexport to PDF
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
+# End:
