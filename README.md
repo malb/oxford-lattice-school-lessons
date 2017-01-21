@@ -2,55 +2,57 @@
 
 ## Outline ##
 
-1. Intro to Sage
-2. Constructing (Ring-)LWE instance (matrices, polynomials, cyclotomic rings, conversions)
-3. SIS attack (simple)
-4. BDD attack including pruned enumeration
+(Outline seemed outdated...)
 
 ## Lectures & Labs ##
 
 ### Lecture 1 (Léo, 60 minutes, Mon 11:30-12:30)
 
-Lattice-based Crypto basics:
-- SIS and LWE. 
-- Basic primitive (Encryption, KE, Signature)
-- Check with *Nigel* what he wants to cover
+Signatures from lattices
+- The Hash-then-Sign approach
+- Gaussian Sampling: why (Nguyen-Regev attack) and how
+- The Fiat-Shamir approach
 
 ### Lecture 2 (Martin, 60 minutes, Mon 13:30-13:30)
 
-- short: Enumeration (no pruning …)
-- short: BKZ, and quality prediction (root Hermite factor, GSA, …)
-- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) [No BDD because not supported in sage yet]
+- [overview/reminder] Finkle-Pohst Enumeration (no pruning …)
+- [overview/reminder] short: BKZ, and quality prediction (root Hermite factor, GSA, …)
+- Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) 
 - Need to check with *Phong* what he’ll cover
 
-### Homework 1 (Monday)
+### Homework 1 (Tuesday ?)
 
 1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
-
 2. Optimise parameter simple 1-bit enc scheme based on LWE (uniform error, perfect correctness)
 
-### Lecture 3 (Martin & Léo, Subfields)
+Prerequisite: LWE, and LWE-based encryption
 
-- Martin: subfield attack
-- Léo: KF16
+### Lecture 3 (Martin & Léo, 60 minutes, ???)
+
+Overstreched NTRU
+- Martin: Lattice-subfield attack
+- Léo: Kirchner-Fouque generalization [KF16]
 
 ### Lecture 4 (Léo, 60 minutes, Tue 11:30-12:30)
 
-Stickelberger Class relation and application to Ideal-SVP
+- Stickelberger Class relation and application to Ideal-SVP
 
-### Homework (Tuesday)
-
-Prepare for Lab 1.
+prerequisite : CGS-BS-CDPR attack (Need to check with *Dan*).
 
 ### Lab 1 (Martin+Leo, 120 minutes, Wed 15:00-17:00)
 
 Implem of HW 1:
+1. Implement generation of LWE and SIS instances
 
-1. Make a script that compute the security level in practice
+2. Design and Implementation of LWE Encryption
+  a. Make a script that compute the security level in practice
+  b. Optimize in practice the parameter for the scheme designe in HW 1
+  c. Implement the full scheme: KeyGen, Enc, Dec
 
-2. 
-  - Re-optimize the parameters using a script
-  - Implement the scheme
+3. (opt) Gaussian Sampling
+  a. Implement a Gaussian Sampler of ZZ (arbitrary center)
+  b. Implement the Klein / GPV Gaussian Sampling algorithm
+  c. Implement a full signature scheme, using NTRU-type lattice
 
 ### Homework (Wednesday)
 
@@ -67,11 +69,9 @@ Do it for both BKZ and BKZ2. Compare statitistics
   b. (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
 
 3. Given an LWE instance, mount the best attack according to the model
-
 4. (opt) Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
-
 5. (opt) Improve the following using more clever stategies
-
+6. (opt) Get your name up there [https://www.latticechallenge.org/lwe_challenge/challenge.php]
 
 ## Other ##
 
