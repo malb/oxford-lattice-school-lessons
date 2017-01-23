@@ -938,6 +938,9 @@ sage: L.shortest_vector().norm().log(2).n()
   : 9.23365749434346
 
 ** Fin
+:PROPERTIES:
+:BEAMER_OPT: standout
+:END:
 
 #+BEGIN_CENTER
 @@beamer:{\Huge@@ *Thank You* @@beamer:}@@
