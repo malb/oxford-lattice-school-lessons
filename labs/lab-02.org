@@ -13,22 +13,22 @@
 #+AUTHOR: Martin R. Albrecht and Léo Ducas
 #+DATE: March 23, 2017
 
-In this lab, we will make intensive use of =fplll=[fn:1] and =fpylll=[fn:2]. Fplll is a C++11 library for operations on lattices using floating point arithmetic. It implements Gram-Schmidt orthogonalisation, LLL, BKZ, BKZ 2.0 footfullcite:AC:CheNgu11, Slide reduction footfullcite:STOC:GamNgu08 and Self-Dual BKZ footfullcite:EPRINT:MicWal15.
+In this lab, we will make intensive use of Fplll[fn:1] and Fpylll[fn:2]. Fplll is a C++11 library for operating on lattices using floating point arithmetic. It implements Gram-Schmidt orthogonalisation, LLL, BKZ, BKZ 2.0 footfullcite:AC:CheNgu11, Slide reduction footfullcite:STOC:GamNgu08 and Self-Dual BKZ footfullcite:EPRINT:MicWal15.
 
-Fpylll is a Python wrapper and extension of fplll, making its data structures and algorithms available in Python and Sage (7.4 and greater). It also (re-)implements some algorithms in Python to make their internals easily accessible, a feature we will make use of.
+Fpylll is a Python wrapper and extension of Fplll, making its data structures and algorithms available in Python and Sage (7.4 and greater). It also (re-)implements some algorithms in Python to make their internals easily accessible, a feature we will make use of.
 
-Note that both =fplll= and =fpylll= are evolving software projects. In particular, the current development versions of either library offer improvements not yet included in the latest stable released shipped with Sage. Thus, using =fpylll= from within Sage and compiling your own version outside of Sage from GitHub will be different. We recommend, if at all possible, to use the latest development version.[fn:3]
+*Note:* Both Fplll and Fpylll are evolving software projects. In particular, the current development versions of either library offer improvements over the latest stable released shipped with Sage. Thus, using Fpylll from within Sage and compiling your own version outside of Sage from GitHub will be different. We recommend, if at all possible, to use the latest development version.[fn:3]
 
-Both libraries being evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!
+That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome![fn:4]
 
 * 1 — Introduction
 :PROPERTIES:
 :tangle: lab-02-fpylll.py
 :END:
 
-In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in =fpylll=. We start with a little tutorial on how to use this library.
+In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
-We first import the =fpylll= API into the main namespace of Sage:
+To start, we first import the =fpylll= API into Sage’s main namespace:
 
 #+BEGIN_SRC sage
 from fpylll import *
@@ -38,7 +38,7 @@ from fpylll import *
 
 ** Integer Matrices
 
-We generate a \(q\)-ary lattice of dimension 100 and determinant $q^50$ where $q$ is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
+To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant $q^{50}$ where $q$ is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
 #+BEGIN_SRC sage
 set_random_seed(1337)
@@ -47,18 +47,20 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 
 #+RESULTS:
 
+*Reminder:* Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.[fn:5]
+
 ** Gram-Schmidt Orthogonalisation
 
-To run LLL we have two choices. We can either run the high-level =LLL.reduction()= function or we can create the appropriate hierarchy of objects “by hand”. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. That is, algorithms are represented by objects with which we can interact. We, hence, first create a =MatGSO= object, which takes care of computing the Gram-Schmidt orthogonalisation. 
+To run LLL we have two choices. We can either run the high-level =LLL.reduction()= function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a =MatGSO= object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
 A =MatGSO= object stores the following information:
 
-- The integral basis =B=,
-- the Gram-Schmidt coefficients \(μ_{i,j} = `⟨b_i, b^*_j⟩ / ||b^*_j||^2\) for \(i>j\),
+- An integral basis =B=,
+- the Gram-Schmidt coefficients \(μ_{i,j} = ⟨b_i, b^*_j⟩ / \|b^*_j\|^2\) for \(i>j\),
 - the coefficients \(r_{i,i} = ⟨b^*_i, b^*_i⟩\) and
 - the coefficients \(r_{i,j} = ⟨b_i, b^*_j⟩ = μ_{i,j} ⋅ r_{j,j}  \) for \(i>j\)
 
-It holds that: $A = R × Q = (μ × D) × (D^{-1} × B^*)$ where $Q$ is orthonormal and $R$ is lower triangular.
+It holds that: $B = R × Q = (μ × D) × (D^{-1} × B^*)$ where $Q$ is orthonormal, $R$ is lower triangular and $B^*$ is the Gram-Schmidt orthogonalisation.
 
 We choose the floating point type (≈ bits of precision) used to represent the Gram-Schmidt coefficients as native =double=, which is fastest and fine up to dimension 170 or so. If you choose =mpfr= for arbitrary precision, you must call =set_precision(prec)= before constructing your object =M=, i.e. precision is global!
 
@@ -75,7 +77,7 @@ M.get_r(0,0)
 #+END_SRC
 
 #+RESULTS:
-: 6.9162853575994e-310
+: 0.0
 
 To get meaningful results, we need to trigger the appropriate computation. To compute the complete GSO, run:
 
@@ -99,7 +101,7 @@ A[0].norm()^2
 
 ** LLL
 
-We can now create an LLL object which operators on GSO objects. All operations perform end on GSO objects, e.g. =M=, are automatically also applied to the underlying integer matrix, e.g. =A=.
+We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. =M=, are automatically also applied to the underlying integer matrix, e.g. =A=.
 
 #+BEGIN_SRC sage
 L = LLL.Reduction(M, delta=0.99, eta=0.501, flags=LLL.VERBOSE)
@@ -154,9 +156,18 @@ all([abs(M.get_mu(i,j)) <= 0.501 for i in range(M.d) for j in range(i)])
 #+RESULTS:
 : True
 
+We also want to check in on =A=:
+
+#+BEGIN_SRC sage
+A[0].norm()^2
+#+END_SRC
+
+#+RESULTS:
+: 13340327827.0
+
 ** BKZ
 
-Calling BKZ works similarly: there is a high-level function =BKZ.reduction()= and a BKZ object =BKZ.Reduction=. However, in addition there are also several implementations of the BKZ algorithm in =fpylll.algorithms=.[fn:4] These are re-implementations in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:5]
+Calling BKZ works similarly: there is a high-level function =BKZ.reduction()= and a BKZ object =BKZ.Reduction=. However, in addition there are also several implementations of the BKZ algorithm in =fpylll.algorithms=.[fn:6] These are re-implementations in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:7]
 
 #+BEGIN_SRC sage
 from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
@@ -182,7 +193,7 @@ param = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 
 #+RESULTS:
 
-The parameter =strategies= takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in =BKZ.DEFAULT_STRATEGY= were computed using fplll’s =strategizer=.[fn:6]
+The parameter =strategies= takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in =BKZ.DEFAULT_STRATEGY= were computed using fplll’s =strategizer=.[fn:8]
 
 #+BEGIN_SRC sage
 BKZ.DEFAULT_STRATEGY
@@ -253,7 +264,7 @@ line(zip(range(10),prime_range(30)), color="lightgrey", dpi=300r)
 #+RESULTS:
 [[file:line-plot-sage.png]]
 
-In vanilla Python, you can use matplotlib[fn:7]
+In vanilla Python, you can use matplotlib[fn:9]
 
 #+BEGIN_SRC sage :results none
 import matplotlib.pyplot as plt
@@ -302,15 +313,19 @@ https://www.latticechallenge.org/lwe_challenge/challenge.php
 
 [fn:3] You can install the latest development versions of fplll/fpylll into Sage as well, if you run Sage locally, i.e. not on https://sagemath.com
 
-[fn:4] We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” https://www.python.org/dev/peps/pep-0020/
+[fn:4] https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md
 
-[fn:5] Check out https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple_bkz.py for a simple implementation of BKZ.
+[fn:5] https://doc.sagemath.org/html/en/tutorial/tour_help.html
 
-[fn:6] https://github.com/fplll/strategizer
+[fn:6] We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” https://www.python.org/dev/peps/pep-0020/
 
-[fn:7] http://matplotlib.org
+[fn:7] Check out https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple_bkz.py for a simple implementation of BKZ.
 
+[fn:8] https://github.com/fplll/strategizer
+
+[fn:9] http://matplotlib.org
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-latex-export-to-latex))) nil t)
 # End:
+
