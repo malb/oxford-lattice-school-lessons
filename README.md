@@ -6,14 +6,14 @@
 
 ## Lectures & Labs ##
 
-### Lecture 1 (Léo, 60 minutes, Mon 11:30-12:30)
+### Lecture 1 (Léo, 60 minutes, Mon)
 
 Signatures from lattices
 - The Hash-then-Sign approach
 - Gaussian Sampling: why (Nguyen-Regev attack) and how
 - The Fiat-Shamir approach
 
-### Lecture 2 (Martin, 60 minutes, Mon 13:30-13:30)
+### Lecture 2 (Martin, 60 minutes, Wed)
 
 - [overview/reminder] Finkle-Pohst Enumeration (no pruning …)
 - [overview/reminder] short: BKZ, and quality prediction (root Hermite factor, GSA, …)
@@ -21,26 +21,14 @@ Signatures from lattices
 - Finding $m$ is an exercise
 - Need to check with *Phong* what he’ll cover
 
-### Homework 1 (Tuesday ?)
-
-1. Given LWE/SIS parameters and a simple cost model for BKZ, predict security level asymptotics
-2. [signatures]
-
-Prerequisite: LWE, and LWE-based encryption
-
-### Lecture 3 (Martin & Léo, 60 minutes, ???)
+### Lecture 3 (Martin & Léo, 60 minutes, Thu)
 
 Overstreched NTRU
+
 - Martin: Lattice-subfield attack
 - Léo: Kirchner-Fouque generalization [KF16]
 
-### Lecture 4 (Léo, 60 minutes, Tue 11:30-12:30)
-
-- Stickelberger Class relation and application to Ideal-SVP
-
-prerequisite : CGS-BS-CDPR attack (Need to check with *Dan*).
-
-### Lab 1: Constructions (Martin+Léo, 120 minutes, Wed 15:00-17:00)
+### Lab 1: Constructions (Martin+Léo, 120 minutes, Wed)
 
 - Sage lecture (introduction.org)
 
@@ -54,11 +42,7 @@ prerequisite : CGS-BS-CDPR attack (Need to check with *Dan*).
   b. Implement a full signature scheme, using NTRU-type lattice
   c. Implement FFT GPV Gaussian Sampling algorithm
 
-### Homework (Wednesday)
-
-Prepare for lab 2.
-
-### Lab 2: Attacks (Martin+Leo, 90 minutes, Wed 15:00-16:30)
+### Lab 2: Attacks (Martin+Léo, 120 minutes, Thu)
 
 - Fpylll lecture
 
@@ -74,6 +58,12 @@ Do it for both BKZ and BKZ2. Compare statistics
 4. (opt) Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 5. (opt) Improve the following using more clever strategies
 6. (opt) Get your name up there [https://www.latticechallenge.org/lwe_challenge/challenge.php]
+
+### Lecture 4 (Léo, 60 minutes, Fri)
+
+- Stickelberger Class relation and application to Ideal-SVP
+
+prerequisite : CGS-BS-CDPR attack (Need to check with *Dan*).
 
 ## Other ##
 
