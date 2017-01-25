@@ -167,7 +167,13 @@ A[0].norm()^2
 
 ** BKZ
 
-Calling BKZ works similarly: there is a high-level function =BKZ.reduction()= and a BKZ object =BKZ.Reduction=. However, in addition there are also several implementations of the BKZ algorithm in =fpylll.algorithms=.[fn:6] These are re-implementations in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:7]
+Calling BKZ works similarly: there is a high-level function =BKZ.reduction()= and a BKZ object =BKZ.Reduction=. However, in addition there are also several implementations[fn:6] of the BKZ algorithm in 
+
+#+BEGIN_EXAMPLE
+fpylll.algorithms
+#+END_EXAMPLE
+
+These are re-implementations of BKZ-syle algorithms in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:7]
 
 #+BEGIN_SRC sage
 from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
@@ -184,11 +190,11 @@ BKZ 2.0 takes a lot of parameters, such as:
 + =auto_abort= :: heuristic, stop when the average slope of \(\log(\|b_i^*\|)\) does not decrease fast enough
 + =gh_factor= :: heuristic, if set then the enumeration bound will be set to this factor times the Gaussian Heuristic.
 
-It gets old fast passing these around one-by-one. Thus, =fplll= and =fpylll= introduce an object =BKZ.Param= to collect such parameters:
+It gets old fast passing these around one-by-one. Thus, Fplll and Fpylll introduce an object =BKZ.Param= to collect such parameters:
 
 #+BEGIN_SRC sage
 flags = BKZ.VERBOSE|BKZ.AUTO_ABORT|BKZ.MAX_LOOPS|BKZ.GH_BND
-param = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
+par = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 #+END_SRC
 
 #+RESULTS:
@@ -213,7 +219,7 @@ Finally, let’s call BKZ-60 on our example lattice:
 bkz = BKZ2(A) # or
 bkz = BKZ2(GSO.Mat(A)) # or 
 bkz = BKZ2(LLL.Reduction(GSO.Mat(A)))
-bkz(param)
+bkz(par)
 #+END_SRC
 
 #+RESULTS:
@@ -233,19 +239,15 @@ bkz(param)
 
 * 2 — Experimenting with LLL / BKZ
 
-In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in =fpylll=
+In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 ** root-Hermite factors
 
-Experimentally measure root-Hermite factors \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) for 
-- LLL \(δ_0≈1.0219\) and 
-- BKZ (2.0) \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}\]
+Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where $\delta_0$ is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 ** GS norms
 
-Running several tours of BKZ (2.0) plot (the logs of) the Gram-Schmidt norms after each tour.
-
-You have several options to accomplish this result:
+Running several tours of BKZ (2.0) plot (the logs of) the norms of Gram-Schmidt vectors after each tour. You have several options to accomplish this result:
 
 - Check out the =dump_gso_filename= option for =BKZ.Param=.
 

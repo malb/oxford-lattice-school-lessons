@@ -1,4 +1,4 @@
-% Created 2017-01-25 Wed 18:29
+% Created 2017-01-25 Wed 18:35
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,a4paper]{tufte-handout}
 \usepackage{fontspec}
@@ -63,7 +63,7 @@ Fpylll is a Python wrapper and extension of Fplll, making its data structures an
 That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!\footnote{\url{https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md}}
 
 \section{1 — Introduction}
-\label{sec:org021ceea}
+\label{sec:org33cf1d8}
 In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
 To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
@@ -74,7 +74,7 @@ from fpylll import *
 \end{lstlisting}
 
 \subsection{Integer Matrices}
-\label{sec:orga36546e}
+\label{sec:org3c42bd5}
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant \(q^{50}\) where \(q\) is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
@@ -87,7 +87,7 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 \textbf{Reminder:} Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.\footnote{\url{https://doc.sagemath.org/html/en/tutorial/tour\_help.html}}
 
 \subsection{Gram-Schmidt Orthogonalisation}
-\label{sec:orgd5ab1d5}
+\label{sec:org354a7af}
 
 To run LLL we have two choices. We can either run the high-level \texttt{LLL.reduction()} function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a \texttt{MatGSO} object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
@@ -145,7 +145,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{LLL}
-\label{sec:org2b7a631}
+\label{sec:org33c09ec}
 
 We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. \texttt{M}, are automatically also applied to the underlying integer matrix, e.g. \texttt{A}.
 
@@ -214,9 +214,15 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{BKZ}
-\label{sec:org5d287e9}
+\label{sec:orge0183a0}
 
-Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations of the BKZ algorithm in \texttt{fpylll.algorithms}.\footnote{We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” \url{https://www.python.org/dev/peps/pep-0020/}} These are re-implementations in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:\footnote{Check out \url{https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple\_bkz.py} for a simple implementation of BKZ.}
+Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations\footnote{We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” \url{https://www.python.org/dev/peps/pep-0020/}} of the BKZ algorithm in 
+
+\begin{verbatim}
+fpylll.algorithms
+\end{verbatim}
+
+These are re-implementations of BKZ-syle algorithms in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:\footnote{Check out \url{https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple\_bkz.py} for a simple implementation of BKZ.}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -234,12 +240,12 @@ BKZ 2.0 takes a lot of parameters, such as:
 \item[{\texttt{gh\_factor}}] heuristic, if set then the enumeration bound will be set to this factor times the Gaussian Heuristic.
 \end{description}
 
-It gets old fast passing these around one-by-one. Thus, \texttt{fplll} and \texttt{fpylll} introduce an object \texttt{BKZ.Param} to collect such parameters:
+It gets old fast passing these around one-by-one. Thus, Fplll and Fpylll introduce an object \texttt{BKZ.Param} to collect such parameters:
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 flags = BKZ.VERBOSE|BKZ.AUTO_ABORT|BKZ.MAX_LOOPS|BKZ.GH_BND
-param = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
+par = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 \end{lstlisting}
 
 The parameter \texttt{strategies} takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in \texttt{BKZ.DEFAULT\_STRATEGY} were computed using fplll’s \texttt{strategizer}.\footnote{\url{https://github.com/fplll/strategizer}}
@@ -265,7 +271,7 @@ Finally, let’s call BKZ-60 on our example lattice:
 bkz = BKZ2(A) # or
 bkz = BKZ2(GSO.Mat(A)) # or 
 bkz = BKZ2(LLL.Reduction(GSO.Mat(A)))
-bkz(param)
+bkz(par)
 \end{lstlisting}
 
 \begin{verbatim}
@@ -285,25 +291,19 @@ False
 \end{verbatim}
 
 \section{2 — Experimenting with LLL / BKZ}
-\label{sec:orgac3a93f}
+\label{sec:org62efda5}
 
-In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in \texttt{fpylll}
+In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 \subsection{root-Hermite factors}
-\label{sec:org537a7f1}
+\label{sec:org17a1802}
 
-Experimentally measure root-Hermite factors \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) for 
-\begin{itemize}
-\item LLL \(δ_0≈1.0219\) and
-\item BKZ (2.0) \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}\]
-\end{itemize}
+Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 \subsection{GS norms}
-\label{sec:org15d0a26}
+\label{sec:org0f58048}
 
-Running several tours of BKZ (2.0) plot (the logs of) the Gram-Schmidt norms after each tour.
-
-You have several options to accomplish this result:
+Running several tours of BKZ (2.0) plot (the logs of) the norms of Gram-Schmidt vectors after each tour. You have several options to accomplish this result:
 
 \begin{itemize}
 \item Check out the \texttt{dump\_gso\_filename} option for \texttt{BKZ.Param}.
@@ -343,12 +343,12 @@ plt.close()
 \end{center} 
 
 \subsection{GSA}
-\label{sec:org29d8621}
+\label{sec:org8ef7940}
 
 Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[bla \] where \(n\) is the dimension of the lattice. Check how well this assumption holds for various block sizes of BKZ and BKZ 2.0.
 
 \subsection{Costs}
-\label{sec:org4879458}
+\label{sec:org532b48b}
 
 \begin{itemize}
 \item Measure cost
@@ -357,7 +357,7 @@ Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-
 \end{itemize}
 
 \section{3 — Dual Attack}
-\label{sec:orgfd50a88}
+\label{sec:orgc4ccf27}
 
 \begin{itemize}
 \item Given a SIS instance, mount the best attack according to the model
@@ -366,15 +366,15 @@ Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-
 \end{itemize}
 
 \section{4 — Primal Attack}
-\label{sec:org445b16b}
+\label{sec:org0f652f8}
 
 \section{5 — Pruned Enumeration}
-\label{sec:org3c6f3f8}
+\label{sec:org75a2cce}
 
 Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
 \section{6 — Lattice Challenge}
-\label{sec:org7e7bb0d}
+\label{sec:org5d4995b}
 
 \url{https://www.latticechallenge.org/lwe\_challenge/challenge.php}
 \end{document}
