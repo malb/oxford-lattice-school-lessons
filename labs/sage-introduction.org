@@ -946,52 +946,16 @@ sage: L.shortest_vector().norm().log(2).n()
 @@beamer:{\Huge@@ *Thank You* @@beamer:}@@
 #+END_CENTER
 
-* Build Artefacts                                                     :noexport:
-
-** Emacs Config
-
-#+BEGIN_SRC emacs-lisp :tangle .dir-locals.el
-((magit-mode .
-             ((eval .
-                    (and
-                     (visual-line-mode 1)))))
- (bibtex-mode . ((fill-column . 10000)))
- (org-mode .
-           ((org-tags-column . -80)
-            (eval .
-                  (and
-                   (flyspell-mode t))))))
-#+END_SRC
-
-** Makefile
-
-#+BEGIN_SRC makefile :tangle Makefile
-EMACS=emacs
-EMACSFLAGS=--batch -l ~/.emacs.d/org-export-init.el
-LATEXMK=latexmk
-LATEXMKFLAGS=-xelatex
-
-%.pdf: %.tex
-	$(LATEXMK) $(LATEXMKFLAGS) $<
-
-%.tex: %.org
-	$(EMACS) $(EMACSFLAGS) $< -f org-latex-export-to-latex
-
-clean:
-	rm -f *.bbl *.aux *.out *.synctex.gz *.log *.run.xml *.blg *-blx.bib *.fdb_latexmk *.fls *.toc *.vrb *.snm *.nav
-
-.PHONY: clean all
-.PRECIOUS: %.tex
-#+END_SRC
-
-** Autoexport to PDF
-
 * Footnotes
 
 [fn:1] On SMC you have the choice between “Sage Worksheet” and “Jupyter Notebook”. We recommend the latter.
 
 [fn:2] Lattices are still represented by bases, though.
 
+* Build Artefacts                                                     :noexport:
+** Autoexport to PDF
+
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
 # End:
+
