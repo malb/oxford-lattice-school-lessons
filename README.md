@@ -30,11 +30,13 @@ Overstreched NTRU
 
 ### Lab 1: Constructions (Martin+Léo, 120 minutes, Wed)
 
-- Sage lecture (introduction.org)
+- Léo
+
+- Sage lecture (Martin)
 
 1. Design and Implementation of LWE Encryption
   a. Make a script that compute the security level in practice
-  b. Optimize in practice the parameter for the scheme designe in HW 1
+  b. Optimise in practice the parameter for the scheme design
   c. Implement the full scheme: KeyGen, Enc, Dec
 
 2. (opt) Gaussian Sampling
@@ -44,7 +46,9 @@ Overstreched NTRU
 
 ### Lab 2: Attacks (Martin+Léo, 120 minutes, Thu)
 
-- Fpylll lecture
+- Martin
+
+- Fpylll lecture (Martin)
 
 1. Experimenting with LLL / BKZ:
 Measure Root-Hermite factors, plot GS norms, check GSA's validity, measure cost
