@@ -1,4 +1,4 @@
-% Created 2017-01-27 Fri 14:33
+% Created 2017-01-27 Fri 15:47
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,a4paper,nobib]{tufte-handout}
 \usepackage{fontspec}
@@ -43,7 +43,7 @@ pdfauthor={Martin R. Albrecht and Léo Ducas},
 pdftitle={Lab 2},
 pdfkeywords={},
 pdfsubject={},
-pdfcreator={Emacs 25.1.1 (Org mode 9.0.3)},
+pdfcreator={Emacs 25.1.1 (Org mode 9.0.4)},
 pdflang={English},
 colorlinks,
 citecolor=gray,
@@ -63,7 +63,7 @@ Fpylll is a Python wrapper and extension of Fplll, making its data structures an
 That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!\footnote{\url{https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md}}
 
 \section{Introduction}
-\label{sec:orgc87df07}
+\label{sec:org5641436}
 In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
 To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
@@ -73,8 +73,10 @@ To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
 from fpylll import *
 \end{lstlisting}
 
+\textbf{Note} by calling \texttt{from fpylll import *} we overwite Sage’s own \texttt{set\_random\_seed}. You can still call it as \texttt{sage.all.set\_random\_seed}.
+
 \subsection{Integer Matrices}
-\label{sec:orgafa4577}
+\label{sec:org032a75a}
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant \(q^{50}\) where \(q\) is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
@@ -87,7 +89,7 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 \textbf{Reminder:} Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.\footnote{\url{https://doc.sagemath.org/html/en/tutorial/tour\_help.html}}
 
 \subsection{Gram-Schmidt Orthogonalisation}
-\label{sec:org4c2955b}
+\label{sec:org2f73f67}
 
 To run LLL we have two choices. We can either run the high-level \texttt{LLL.reduction()} function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a \texttt{MatGSO} object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
@@ -145,7 +147,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{LLL}
-\label{sec:org79ed09a}
+\label{sec:orgebd1d82}
 
 We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. \texttt{M}, are automatically also applied to the underlying integer matrix, e.g. \texttt{A}.
 
@@ -214,7 +216,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{BKZ}
-\label{sec:org10cb712}
+\label{sec:org976bef7}
 
 Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations of the BKZ algorithm in 
 
@@ -291,17 +293,17 @@ i & time & r\(_{\text{0}}\)\\
 \end{center}
 
 \section{Lattice Reduction}
-\label{sec:orgc4eec58}
+\label{sec:orgc0dedeb}
 
 In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 \subsection{root-Hermite factors}
-\label{sec:org2eb6057}
+\label{sec:org64287fd}
 
-Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
+Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org8974ebc}
+\label{sec:orgb889322}
 
 Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \Vol(L)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where \(m\) is the dimension of the lattice, we get \(α = δ^{-2m/(m-1)}\).\footfullcite{RSA:LinPei11} Check how well this assumption holds for various block sizes of BKZ.
 
@@ -344,46 +346,45 @@ plt.close()
 \end{center} 
 
 \section{Dual Attack}
-\label{sec:org17c835d}
+\label{sec:org986edcd}
 
 In this exercise, you are asked to break a decision-LWE instance using the dual lattice attack.
 
-\begin{enumerate}
-\item Given samples from 
+That is, assume you are given access to an lWE oracle such as
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
-  from sage.la
+from sage.crypto.lwe import LindnerPeikert
+lwe = LindnerPeikert(50)
 \end{lstlisting}
+
+\begin{enumerate}
+\item Establish the BKZ block size required to distinguish with an advantage of, say, 60\%.\footfullcite{RSA:LinPei11}
+
+Note that this entails finding the optimal number of samples \(m\), i.e that \(m\) which minimises the expression \(δ_0^m ⋅ q^{n/m}\).\footfullcite{PQCBook:MicReg09,EPRINT:AlbPlaSco15}
+\item Construct a basis for the scaled dual lattice.
+\item Run BKZ on on that basis to recover a short vector \(v\) in the scaled dual lattice.
+\item Use (possibly several) \(v\) to distinguish the outputs of the oracle from uniform.
+\item Attempt bigger, harder instances.
+\item Improve the running time by employing cleverer techniques, such as progressive BKZ \footfullcite{EPRINT:AWHT16}, running in the low-advantage regime or sparse-ish re-randomisation of already reduced bases.
 \end{enumerate}
 
-
-\begin{itemize}
-\item Given a SIS instance, mount the best attack according to the model
-
-\item (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
-\end{itemize}
-
 \section{Primal Attack}
-\label{sec:org4a41468}
-
-\section{Pruned Enumeration}
-\label{sec:orgc7ca936}
+\label{sec:org7e106f5}
 
 Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
 \section{Lattice Challenge}
-\label{sec:org083500d}
+\label{sec:org421fb19}
 
-\url{https://www.latticechallenge.org/lwe\_challenge/challenge.php}
+Get your name up here: \url{https://www.latticechallenge.org/lwe\_challenge/challenge.php}
 
 \appendix
 
 \section{Example Solutions}
-\label{sec:org00ca19b}
-
+\label{sec:orgd8828ed}
 \subsection{root-Hermite factors}
-\label{sec:orgd98b0a0}
+\label{sec:org5704e71}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -468,7 +469,7 @@ n: 130, bits: 40, β: 60, δ_0: 1.0114, pred: 2^22.12, real: 2^21.67
 \end{verbatim}
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org2bb3352}
+\label{sec:org86e7a3d}
 
 \texttt{dump\_gso\_filename}
 
@@ -657,5 +658,131 @@ g
 
 \begin{center}
 \includegraphics[width=.9\linewidth]{lab-02-solution-plot-gsa-3.png}
+\end{center}
+
+\subsection{Dual attack}
+\label{sec:org79f8e53}
+We will need to invert \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\]
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+def block_sizef(delta_0):
+    """
+    Blocksize for a given delta_0
+    :param delta_0: root-hermite factor
+
+    """
+    k = ZZ(40)
+    RR = delta_0.parent()
+    pi_r = RR(pi)
+    e_r = RR(e)
+
+    f = lambda k: (k/(2*pi_r*e_r) * (pi_r*k)**(1/k))**(1/(2*(k-1)))
+
+    while f(2*k) > delta_0:
+        k *= 2
+    while f(k+10) > delta_0:
+        k += 10
+    while True:
+        if f(k) < delta_0:
+            break
+        k += 1
+
+    return k
+\end{lstlisting}
+
+
+We will also need to lift from \(\bmod q\) to the integers by mapping to the element closest to zero.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+def balanced_lift(e):
+    q = parent(e).order()
+    e = ZZ(e)
+    return e - q if e > q//2 else e
+\end{lstlisting}
+
+We set up our instance and recover \(q\) and \(α\), the latter from \(σ = α⋅q/\sqrt{2π}\) where \(σ\) is the \textbf{standard deviation}.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from sage.crypto.lwe import LindnerPeikert
+adv, n = 0.6, 50
+
+sage.all.set_random_seed(1337) # make it reproducible
+
+lwe = LindnerPeikert(n)
+q = lwe.K.order()
+alpha = RR(sqrt(2*pi)*lwe.D.sigma/q)
+\end{lstlisting}
+
+We compute \(δ_0\) \footfullcite{EPRINT:AlbPlaSco15}, \(β\) and \(m\).\footfullcite{PQCBook:MicReg09}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+log_delta_0 = log(RR(sqrt(log(1/adv)/pi))/alpha, 2)**2 / (4*n*log(q, 2))
+delta_0 = RR(2**log_delta_0)
+
+beta = block_sizef(delta_0)
+m = ZZ(round(sqrt(n*log(q, 2)/log(delta_0, 2))))
+beta, m
+\end{lstlisting}
+
+\begin{verbatim}
+(40, 164)
+\end{verbatim}
+
+It is time to sample from our oracle. We write the result in matrix form.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+samples = [lwe() for _ in range(m)]
+
+A = matrix([a for a,c in samples])
+c = vector([c for a,c in samples])
+\end{lstlisting}
+
+We compute a basis for for \(v ⋅ A ≡ 0 \bmod q\) and extend that basis to a \(q\)-ary lattice basis \(B\).
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+B = A.left_kernel().matrix()
+N = B.change_ring(ZZ)
+S = matrix(ZZ, n, m-n).augment(q*identity_matrix(n))
+B = N.stack(S)
+\end{lstlisting}
+
+We call BKZ
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+R = B.BKZ(block_size=beta, proof=False)
+\end{lstlisting}
+
+Our short vector is the first in the basis, let’s look at \(⟨v,c⟩ = ⟨v,e⟩\).
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+v = R[0]
+balanced_lift(v*c)
+\end{lstlisting}
+
+\begin{verbatim}
+-20
+\end{verbatim}
+
+Let’s \#yolo and take inner products of all vectors in \(R\).
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+l = []
+for r in R.rows():
+    l.append(balanced_lift(r*c))
+
+histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{lab-02-solution-dual-attack-histogram.png}
 \end{center}
 \end{document}

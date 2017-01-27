@@ -37,6 +37,8 @@ from fpylll import *
 
 #+RESULTS:
 
+*Note* by calling =from fpylll import *= we overwite Sage’s own =set_random_seed=. You can still call it as =sage.all.set_random_seed=.
+
 ** Integer Matrices
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant $q^{50}$ where $q$ is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
@@ -241,7 +243,7 @@ In this exercise, we ask you to verify various predictions made about lattice re
 
 ** root-Hermite factors
 
-Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where $\delta_0$ is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
+Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where $\delta_0$ is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 ** GS norms & Geometric series assumption
 
@@ -284,26 +286,31 @@ plt.close()
 
 In this exercise, you are asked to break a decision-LWE instance using the dual lattice attack.
 
-1. Given samples from 
+That is, assume you are given access to an lWE oracle such as
 
-  #+BEGIN_SRC sage
-  from sage.la
-  #+END_SRC
+#+BEGIN_SRC sage
+from sage.crypto.lwe import LindnerPeikert
+lwe = LindnerPeikert(50)
+#+END_SRC
 
+#+RESULTS:
 
- - Given a SIS instance, mount the best attack according to the model
-
- - (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
+1. Establish the BKZ block size required to distinguish with an advantage of, say, 60%.footfullcite:RSA:LinPei11
+   
+   Note that this entails finding the optimal number of samples \(m\), i.e that \(m\) which minimises the expression $δ_0^m ⋅ q^{n/m}$.footfullcite:PQCBook:MicReg09,EPRINT:AlbPlaSco15
+2. Construct a basis for the scaled dual lattice.
+3. Run BKZ on on that basis to recover a short vector \(v\) in the scaled dual lattice.
+4. Use (possibly several) \(v\) to distinguish the outputs of the oracle from uniform.
+5. Attempt bigger, harder instances.
+6. Improve the running time by employing cleverer techniques, such as progressive BKZ footfullcite:EPRINT:AWHT16, running in the low-advantage regime or sparse-ish re-randomisation of already reduced bases.
 
 * Primal Attack
-
-* Pruned Enumeration
 
 Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
 * Lattice Challenge
 
-https://www.latticechallenge.org/lwe_challenge/challenge.php
+Get your name up here: https://www.latticechallenge.org/lwe_challenge/challenge.php
 
 * Ignored                                                               :ignore:
 
@@ -312,7 +319,6 @@ https://www.latticechallenge.org/lwe_challenge/challenge.php
 #+END_EXPORT
 
 * Example Solutions                                                   :solution:
-
 ** root-Hermite factors
 
 #+BEGIN_SRC sage :eval never :tangle lab-02-solution-root-hermite.sage
@@ -580,6 +586,132 @@ g
 
 #+RESULTS:
 [[file:lab-02-solution-plot-gsa-3.png]]
+
+** Dual attack
+:PROPERTIES:
+:header-args: :tangle lab-02-solution-dual-attack.sage
+:END:
+
+We will need to invert \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\]
+
+#+BEGIN_SRC sage
+def block_sizef(delta_0):
+    """
+    Blocksize for a given delta_0
+    :param delta_0: root-hermite factor
+
+    """
+    k = ZZ(40)
+    RR = delta_0.parent()
+    pi_r = RR(pi)
+    e_r = RR(e)
+
+    f = lambda k: (k/(2*pi_r*e_r) * (pi_r*k)**(1/k))**(1/(2*(k-1)))
+
+    while f(2*k) > delta_0:
+        k *= 2
+    while f(k+10) > delta_0:
+        k += 10
+    while True:
+        if f(k) < delta_0:
+            break
+        k += 1
+
+    return k
+#+END_SRC
+
+
+We will also need to lift from $\bmod q$ to the integers by mapping to the element closest to zero.
+
+#+BEGIN_SRC sage
+def balanced_lift(e):
+    q = parent(e).order()
+    e = ZZ(e)
+    return e - q if e > q//2 else e
+#+END_SRC
+
+#+RESULTS:
+
+We set up our instance and recover $q$ and $α$, the latter from $σ = α⋅q/\sqrt{2π}$ where $σ$ is the *standard deviation*.
+
+#+BEGIN_SRC sage
+from sage.crypto.lwe import LindnerPeikert
+adv, n = 0.6, 50
+
+sage.all.set_random_seed(1337) # make it reproducible
+
+lwe = LindnerPeikert(n)
+q = lwe.K.order()
+alpha = RR(sqrt(2*pi)*lwe.D.sigma/q)
+#+END_SRC
+
+#+RESULTS:
+
+We compute $δ_0$ footfullcite:EPRINT:AlbPlaSco15, $β$ and $m$.footfullcite:PQCBook:MicReg09
+
+#+BEGIN_SRC sage
+log_delta_0 = log(RR(sqrt(log(1/adv)/pi))/alpha, 2)**2 / (4*n*log(q, 2))
+delta_0 = RR(2**log_delta_0)
+
+beta = block_sizef(delta_0)
+m = ZZ(round(sqrt(n*log(q, 2)/log(delta_0, 2))))
+beta, m
+#+END_SRC
+
+#+RESULTS:
+: (40, 164)
+
+It is time to sample from our oracle. We write the result in matrix form.
+
+#+BEGIN_SRC sage
+samples = [lwe() for _ in range(m)]
+
+A = matrix([a for a,c in samples])
+c = vector([c for a,c in samples])
+#+END_SRC
+
+We compute a basis for for $v ⋅ A ≡ 0 \bmod q$ and extend that basis to a \(q\)-ary lattice basis $B$.
+
+#+BEGIN_SRC sage
+B = A.left_kernel().matrix()
+N = B.change_ring(ZZ)
+S = matrix(ZZ, n, m-n).augment(q*identity_matrix(n))
+B = N.stack(S)
+#+END_SRC
+
+#+RESULTS:
+
+We call BKZ
+
+#+BEGIN_SRC sage
+R = B.BKZ(block_size=beta, proof=False)
+#+END_SRC
+
+#+RESULTS:
+
+Our short vector is the first in the basis, let’s look at \(⟨v,c⟩ = ⟨v,e⟩\).
+
+#+BEGIN_SRC sage
+v = R[0]
+balanced_lift(v*c)
+#+END_SRC
+
+#+RESULTS:
+: -20
+
+Let’s #yolo and take inner products of all vectors in \(R\).
+
+#+BEGIN_SRC sage :file lab-02-solution-dual-attack-histogram.png 
+l = []
+for r in R.rows():
+    l.append(balanced_lift(r*c))
+
+histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
+#+END_SRC
+
+#+RESULTS:
+[[file:lab-02-solution-dual-attack-histogram.png]]
+
 
 * Footnotes
 
