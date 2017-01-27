@@ -183,3 +183,4 @@ TSWLatexianTemp*
 /introduction.tex
 /labs/sage-introduction.pdf
 /labs/lab-02.pdf
+*.sage.py

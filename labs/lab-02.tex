@@ -1,6 +1,6 @@
-% Created 2017-01-25 Wed 18:35
+% Created 2017-01-27 Fri 14:33
 % Intended LaTeX compiler: pdflatex
-\documentclass[10pt,a4paper]{tufte-handout}
+\documentclass[10pt,a4paper,nobib]{tufte-handout}
 \usepackage{fontspec}
 \usepackage{graphicx}
 \usepackage{grffile}
@@ -16,7 +16,7 @@
 \usepackage{microtype}
 \usepackage{newunicodechar}
 \usepackage{unicodesymbols}
-\usepackage[notions,operators,sets,keys,ff,adversary,primitives,complexity,asymptotics,lambda,landau]{cryptocode}
+\usepackage[notions,operators,sets,keys,ff,adversary,primitives,complexity,asymptotics,lambda,landau,advantage]{cryptocode}
 \usepackage{xspace}
 \usepackage{units}
 \usepackage{nicefrac}
@@ -37,7 +37,7 @@
 \author{Martin R. Albrecht and Léo Ducas}
 \date{March 23, 2017}
 \title{Lab 2\\\medskip
-\large Attacks \& Lattice Reduction}
+\large Lattice Reduction \& Attacks}
 \hypersetup{
 pdfauthor={Martin R. Albrecht and Léo Ducas},
 pdftitle={Lab 2},
@@ -62,8 +62,8 @@ Fpylll is a Python wrapper and extension of Fplll, making its data structures an
 
 That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!\footnote{\url{https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md}}
 
-\section{1 — Introduction}
-\label{sec:org33cf1d8}
+\section{Introduction}
+\label{sec:orgc87df07}
 In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
 To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
@@ -74,7 +74,7 @@ from fpylll import *
 \end{lstlisting}
 
 \subsection{Integer Matrices}
-\label{sec:org3c42bd5}
+\label{sec:orgafa4577}
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant \(q^{50}\) where \(q\) is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
@@ -87,7 +87,7 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 \textbf{Reminder:} Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.\footnote{\url{https://doc.sagemath.org/html/en/tutorial/tour\_help.html}}
 
 \subsection{Gram-Schmidt Orthogonalisation}
-\label{sec:org354a7af}
+\label{sec:org4c2955b}
 
 To run LLL we have two choices. We can either run the high-level \texttt{LLL.reduction()} function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a \texttt{MatGSO} object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
@@ -117,7 +117,7 @@ M.get_r(0,0)
 \end{lstlisting}
 
 \begin{verbatim}
-0.0
+6.90051235708626e-310
 \end{verbatim}
 
 To get meaningful results, we need to trigger the appropriate computation. To compute the complete GSO, run:
@@ -145,7 +145,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{LLL}
-\label{sec:org33c09ec}
+\label{sec:org79ed09a}
 
 We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. \texttt{M}, are automatically also applied to the underlying integer matrix, e.g. \texttt{A}.
 
@@ -214,9 +214,9 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{BKZ}
-\label{sec:orge0183a0}
+\label{sec:org10cb712}
 
-Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations\footnote{We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” \url{https://www.python.org/dev/peps/pep-0020/}} of the BKZ algorithm in 
+Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations of the BKZ algorithm in 
 
 \begin{verbatim}
 fpylll.algorithms
@@ -244,7 +244,7 @@ It gets old fast passing these around one-by-one. Thus, Fplll and Fpylll introdu
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
-flags = BKZ.VERBOSE|BKZ.AUTO_ABORT|BKZ.MAX_LOOPS|BKZ.GH_BND
+flags = BKZ.AUTO_ABORT|BKZ.MAX_LOOPS|BKZ.GH_BND # optionally add |BKZ.VERBOSE
 par = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 \end{lstlisting}
 
@@ -258,7 +258,7 @@ print strategies[60]
 \end{lstlisting}
 
 \begin{verbatim}
-'/home/malb/.virtualenvs/fpylll2/share/fplll/strategies/default.json'
+'/opt/sage-devel/local/share/fplll/strategies/default.json'
 Strategy< 60, (40), 0.29-0.50>
 \end{verbatim}
 
@@ -271,39 +271,41 @@ Finally, let’s call BKZ-60 on our example lattice:
 bkz = BKZ2(A) # or
 bkz = BKZ2(GSO.Mat(A)) # or 
 bkz = BKZ2(LLL.Reduction(GSO.Mat(A)))
-bkz(par)
+
+_ = bkz(par)
+
+tours = bkz.stats.tours
+map(lambda x: [x["i"], RealField(20)(x["total time"]), x["r_0"]], tours)
 \end{lstlisting}
 
-\begin{verbatim}
-{"i":   0,  "total":     12.34,  "time":    12.34,  "preproc":     7.82,  "svp":     4.25,  
- "lll":     1.40,  "postproc":     0.00,  "r_0": 5.6063e+09,  "slope": -0.0561,  
- "enum nodes": 27.45,  "max(kappa)":   0}
-{"i":   1,  "total":     23.32,  "time":    10.98,  "preproc":     7.42,  "svp":     3.32,  
- "lll":     1.09,  "postproc":     0.00,  "r_0": 3.0770e+09,  "slope": -0.0500,  
- "enum nodes": 27.05,  "max(kappa)":   0}
-{"i":   2,  "total":     33.04,  "time":     9.72,  "preproc":     6.69,  "svp":     2.80,  
- "lll":     0.81,  "postproc":     0.00,  "r_0": 3.0770e+09,  "slope": -0.0492,  
- "enum nodes": 26.83,  "max(kappa)":   0}
-{"i":   3,  "total":     42.44,  "time":     9.40,  "preproc":     6.65,  "svp":     2.50,  
-"lll":     0.82,  "postproc":     0.00,  "r_0": 2.9138e+09,  "slope": -0.0487,  
-"enum nodes": 26.63,  "max(kappa)":   0}
-False
-\end{verbatim}
+\begin{center}
+\begin{tabular}{rrr}
+i & time & r\(_{\text{0}}\)\\
+\hline
+0 & 13.573 & 5729242260.0\\
+1 & 25.795 & 3034110354.0\\
+2 & 40.709 & 2845292328.0\\
+3 & 52.384 & 2845292328.0\\
+\end{tabular}
 
-\section{2 — Experimenting with LLL / BKZ}
-\label{sec:org62efda5}
+\end{center}
+
+\section{Lattice Reduction}
+\label{sec:orgc4eec58}
 
 In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 \subsection{root-Hermite factors}
-\label{sec:org17a1802}
+\label{sec:org2eb6057}
 
 Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[\delta_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
-\subsection{GS norms}
-\label{sec:org0f58048}
+\subsection{GS norms \& Geometric series assumption}
+\label{sec:org8974ebc}
 
-Running several tours of BKZ (2.0) plot (the logs of) the norms of Gram-Schmidt vectors after each tour. You have several options to accomplish this result:
+Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \Vol(L)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where \(m\) is the dimension of the lattice, we get \(α = δ^{-2m/(m-1)}\).\footfullcite{RSA:LinPei11} Check how well this assumption holds for various block sizes of BKZ.
+
+That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:\footnote{We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” \url{https://www.python.org/dev/peps/pep-0020/}}
 
 \begin{itemize}
 \item Check out the \texttt{dump\_gso\_filename} option for \texttt{BKZ.Param}.
@@ -320,9 +322,8 @@ If you are running from within Sage, you can simply call \texttt{line()} to plot
 line(zip(range(10),prime_range(30)), color="lightgrey", dpi=300r)
 \end{lstlisting}
 
-
 \begin{center}
-\includegraphics[width=0.6\textwidth]{line-plot-sage.png}
+\includegraphics[width=0.6\textwidth]{lab-02-plot-line-sage.png}
 \end{center}
 
 In vanilla Python, you can use matplotlib\footnote{\url{http://matplotlib.org}}
@@ -334,30 +335,28 @@ X = range(10)
 Y = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 plt.plot(X, Y)
 plt.ylabel('primes!!!')
-plt.savefig("line-plot-matplotlib.png", dpi=300r, bbox_inches='tight')
+plt.savefig("lab-02-plot-line-matplotlib.png", dpi=300r, bbox_inches='tight')
 plt.close()
 \end{lstlisting}
 
 \begin{center}
-\includegraphics[width=0.7\textwidth]{./line-plot-matplotlib.png}
+\includegraphics[width=0.7\textwidth]{./lab-02-plot-line-matplotlib.png}
 \end{center} 
 
-\subsection{GSA}
-\label{sec:org8ef7940}
+\section{Dual Attack}
+\label{sec:org17c835d}
 
-Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[bla \] where \(n\) is the dimension of the lattice. Check how well this assumption holds for various block sizes of BKZ and BKZ 2.0.
+In this exercise, you are asked to break a decision-LWE instance using the dual lattice attack.
 
-\subsection{Costs}
-\label{sec:org532b48b}
+\begin{enumerate}
+\item Given samples from 
 
-\begin{itemize}
-\item Measure cost
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+  from sage.la
+\end{lstlisting}
+\end{enumerate}
 
-\item Compare statistics
-\end{itemize}
-
-\section{3 — Dual Attack}
-\label{sec:orgc4ccf27}
 
 \begin{itemize}
 \item Given a SIS instance, mount the best attack according to the model
@@ -365,16 +364,298 @@ Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-
 \item (opt) Improve it using cleverer strategies (e.g. autotuned progressive strategy)
 \end{itemize}
 
-\section{4 — Primal Attack}
-\label{sec:org0f652f8}
+\section{Primal Attack}
+\label{sec:org4a41468}
 
-\section{5 — Pruned Enumeration}
-\label{sec:org75a2cce}
+\section{Pruned Enumeration}
+\label{sec:orgc7ca936}
 
 Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
-\section{6 — Lattice Challenge}
-\label{sec:org5d4995b}
+\section{Lattice Challenge}
+\label{sec:org083500d}
 
 \url{https://www.latticechallenge.org/lwe\_challenge/challenge.php}
+
+\appendix
+
+\section{Example Solutions}
+\label{sec:org00ca19b}
+
+\subsection{root-Hermite factors}
+\label{sec:orgd98b0a0}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+# -*- coding: utf-8 -*-
+from fpylll import *
+
+deltaf = lambda beta: (beta/(2*pi*e) * (pi*beta)^(1/beta))^(1/(2*beta-1))
+fmt = u"n: %3d, bits: %2d, β: %2d, δ_0: %.4f, pred: 2^%5.2f, real: 2^%5.2f"
+
+ntrials = 20
+for n in (50, 70, 90, 110, 130):
+    for bits in (20, 40):
+        for beta in (2, 20, 50, 60):
+            if beta > n:
+                continue
+            beta = ZZ(beta)
+            if beta == 2:
+                delta_0 = 1.0219
+            else:
+                delta_0 = deltaf(beta)
+            n_pred = float(delta_0^n * 2^(bits/2))
+            n_real = []
+            for i in range(ntrials):
+                A = IntegerMatrix.random(n, "qary", k=n/2, bits=bits)
+                if beta == 2:
+                    LLL.reduction(A)
+                else:
+                    par = BKZ.Param(block_size=beta,
+                                    strategies=BKZ.DEFAULT_STRATEGY,
+                                    max_loops=4,
+                                    flags=BKZ.MAX_LOOPS|BKZ.GH_BND)
+                    BKZ.reduction(A, par)
+                n_real.append(A[0].norm())
+            n_real = sum(n_real)/ntrials
+            print(fmt%(n, bits, beta, delta_0, log(n_pred,2), log(n_real,2)))
+    print
+\end{lstlisting}
+
+\begin{verbatim}
+n:  50, bits: 20, β:  2, δ_0: 1.0219, pred: 2^11.56, real: 2^10.75
+n:  50, bits: 20, β: 20, δ_0: 1.0094, pred: 2^10.67, real: 2^10.51
+n:  50, bits: 20, β: 50, δ_0: 1.0119, pred: 2^10.86, real: 2^10.14
+n:  50, bits: 40, β:  2, δ_0: 1.0219, pred: 2^21.56, real: 2^20.61
+n:  50, bits: 40, β: 20, δ_0: 1.0094, pred: 2^20.67, real: 2^20.66
+n:  50, bits: 40, β: 50, δ_0: 1.0119, pred: 2^20.86, real: 2^20.26
+
+n:  70, bits: 20, β:  2, δ_0: 1.0219, pred: 2^12.19, real: 2^11.44
+n:  70, bits: 20, β: 20, δ_0: 1.0094, pred: 2^10.94, real: 2^11.02
+n:  70, bits: 20, β: 50, δ_0: 1.0119, pred: 2^11.20, real: 2^10.55
+n:  70, bits: 20, β: 60, δ_0: 1.0114, pred: 2^11.14, real: 2^10.59
+n:  70, bits: 40, β:  2, δ_0: 1.0219, pred: 2^22.19, real: 2^21.36
+n:  70, bits: 40, β: 20, δ_0: 1.0094, pred: 2^20.94, real: 2^20.93
+n:  70, bits: 40, β: 50, δ_0: 1.0119, pred: 2^21.20, real: 2^20.84
+n:  70, bits: 40, β: 60, δ_0: 1.0114, pred: 2^21.14, real: 2^20.51
+
+n:  90, bits: 20, β:  2, δ_0: 1.0219, pred: 2^12.81, real: 2^11.46
+n:  90, bits: 20, β: 20, δ_0: 1.0094, pred: 2^11.21, real: 2^11.64
+n:  90, bits: 20, β: 50, δ_0: 1.0119, pred: 2^11.54, real: 2^10.97
+n:  90, bits: 20, β: 60, δ_0: 1.0114, pred: 2^11.47, real: 2^11.01
+n:  90, bits: 40, β:  2, δ_0: 1.0219, pred: 2^22.81, real: 2^21.94
+n:  90, bits: 40, β: 20, δ_0: 1.0094, pred: 2^21.21, real: 2^21.51
+n:  90, bits: 40, β: 50, δ_0: 1.0119, pred: 2^21.54, real: 2^20.96
+n:  90, bits: 40, β: 60, δ_0: 1.0114, pred: 2^21.47, real: 2^20.96
+
+n: 110, bits: 20, β:  2, δ_0: 1.0219, pred: 2^13.44, real: 2^12.81
+n: 110, bits: 20, β: 20, δ_0: 1.0094, pred: 2^11.48, real: 2^12.18
+n: 110, bits: 20, β: 50, δ_0: 1.0119, pred: 2^11.88, real: 2^11.31
+n: 110, bits: 20, β: 60, δ_0: 1.0114, pred: 2^11.79, real: 2^11.08
+n: 110, bits: 40, β:  2, δ_0: 1.0219, pred: 2^23.44, real: 2^22.71
+n: 110, bits: 40, β: 20, δ_0: 1.0094, pred: 2^21.48, real: 2^22.20
+n: 110, bits: 40, β: 50, δ_0: 1.0119, pred: 2^21.88, real: 2^21.24
+n: 110, bits: 40, β: 60, δ_0: 1.0114, pred: 2^21.79, real: 2^21.04
+
+n: 130, bits: 20, β:  2, δ_0: 1.0219, pred: 2^14.06, real: 2^13.37
+n: 130, bits: 20, β: 20, δ_0: 1.0094, pred: 2^11.75, real: 2^12.81
+n: 130, bits: 20, β: 50, δ_0: 1.0119, pred: 2^12.23, real: 2^11.90
+n: 130, bits: 20, β: 60, δ_0: 1.0114, pred: 2^12.12, real: 2^11.66
+n: 130, bits: 40, β:  2, δ_0: 1.0219, pred: 2^24.06, real: 2^23.25
+n: 130, bits: 40, β: 20, δ_0: 1.0094, pred: 2^21.75, real: 2^22.71
+n: 130, bits: 40, β: 50, δ_0: 1.0119, pred: 2^22.23, real: 2^21.70
+n: 130, bits: 40, β: 60, δ_0: 1.0114, pred: 2^22.12, real: 2^21.67
+\end{verbatim}
+
+\subsection{GS norms \& Geometric series assumption}
+\label{sec:org2bb3352}
+
+\texttt{dump\_gso\_filename}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+# -*- coding: utf-8 -*-
+from fpylll import *
+
+set_random_seed(1)
+n, bits = 120, 40
+A = IntegerMatrix.random(n, "qary", k=n/2, bits=bits)
+beta = 60
+tours = 2
+
+fn = "/tmp/logs.txt"
+par = BKZ.Param(block_size=beta,
+                strategies=BKZ.DEFAULT_STRATEGY,
+                dump_gso_filename=fn,
+                max_loops=tours) 
+par.flags & BKZ.MAX_LOOPS # max_loops sets flag for you
+
+delta_0 = (beta/(2*pi*e) * (pi*beta)^(1/ZZ(beta)))^(1/(2*beta-1))
+alpha = delta_0^(-2*n/(n-1))
+
+norms = [map(log, [(alpha^i * delta_0^n * 2^(bits/2))^2 for i in range(n)])]
+
+BKZ.reduction(A, par)
+
+for i, l in enumerate(open(fn).readlines()):
+    if i > tours:
+        break
+    _norms =  l.split(":")[1] # stop off other information
+    _norms = _norms.strip().split(" ") # split string
+    _norms = map(float, _norms) # map to floats
+    norms.append(_norms)
+        
+colours = ["#4D4D4D", "#5DA5DA", "#FAA43A", "#60BD68", 
+           "#F17CB0", "#B2912F", "#B276B2", "#DECF3F", "#F15854"]
+
+g  = line(zip(range(n), norms[0]), legend_label="GSA", color=colours[0])
+g += line(zip(range(n), norms[1]), legend_label="lll", color=colours[1])
+
+for i,_norms in enumerate(norms[2:]):
+    g += line(zip(range(n), _norms), 
+              legend_label="tour %d"%i, color=colours[i+2])
+g
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{lab-02-solution-plot-gsa-1.png}
+\end{center}
+
+\texttt{bkz.tour}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+# -*- coding: utf-8 -*-
+from fpylll import *
+from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
+
+set_random_seed(1)
+n, bits = 120, 40
+A = IntegerMatrix.random(n, "qary", k=n/2, bits=bits)
+beta = 60
+tours = 2
+par = BKZ.Param(block_size=beta,
+                strategies=BKZ.DEFAULT_STRATEGY) 
+
+delta_0 = (beta/(2*pi*e) * (pi*beta)^(1/ZZ(beta)))^(1/(2*beta-1))
+alpha = delta_0^(-2*n/(n-1))
+
+LLL.reduction(A)
+
+M = GSO.Mat(A)
+M.update_gso()
+
+
+norms  = [map(log, [(alpha^i * delta_0^n * 2^(bits/2))^2 for i in range(n)])]
+norms += [[log(M.get_r(i,i)) for i in range(n)]]
+
+bkz = BKZ2(M)
+
+for i in range(tours):
+    bkz.tour(par)
+    norms += [[log(M.get_r(i,i)) for i in range(n)]]
+        
+colours = ["#4D4D4D", "#5DA5DA", "#FAA43A", "#60BD68", 
+           "#F17CB0", "#B2912F", "#B276B2", "#DECF3F", "#F15854"]
+
+g  = line(zip(range(n), norms[0]), legend_label="GSA", color=colours[0])
+g += line(zip(range(n), norms[1]), legend_label="lll", color=colours[1])
+
+for i,_norms in enumerate(norms[2:]):
+    g += line(zip(range(n), _norms), 
+              legend_label="tour %d"%i, color=colours[i+2])
+g
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{lab-02-solution-plot-gsa-2.png}
+\end{center}
+
+\texttt{MyBKZ}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from fpylll import *
+from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
+from fpylll.algorithms.bkz_stats import BKZStats
+import time
+
+class MyBKZ(BKZ2):
+    def __call__(self, params, norms, min_row=0, max_row=-1):
+        """Run the BKZ with `param`  and dump norms to ``norms``
+
+        :param params: BKZ parameters
+        :param norms: a list to append vectors of norms to
+        :param min_row: start processing in this row
+        :param max_row: stop processing in this row (exclusive)
+
+        """
+        # this changed in the development version of fpyll
+        stats = BKZStats(self, verbose=params.flags & BKZ.VERBOSE)
+
+        if params.flags & BKZ.AUTO_ABORT:
+            auto_abort = BKZ.AutoAbort(self.M, self.A.nrows)
+
+        cputime_start = time.clock()
+
+        self.M.discover_all_rows()
+        norms.append([self.M.get_r(j, j) for j in range(n)])
+
+        i = 0
+        while True:
+            with stats.context("tour"):
+                clean = self.tour(params, min_row, max_row, stats)
+            norms.append([self.M.get_r(j, j) for j in range(n)])
+            i += 1
+            if clean or params.block_size >= self.A.nrows:
+                break
+            if (params.flags & BKZ.AUTO_ABORT) and auto_abort.test_abort():
+                break
+            if (params.flags & BKZ.MAX_LOOPS) and i >= params.max_loops:
+                break
+            if (params.flags & BKZ.MAX_TIME) \
+               and time.clock() - cputime_start >= params.max_time:
+                break
+            
+        stats.finalize()
+        self.stats = stats
+        return clean
+
+set_random_seed(1)
+
+n, bits = 120, 40
+A = IntegerMatrix.random(n, "qary", k=n/2, bits=bits)
+beta = 60
+tours = 2
+par = BKZ.Param(block_size=beta,
+                strategies=BKZ.DEFAULT_STRATEGY,
+                max_loops=tours) 
+
+delta_0 = (beta/(2*pi*e) * (pi*beta)^(1/ZZ(beta)))^(1/(2*beta-1))
+alpha = delta_0^(-2*n/(n-1))
+
+LLL.reduction(A)
+
+norms  = [[(alpha^i * delta_0^n * 2^(bits/2))^2 for i in range(n)]]
+bkz = MyBKZ(A)
+
+bkz(par, norms)
+        
+colours = ["#4D4D4D", "#5DA5DA", "#FAA43A", "#60BD68", "#F17CB0",
+           "#B2912F", "#B276B2", "#DECF3F", "#F15854"]
+
+g  = line(zip(range(n), map(log, norms[0])),
+          legend_label="GSA", color=colours[0])
+g += line(zip(range(n), map(log, norms[1])),
+          legend_label="lll", color=colours[1])
+
+for i,_norms in enumerate(norms[2:]):
+    g += line(zip(range(n), map(log, _norms)),
+              legend_label="tour %d"%i, color=colours[i+2])
+g
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{lab-02-solution-plot-gsa-3.png}
+\end{center}
 \end{document}

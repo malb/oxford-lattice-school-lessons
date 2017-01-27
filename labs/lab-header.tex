@@ -47,6 +47,9 @@
 \setlength{\RaggedRightParindent}{0em}
 
 \usepackage{xcolor}
+
+\lstdefinelanguage{Sage}[]{Python}{morekeywords={True,False,sage,cdef,cpdef,ctypedef,self},sensitive=true}
+
 \lstset{showstringspaces=false,
         aboveskip=0.75em,
         basicstyle=\footnotesize\ttfamily,
@@ -57,10 +60,3 @@
         backgroundcolor=\color{gray!190!black},
         frame=none,
         xleftmargin=\parindent}
-
-\hypersetup{
-  linkcolor=gray!40!black,
-  colorlinks=true,
-  citecolor=gray!40!black,
-  linkcolor=gray!40!black,
-  urlcolor=gray!40!black}
