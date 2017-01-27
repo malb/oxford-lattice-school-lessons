@@ -125,13 +125,6 @@ type(2)
 #+RESULTS:
 : <type 'sage.rings.integer.Integer'>
 
-#+BEGIN_SRC sage
-type(2r)
-#+END_SRC
-
-#+RESULTS:
-: <type 'int'>
-
 ****                                                               :B_column:
 :PROPERTIES:
 :BEAMER_env: column
@@ -161,12 +154,66 @@ type(2)
 #+RESULTS:
 : <type 'int'>
 
+** Sage ≠ Python
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.45
+:END:
+
+_Sage_
+
+#+BEGIN_SRC sage
+type(2r)
+#+END_SRC
+
+#+RESULTS:
+: <type 'int'>
+
+#+BEGIN_SRC sage
+type(range(10)[0])
+#+END_SRC
+
+#+RESULTS:
+: <type 'int'>
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.45
+:END:
+
+_Python_
+
+#+BEGIN_SRC python :session :exports both
+type(2r)
+#+END_SRC
+
+#+RESULTS:
+: SyntaxError: invalid syntax
+
+#+BEGIN_SRC  python :session :exports both
+type(range(10)[0])
+#+END_SRC
+
+#+RESULTS:
+: <type 'int'>
+
 ***                                                          :B_ignoreheading:
 :PROPERTIES:
 :BEAMER_env: ignoreheading
 :END:
 
+*** Files
+
 =.sage= files are parsed as Sage code, =.py= files as Python code
+
 
 ** Naive RSA
 :PROPERTIES:
