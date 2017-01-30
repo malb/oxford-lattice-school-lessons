@@ -1,0 +1,488 @@
+% Created 2017-01-30 Mon 14:41
+% Intended LaTeX compiler: pdflatex
+\documentclass[presentation,smaller]{beamer}
+\RequirePackage{etex}
+\RequirePackage[l2tabu,orthodox]{nag}            %% Warn about obsolete commands and packages
+\RequirePackage{amsmath,amsfonts,amssymb,amsthm} %% Math
+\RequirePackage{ifxetex,ifluatex}                %% Detect XeTeX and LuaTeX
+\RequirePackage{fixltx2e}                        %% provides \textsubscript
+\RequirePackage{xspace}
+\RequirePackage{graphicx}
+\RequirePackage{comment}
+\RequirePackage{url}
+\RequirePackage{relsize}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage[normalem]{ulem}
+\RequirePackage[all]{xy}
+\RequirePackage{etoolbox}
+
+%%%
+%%% Code Listings
+%%%
+
+\RequirePackage{listings}
+\lstdefinelanguage{Sage}[]{Python}{morekeywords={True,False,sage,cdef,cpdef,ctypedef,self},sensitive=true}
+
+\lstset{frame=none,
+  showtabs=False,
+  showspaces=False,
+  showstringspaces=False,
+  commentstyle={\color{gray}},
+  keywordstyle={\color{mLightBrown}\textbf},
+  stringstyle ={\color{mDarkBrown}},
+  frame=single,
+  basicstyle=\tt\scriptsize\relax,
+  backgroundcolor=\color{gray!190!black},
+  inputencoding=utf8,
+  literate={…}{{\ldots}}1,
+  belowskip=0.0em,
+}
+
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\scriptsize}
+  {}{}
+\makeatother
+
+%%%
+%%% Tikz
+%%%
+
+\RequirePackage{tikz,pgfplots}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{fit,}
+\usetikzlibrary{shapes.symbols}
+\usetikzlibrary{chains}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.arrows}
+\usetikzlibrary{graphs}
+
+%% Cache
+
+\ifdefined\tikzcaching  % chktex 1
+  \usetikzlibrary{external}
+  \tikzexternalize[prefix=build/]
+  \tikzset{external/up to date check=diff}  %% MD5 fails from within emacs
+\fi
+
+%%%
+%%% SVG (Inkscape)
+%%%
+
+\ifxetex % chktex 1
+\newcommand{\executeiffilenewer}[3]{%
+  {\immediate\write18{#3}} % hack
+}
+\else
+\newcommand{\executeiffilenewer}[3]{%
+  \ifnum\pdfstrcmp{\pdffilemoddate{#1}}%
+    {\pdffilemoddate{#2}}>0%
+    {\immediate\write18{#3}}
+  \fi%
+}
+\fi
+
+\newcommand{\includesvg}[2][1.0\textwidth]{%
+ \executeiffilenewer{#1.svg}{#1.pdf}%
+ {inkscape -z -D --file=#2.svg --export-pdf=#2.pdf --export-latex --export-area-page}%
+ \def\svgwidth{#1} 
+ \input{#2.pdf_tex}%
+} 
+
+%%%
+%%% Metropolis Theme
+%%%
+
+\usetheme{metropolis}
+\metroset{color/block=fill}
+\metroset{numbering=none}
+\metroset{outer/progressbar=foot}
+\metroset{titleformat=smallcaps}
+
+\setbeamercolor{description item}{fg=mLightBrown}
+% \setbeamerfont{alerted text}{series=\bfseries}
+\setbeamerfont{footnote}{size=\scriptsize}
+\setbeamercolor{example text}{fg=mDarkBrown}
+
+\renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
+
+%%%
+%%% UTF-8
+%%% 
+
+\RequirePackage{unicodesymbols} % after metropolis which loads fontspec
+
+%%%
+%%% BibLaTeX
+%%%
+
+\RequirePackage[backend=bibtex,
+            style=alphabetic,
+            maxnames=4,
+            citestyle=alphabetic]{biblatex}
+
+\bibliography{local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib}
+
+\DeclareFieldFormat{title}{\alert{#1}}
+\DeclareFieldFormat[book]{title}{\alert{#1}}
+\DeclareFieldFormat[thesis]{title}{\alert{#1}}
+\DeclareFieldFormat[inproceedings]{title}{\alert{#1}}
+\DeclareFieldFormat[incollection]{title}{\alert{#1}}
+\DeclareFieldFormat[article]{title}{\alert{#1}}
+\DeclareFieldFormat[misc]{title}{\alert{#1}}
+
+%%% 
+%%% Microtype
+%%%
+
+\IfFileExists{upquote.sty}{\RequirePackage{upquote}}{}
+\IfFileExists{microtype.sty}{\RequirePackage{microtype}}{}
+
+\setlength{\parindent}{0pt}                   %%
+\setlength{\parskip}{6pt plus 2pt minus 1pt}  %%
+\setlength{\emergencystretch}{3em}            %% prevent overfull lines
+\setcounter{secnumdepth}{0}                   %%
+
+%%% Local Variables:
+%%% mode: latex
+%%% End:
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{newunicodechar}
+\usepackage{unicodesymbols}
+\usepackage[notions,operators,sets,keys,ff,adversary,primitives,complexity,asymptotics,lambda,landau,advantage]{cryptocode}
+\usepackage{xspace}
+\usepackage{units}
+\usepackage{nicefrac}
+\usepackage{gensymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[color=yellow!40]{todonotes}
+\renewcommand{\vec}[1]{\mathbf{#1}\xspace}
+\newcommand{\mat}[1]{\mathbf{#1}\xspace}
+\DeclareMathOperator{\Vol}{Vol}
+\usetheme{default}
+\author{Martin R. Albrecht}
+\date{Oxford Lattice School}
+\title{Attacks on LWE}
+\hypersetup{
+pdfauthor={Martin R. Albrecht},
+pdftitle={Attacks on LWE},
+pdfkeywords={},
+pdfsubject={},
+pdfcreator={Emacs 25.1.1 (Org mode 9.0.4)},
+pdflang={English},
+colorlinks,
+citecolor=gray,
+filecolor=gray,
+linkcolor=gray,
+urlcolor=gray
+}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+
+
+\section{Lattice Point Enumeration}
+\label{sec:orga0dda1f}
+
+\begin{frame}[label={sec:orgf33c3bd}]{Finding Shortest Vectors}
+Given some lattice \(Λ(\mat{B})\), find \(\vec{v} \in Λ(\mat{B})\) with \(\vec{v} \neq 0\) such that \(\|\vec{v}\|^2\) is minimal.
+\end{frame}
+
+\begin{frame}[label={sec:org65709b5}]{Finding Short Vectors}
+Given some \textbf{matrix} \(\mat{B}\) and some \textbf{bound} \(R\), find \(\vec{v} = \sum_{i=1}^{d} v_i \vec{b}_i\) where at least one \(v_i \neq 0\) such that \(\|\vec{v}\|^2 \leq R^2\).
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org0a6eac9}]{Rephrasing in Gram-Schmidt Basis}
+ \begin{columns}[t]
+\begin{column}{0.6\columnwidth}
+Given some basis \(\mat{B}\) for some lattice \(Λ(\mat{B})\) we can compute the Gram-Schmidt orthogonalisation \[\mat{B} = μ \cdot \mat{B}^*\]
+
+Any vector in \(\vec{w} \in Λ(B)\) can be written as 
+\begin{align*}
+\vec{w} &= \sum_{i=1}^d v_i \vec{b}_i = \sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\\
+        &= \sum_{j=1}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^* 
+\end{align*}
+\end{column}
+
+\begin{column}{0.4\columnwidth}
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+B = matrix(ZZ, [[-1,  1, -2], 
+                [ 0, -2,  0], 
+                [10, -1, -2]])
+Bs, mu = B.gram_schmidt()
+Bs
+\end{lstlisting}
+
+\begin{verbatim}
+[   -1     1    -2]
+[ -1/3  -5/3  -2/3]
+[ 44/5     0 -22/5]
+\end{verbatim}
+
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+v = vector([1,2,3])
+v*B == v*(mu*Bs) == (v*mu)*Bs
+\end{lstlisting}
+
+\begin{verbatim}
+True
+\end{verbatim}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org66fd598}]{Orthogonal Projections}
+ \begin{columns}[t]
+\begin{column}{0.55\columnwidth}
+The same representation applies to projections of \(\vec{w}\):
+
+\begin{align*}
+\pi_k\left(\vec{w}\right) &= \pi_k\left(\sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\right)\\
+                        &= \sum_{j=\alert{k}}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*
+\end{align*}
+\end{column}
+
+\begin{column}{0.45\columnwidth}
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+k, d = 1, 3
+w_1 = 0
+for j in range(k, d):
+    c = v[j]
+    for i in range(j+1, d):
+        c += v[i]*mu[i,j]
+    w_1 += c*Bs[j]
+w_1
+\end{lstlisting}
+
+\begin{verbatim}
+(155/6, -17/6, -43/3)
+\end{verbatim}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+def proj(u, v):
+    return v*u/(u*u) * u
+
+w = v * mu * Bs
+w - proj(Bs[0], w)
+\end{lstlisting}
+
+\begin{verbatim}
+(155/6, -17/6, -43/3)
+\end{verbatim}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:orgee37204}]{Bounding Norms}
+ \begin{columns}[t]
+\begin{column}{0.6\columnwidth}
+Since \(\vec{b}_i^*\) are orthogonal, we can write:
+
+\begin{align*}
+\|π_k\left(\vec{w}\right)\|^2 &= \left\|\sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\right\|^2\\
+&= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right)^2 \|\vec{b}_j^*\|^2
+\end{align*}
+
+
+
+Thus \[\|π_{k}(\vec{w})\| ≥ \|π_{k+1}(\vec{w})\|,\] i.e. vectors don’t become longer by projecting.
+\end{column}
+
+\begin{column}{0.4\columnwidth}
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+k, d = 1, 3
+r = 0
+for j in range(k, d):
+    c = v[j]
+    for i in range(j+1, d):
+        c += v[i]*mu[i,j]
+    r += c^2 * abs(Bs[j])^2
+r
+\end{lstlisting}
+
+\begin{verbatim}
+5285/6
+\end{verbatim}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+def proj(u, v):
+    return v*u/(u*u) * u
+
+w = v * mu * Bs
+abs(w - proj(Bs[0], w))^2
+\end{lstlisting}
+
+\begin{verbatim}
+5285/6
+\end{verbatim}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:orgbee23f9}]{Key Idea}
+From \[\|π_{d}(\vec{w})\|^2 \leq \|π_{d-1}(\vec{w})\|^2 ≤ … ≤ \|π_{1}(\vec{w})\|^2 ≤ \|\vec{w}\|^2 \leq R^2,\] find candidates for \(π_{k+1}(\vec{w})\) and extend solution to \(π_{k}(\vec{w})\) using
+\begin{align*}
+\pi_k\left(\vec{w}\right) &= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\\
+&=  \pi_{k+1}(\vec{w}) + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right) \vec{b}_k^*
+\end{align*}
+and
+\begin{align*}
+\|\pi_k\left(\vec{w}\right)\|^2 
+&=  \|\pi_{k+1}(\vec{w})\|^2 + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right)^2 \|\vec{b}_k^*\|^2
+\end{align*}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org90feb2a}]{Execution}
+ \begin{columns}[t]
+\begin{column}{0.58\columnwidth}
+From the bound \(R\) we know \[v_d^2 \|\vec{b}_d^*\|^2 = \|π_d(\vec{w})\|^2 ≤ R^2\]
+
+Thus, the only valid candidates for \(v_d\) are \[\ZZ \cap [-R/\|\vec{b}_d^*\|,R/\|\vec{b}_d^*\|]\]
+
+For any choice of \(v_d\) in this interval, we know
+\begin{align*}
+\|π_{d-1}(\vec{w})\|^2 \leq& R^2\\
+v_d^2 \|\vec{b}_d^*\|^2 + (\alert{v_{d-1}} + v_d\, \mu_{d,d-1})^2 \cdot \|\vec{b}_{d-1}^*\|^2 \leq& R^2\\ 
+\end{align*}
+
+This defines an integral interval for \(v_{d-1}\)
+\end{column}
+
+\begin{column}{0.42\columnwidth}
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+R = abs(B[0])
+bnd = floor(abs(Bs[-1])/R)
+range(-bnd, bnd+1)
+\end{lstlisting}
+
+\begin{verbatim}
+[-4, -3, -2, -1, 0, 1, 2, 3, 4]
+\end{verbatim}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+v_d = 0
+c = -v_d*mu[-1,-2]
+o = R^2 - v_d^2*abs(Bs[-1])^2
+o = sqrt(o)/abs(Bs[-2])
+range(ceil(c-o), floor(c+o)+1)
+\end{lstlisting}
+
+\begin{verbatim}
+[-1, 0, 1]
+\end{verbatim}
+
+…
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org1a9b7d0}]{Enumeration}
+\begin{description}
+\item[{shortest vectors}] reduce \(R\) whenever a shortet vector than bound is found
+\item[{short enough vectors}] stop when vector with target norm is found
+\item[{target radius}] \(R = \|\vec{b}_1\|\) always works, picking a small \(R\) reduces the search space, e.g. \(R ≈ \Vol(L)^{1/d}\)
+\item[{pruning}] not all choices for \(v_k\) equally likely lead to a solution, skip some
+\end{description}
+\end{frame}
+
+
+\section{BKZ}
+\label{sec:org7879d80}
+
+\section{LWE}
+\label{sec:org583f538}
+
+\begin{frame}[label={sec:org858de6a}]{Learning with Errors}
+Let \(n,\,q\) be positive integers, \(\chi\) be a probability distribution on \(\ZZ\) and \(\vec{s}\) be a secret vector in \(\ZZ_q^n\). We denote by \(L_{n,q,\chi}\) the probability distribution on \(\ZZ_q^n × \ZZ_q\) obtained by choosing \(\vec{a} ∈ \ZZ_q^n\) uniformly at random, choosing \(e ∈ \ZZ\) according to χ and considering it in \(\ZZ_q\), and returning \((\vec{a}, c) = (\vec{a}, \Angle{\vec{a},\vec{s}}+ e) ∈ \ZZ_q^n × \ZZ_q\).
+
+\begin{description}
+\item[{Decision-LWE}] is the problem of deciding whether pairs \((\vec{a}, c) ∈ \ZZ_q^n × \ZZ_q\) are sampled according to \(L_{n, q, \chi}\) or the uniform distribution on \(\ZZ_q^n × \ZZ_q\).
+
+\item[{Search-LWE}] is the problem of recovering \(\vec{s}\) from \((\vec{a}, c)=(\vec{a}, \Angle{\vec{a},\vec{s}} + e) ∈ \ZZ_q^n × \ZZ_q\) sampled according to \(L_{n, q, \chi}\).
+\end{description}
+\end{frame}
+
+\section{Dual Lattice Attack}
+\label{sec:org31e39da}
+\begin{frame}[label={sec:orgaae87bf}]{Short Integer Solutions}
+Consider the scaled (by \(q\)) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \vec{A} \equiv 0 \bmod q\}.\] A short vector of \(qΛ^*\) is equivalent to solving SIS on \(\vec{A}\).
+
+\begin{block}{Short Integer Solutions (SIS)}
+Given \(q \in \mathbb{Z}\), a matrix \(\vec{A}\), and \(t < q\); find \(\vec{y}\) with \(0 < \|\vec{y}\| \leq t\) and \[\vec{y}\, \vec{A} \equiv  \vec{0} \pmod{q}.\]
+\end{block}
+\end{frame}
+
+\begin{frame}[label={sec:org1937f59}]{Strategy}
+\begin{itemize}
+\item Find a short \(\vec{y}\) solving SIS on \(\vec{A}\).
+\item Given LWE samples \(\vec{A}, \vec{c}\) where either \(\vec{c} = \vec{A}\vec{s} + \vec{e}\) or \(\vec{c}\) uniformly random.
+\item Compute \(\Angle{\vec{y}, \vec{c}}\). 
+\begin{itemize}
+\item If \(\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}\), then \(\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y}\vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}\).
+\item If \(\vec{c}\) is uniformly random, so is \(\Angle{\vec{y}, \vec{c}}\).
+\end{itemize}
+\end{itemize}
+
+If \(\vec{y}\) is sufficiently short, then \(\Angle{\vec{y}, \vec{e}}\) will also be short, since \(\vec{e}\) is also small, and can be distinguished from uniform values.
+\end{frame}
+
+\begin{frame}[label={sec:org897ea0b}]{Degrees of Freedom}
+\end{frame}
+\begin{frame}[label={sec:org3cccd4a}]{Constructing a Basis}
+\end{frame}
+\begin{frame}[label={sec:orgddc5b70}]{Lattice Reduction}
+A \alert{reduced lattice} basis is made of short vectors, in particular the first vector.
+\begin{itemize}
+\item Construct a basis of the dual from the instance.
+\item Feed to a lattice reduction algorithm to obtain short vectors \(\vec{v}_i\).
+\item Check if \(\vec{v}_i\, \vec{A}\) are small.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orge5d246f}]{BKW}
+\end{frame}
+\section{Primal Lattice Attack (uSVP Version)}
+\label{sec:orgac664b3}
+
+\begin{frame}[standout,label={sec:org4463593}]{Fin}
+\begin{center}
+\Huge \alert{Thank You}
+\end{center}
+\end{frame}
+\end{document}

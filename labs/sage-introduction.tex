@@ -1,4 +1,4 @@
-% Created 2017-01-27 Fri 14:08
+% Created 2017-01-27 Fri 18:27
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation,smaller]{beamer}
 \RequirePackage{etex}
@@ -179,13 +179,6 @@
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage[color=yellow!40]{todonotes}
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd{\@verbatim}
-{\verbatim@font}
-{\verbatim@font\scriptsize}
-{}{}
-\makeatother
 \newcommand{\cR}{\ensuremath{\mathcal{R}}\xspace}
 \newcommand{\Z}{\ensuremath{\mathbb Z}\xspace}
 \renewcommand{\C}{\ensuremath{\mathbb C}\xspace}
@@ -204,7 +197,7 @@ pdfauthor={Martin R. Albrecht and Léo Ducas},
 pdftitle={Sage for Lattice-based Cryptography},
 pdfkeywords={},
 pdfsubject={},
-pdfcreator={Emacs 25.1.1 (Org mode 9.0.3)},
+pdfcreator={Emacs 25.1.1 (Org mode 9.0.4)},
 pdflang={English},
 colorlinks,
 citecolor=gray,
@@ -220,10 +213,9 @@ urlcolor=gray
 \end{frame}
 
 
-
 \section{Sage}
-\label{sec:org73ad163}
-\begin{frame}[label={sec:org55d92a3}]{Blurb}
+\label{sec:orgc7c5de8}
+\begin{frame}[label={sec:org4dd4b4d}]{Blurb}
 \begin{columns}
 \begin{column}{0.15\columnwidth}
 \begin{center}
@@ -243,7 +235,7 @@ urlcolor=gray
 Sage is a free open-source mathematics software system licensed under the GPL. It combines the power of many existing open-source packages into a common Python-based interface.
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orge2b7552}]{How to use it}
+\begin{frame}[fragile,label={sec:org7ca6928}]{How to use it}
  \begin{description}
 \item[{command line}] run \texttt{sage}
 \item[{local webapp}] run \texttt{sage -notebook=jupyter}
@@ -252,7 +244,7 @@ Sage is a free open-source mathematics software system licensed under the GPL. I
 \end{description}
 \end{frame}
 
-\begin{frame}[label={sec:orgc2a86f6}]{Python \& Cython}
+\begin{frame}[label={sec:orgb4c65d0}]{Python \& Cython}
 \begin{center}
 \centering
 \begin{center}
@@ -271,7 +263,7 @@ Sage does \alert{not} come with yet-another ad-hoc mathematical programming lang
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org855ec46}]{Sage ≠ Python}
+\begin{frame}[fragile,label={sec:orgae0d8c3}]{Sage ≠ Python}
  \begin{columns}[t]
 \begin{column}{0.45\columnwidth}
 \textbf{Sage}
@@ -337,7 +329,7 @@ type(2)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgdb3fa6b}]{Sage ≠ Python}
+\begin{frame}[fragile,label={sec:org09b4de6}]{Sage ≠ Python}
  \begin{columns}[t]
 \begin{column}{0.45\columnwidth}
 \textbf{Sage}
@@ -623,7 +615,7 @@ f.simplify_log()
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org6c6a6be}]{Dense Linear Algebra}
+\begin{frame}[fragile,label={sec:org36d0976}]{Dense Linear Algebra}
  \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 sage: for p in (2,3,4,7,8,9,11):
@@ -652,8 +644,8 @@ Finite Field of size 11 & 0.212 s & \href{http://www.linalg.org}{LinBox}\\
 \end{frame}
 
 \section{Lattices}
-\label{sec:org9b6d47f}
-\begin{frame}[fragile,label={sec:org0ba46b9}]{Integer Matrices}
+\label{sec:org8a4d54c}
+\begin{frame}[fragile,label={sec:orgc581a8d}]{Integer Matrices}
  The usual operations on matrices are available:
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -687,7 +679,7 @@ sage: abs(A.det()).log(2).n()
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org12a9dda}]{Bases for q-ary Lattices}
+\begin{frame}[fragile,label={sec:orgd3a1a3f}]{Bases for q-ary Lattices}
  We construct a basis for a \(q\)-lattice.
 
 \begin{itemize}
@@ -727,7 +719,7 @@ N.stack(S, subdivide=True)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgee02f79}]{Instance Generator}
+\begin{frame}[fragile,label={sec:org9486f68}]{Instance Generator}
  If you just want some typical lattices to play with:
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -749,7 +741,7 @@ sage: sage.crypto.gen_lattice(m=10, seed=42, type="modular")
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org3a97b29}]{LLL}
+\begin{frame}[fragile,label={sec:org7174a90}]{LLL}
  LLL is available. By default Sage calls \texttt{Fplll}, but you can also call \texttt{NTL}.
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -774,7 +766,7 @@ sage: A.LLL(delta=0.99, eta=0.51) # calls fplll
 If you want LLL on Gram matrices, \texttt{Pari} is also available.
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org84627a9}]{BKZ}
+\begin{frame}[fragile,label={sec:org8aece74}]{BKZ}
  BKZ is available. By default \texttt{Fplll} is called, but you can also call \texttt{NTL}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -793,7 +785,7 @@ Passing \texttt{proof=False} enables BKZ 2.0 with some decent heuristics. It wil
 \end{block}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgf9b3230}]{Lattices}
+\begin{frame}[fragile,label={sec:org7541920}]{Lattices}
  Sometimes it is more natural to work with a lattice object directly, instead of a basis matrix\footnote{Lattices are still represented by bases, though.}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -819,7 +811,7 @@ sage: L.shortest_vector().norm().log(2).n()
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org32213a5}]{Discrete Gaussians: Integers}
+\begin{frame}[fragile,label={sec:org9cb6cd5}]{Discrete Gaussians: Integers}
  Discrete Gaussian samplers are available as:
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -835,7 +827,7 @@ sage: histogram([D() for _ in range(2^16)], color="orange")
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgcfba929}]{Discrete Gaussians: Lattices}
+\begin{frame}[fragile,label={sec:org94a0d65}]{Discrete Gaussians: Lattices}
  GPV algorithm for sampling from arbitrary lattices.\footfullcite{STOC:GenPeiVai08}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -854,7 +846,7 @@ sage: list_plot3d(l, point_list=True, interpolation='nn')
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgbdab677}]{Learning with Errors}
+\begin{frame}[fragile,label={sec:orgba506f3}]{Learning with Errors}
  \begin{itemize}
 \item Module also has \texttt{Regev} and \texttt{LindnerPeikert} samplers
 
@@ -1043,7 +1035,7 @@ class BKZReduction:
 
 
 \section{Rings}
-\label{sec:org45e5daa}
+\label{sec:org7c4c709}
 \begin{frame}[fragile,allowframebreaks]{Polynomial Rings}
  \begin{itemize}
 \item Sage has polynomial rings …
@@ -1096,7 +1088,7 @@ Multivariate Polynomial Ring in x00, x01, x02 \
 \end{verbatim}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:orgfc869fa}]{Quotient Rings}
+\begin{frame}[fragile,label={sec:org66d89e4}]{Quotient Rings}
  \begin{itemize}
 \item You can construct quotient rings:
 
@@ -1127,7 +1119,7 @@ x^3 + x^2 - x - 7
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org9431624}]{Number Fields}
+\begin{frame}[fragile,label={sec:org9470c70}]{Number Fields}
  \begin{itemize}
 \item Relative and absolute number fields are a thing:
 
@@ -1161,7 +1153,7 @@ sage: s^2
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orge6a8fd1}]{Cyclotomic Number Fields}
+\begin{frame}[fragile,label={sec:orgc3bdd71}]{Cyclotomic Number Fields}
  Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and \(n = m/2\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -1176,7 +1168,7 @@ x^4 + 1
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgb0e9819}]{Cyclotomic Number Fields: Subfields}
+\begin{frame}[fragile,label={sec:org368b4a5}]{Cyclotomic Number Fields: Subfields}
  Let \(\L = \Q(ζ_{m'})\) with \(m' | m\) be a subfield of \(\K\). The ring of integers of \(\L\) is \(\cR' ≃ \Z[X]/(X^{n'} + 1)\) with \(n' = m'/2\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -1191,7 +1183,7 @@ zeta^2
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org6376d91}]{Cyclotomic Number Fields: Galois Group}
+\begin{frame}[fragile,label={sec:org14ebc97}]{Cyclotomic Number Fields: Galois Group}
  \(\K\) is a Galois extension of \(\Q\), and its Galois group \(G\) is isomorphic to \(\Z_m^*\): \(i \in \Z_m^* \leftrightarrow (X \mapsto X^i) \in G\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -1204,7 +1196,7 @@ Galois group of Cyclotomic Field of order 8 and degree 4
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org108575d}]{Cyclotomic Number Fields: Class Group}
+\begin{frame}[fragile,label={sec:org1c899c8}]{Cyclotomic Number Fields: Class Group}
  The first Cyclotomic field with \(m=2^k\) and a non-trivial class group is \(m=2^6\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
@@ -1218,7 +1210,7 @@ sage: K.class_number(proof=False)
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgf561498}]{Cyclotomic Number Fields: Lattices}
+\begin{frame}[fragile,label={sec:org1bb2790}]{Cyclotomic Number Fields: Lattices}
  \begin{itemize}
 \item Converting number field elements to matrices/lattice bases:
 
@@ -1256,7 +1248,7 @@ sage: L.shortest_vector().norm().log(2).n()
 \end{itemize}
 \end{frame}
 
-\begin{frame}[standout,label={sec:org6d919a8}]{Fin}
+\begin{frame}[standout,label={sec:org9340a6d}]{Fin}
 \begin{center}
 {\Huge \alert{Thank You} }
 \end{center}

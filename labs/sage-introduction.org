@@ -12,13 +12,6 @@
 #+STARTUP: beamer indent
 #+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
 
-#+LATEX_HEADER: \usepackage{etoolbox}
-#+LATEX_HEADER: \makeatletter
-#+LATEX_HEADER: \patchcmd{\@verbatim}
-#+LATEX_HEADER:   {\verbatim@font}
-#+LATEX_HEADER:   {\verbatim@font\scriptsize}
-#+LATEX_HEADER:   {}{}
-#+LATEX_HEADER: \makeatother
 #+LATEX_HEADER: \newcommand{\cR}{\ensuremath{\mathcal{R}}\xspace}
 #+LATEX_HEADER: \newcommand{\Z}{\ensuremath{\mathbb Z}\xspace}
 #+LATEX_HEADER: \renewcommand{\C}{\ensuremath{\mathbb C}\xspace}

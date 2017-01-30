@@ -1,0 +1,381 @@
+#+OPTIONS: H:2 toc:t num:t
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+
+#+LaTeX_CLASS: mbeamer
+
+#+TITLE: Attacks on LWE
+#+SUBTITLE:  
+#+AUTHOR: Martin R. Albrecht
+#+EMAIL: martin.albrecht@royalholloway.ac.uk
+#+DATE: Oxford Lattice School
+#+STARTUP: beamer indent
+#+LATEX_HEADER: \renewcommand{\vec}[1]{\mathbf{#1}\xspace}
+#+LATEX_HEADER: \newcommand{\mat}[1]{\mathbf{#1}\xspace}
+#+LATEX_HEADER: \DeclareMathOperator{\Vol}{Vol}
+#+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
+
+
+* Lattice Point Enumeration
+
+** Finding Shortest Vectors
+
+Given some lattice $Λ(\mat{B})$, find $\vec{v} \in Λ(\mat{B})$ with $\vec{v} \neq 0$ such that $\|\vec{v}\|^2$ is minimal.
+
+** Finding Short Vectors
+
+Given some _matrix_ $\mat{B}$ and some _bound_ $R$, find $\vec{v} = \sum_{i=1}^{d} v_i \vec{b}_i$ where at least one $v_i \neq 0$ such that $\|\vec{v}\|^2 \leq R^2$.
+
+** Rephrasing in Gram-Schmidt Basis
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.6
+:END:
+
+Given some basis $\mat{B}$ for some lattice $Λ(\mat{B})$ we can compute the Gram-Schmidt orthogonalisation \[\mat{B} = μ \cdot \mat{B}^*\]
+
+Any vector in \(\vec{w} \in Λ(B)\) can be written as 
+#+BEGIN_EXPORT latex
+\begin{align*}
+\vec{w} &= \sum_{i=1}^d v_i \vec{b}_i = \sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\\
+        &= \sum_{j=1}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^* 
+\end{align*}
+#+END_EXPORT
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.4
+:END:
+
+#+BEGIN_SRC sage
+B = matrix(ZZ, [[-1,  1, -2], 
+                [ 0, -2,  0], 
+                [10, -1, -2]])
+Bs, mu = B.gram_schmidt()
+Bs
+#+END_SRC
+
+#+RESULTS: 
+: [   -1     1    -2]
+: [ -1/3  -5/3  -2/3]
+: [ 44/5     0 -22/5]
+
+
+#+BEGIN_SRC sage
+v = vector([1,2,3])
+v*B == v*(mu*Bs) == (v*mu)*Bs
+#+END_SRC
+
+#+RESULTS:
+: True
+
+** Orthogonal Projections
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.55
+:END:
+
+
+The same representation applies to projections of $\vec{w}$:
+
+#+BEGIN_EXPORT latex
+\begin{align*}
+\pi_k\left(\vec{w}\right) &= \pi_k\left(\sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\right)\\
+                        &= \sum_{j=\alert{k}}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*
+\end{align*}
+#+END_EXPORT
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.45
+:END:
+
+#+BEGIN_SRC sage
+k, d = 1, 3
+w_1 = 0
+for j in range(k, d):
+    c = v[j]
+    for i in range(j+1, d):
+        c += v[i]*mu[i,j]
+    w_1 += c*Bs[j]
+w_1
+#+END_SRC
+
+#+RESULTS:
+: (155/6, -17/6, -43/3)
+
+#+BEGIN_SRC sage
+def proj(u, v):
+    return v*u/(u*u) * u
+
+w = v * mu * Bs
+w - proj(Bs[0], w)
+#+END_SRC
+
+#+RESULTS:
+: (155/6, -17/6, -43/3)
+
+** Bounding Norms
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.6
+:END:
+
+Since $\vec{b}_i^*$ are orthogonal, we can write:
+
+#+BEGIN_EXPORT latex
+\begin{align*}
+\|π_k\left(\vec{w}\right)\|^2 &= \left\|\sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\right\|^2\\
+&= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right)^2 \|\vec{b}_j^*\|^2
+\end{align*}
+#+END_EXPORT
+
+
+
+Thus \[\|π_{k}(\vec{w})\| ≥ \|π_{k+1}(\vec{w})\|,\] i.e. vectors don’t become longer by projecting.
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.4
+:END:
+
+
+#+BEGIN_SRC sage
+k, d = 1, 3
+r = 0
+for j in range(k, d):
+    c = v[j]
+    for i in range(j+1, d):
+        c += v[i]*mu[i,j]
+    r += c^2 * abs(Bs[j])^2
+r
+#+END_SRC
+
+#+RESULTS:
+: 5285/6
+
+#+BEGIN_SRC sage
+def proj(u, v):
+    return v*u/(u*u) * u
+
+w = v * mu * Bs
+abs(w - proj(Bs[0], w))^2
+#+END_SRC
+
+#+RESULTS:
+: 5285/6
+
+** Key Idea
+
+
+From \[\|π_{d}(\vec{w})\|^2 \leq \|π_{d-1}(\vec{w})\|^2 ≤ … ≤ \|π_{1}(\vec{w})\|^2 ≤ \|\vec{w}\|^2 \leq R^2,\] find candidates for \(π_{k+1}(\vec{w})\) and extend solution to \(π_{k}(\vec{w})\) using
+#+BEGIN_EXPORT latex
+\begin{align*}
+\pi_k\left(\vec{w}\right) &= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\\
+&=  \pi_{k+1}(\vec{w}) + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right) \vec{b}_k^*
+\end{align*}
+#+END_EXPORT
+and
+#+BEGIN_EXPORT latex
+\begin{align*}
+\|\pi_k\left(\vec{w}\right)\|^2 
+&=  \|\pi_{k+1}(\vec{w})\|^2 + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right)^2 \|\vec{b}_k^*\|^2
+\end{align*}
+#+END_EXPORT
+
+** Execution
+
+***                                                                :B_columns:
+:PROPERTIES:
+:BEAMER_env: columns
+:BEAMER_OPT: t
+:END:
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.58
+:END:
+
+From the bound $R$ we know \[v_d^2 \|\vec{b}_d^*\|^2 = \|π_d(\vec{w})\|^2 ≤ R^2\]
+
+Thus, the only valid candidates for $v_d$ are \[\ZZ \cap [-R/\|\vec{b}_d^*\|,R/\|\vec{b}_d^*\|]\]
+
+For any choice of $v_d$ in this interval, we know
+#+BEGIN_EXPORT latex
+\begin{align*}
+\|π_{d-1}(\vec{w})\|^2 \leq& R^2\\
+v_d^2 \|\vec{b}_d^*\|^2 + (\alert{v_{d-1}} + v_d\, \mu_{d,d-1})^2 \cdot \|\vec{b}_{d-1}^*\|^2 \leq& R^2\\ 
+\end{align*}
+#+END_EXPORT
+
+This defines an integral interval for $v_{d-1}$
+
+****                                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.42
+:END:
+
+#+BEGIN_SRC sage
+R = abs(B[0])
+bnd = floor(abs(Bs[-1])/R)
+range(-bnd, bnd+1)
+#+END_SRC
+
+#+RESULTS:
+: [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+ 
+#+BEGIN_SRC sage
+v_d = 0
+c = -v_d*mu[-1,-2]
+o = R^2 - v_d^2*abs(Bs[-1])^2
+o = sqrt(o)/abs(Bs[-2])
+range(ceil(c-o), floor(c+o)+1)
+#+END_SRC 
+
+#+RESULTS:
+: [-1, 0, 1]
+
+…
+
+** Enumeration
+
+- shortest vectors :: reduce $R$ whenever a shortet vector than bound is found
+- short enough vectors :: stop when vector with target norm is found
+- target radius :: $R = \|\vec{b}_1\|$ always works, picking a small $R$ reduces the search space, e.g. $R ≈ \Vol(L)^{1/d}$
+- pruning :: not all choices for $v_k$ equally likely lead to a solution, skip some
+
+
+* BKZ
+
+* LWE
+
+** Learning with Errors
+
+Let \(n,\,q\) be positive integers, $\chi$ be a probability distribution on $\ZZ$ and $\vec{s}$ be a secret vector in \(\ZZ_q^n\). We denote by $L_{n,q,\chi}$ the probability distribution on \(\ZZ_q^n × \ZZ_q\) obtained by choosing \(\vec{a} ∈ \ZZ_q^n\) uniformly at random, choosing \(e ∈ \ZZ\) according to χ and considering it in \(\ZZ_q\), and returning \((\vec{a}, c) = (\vec{a}, \Angle{\vec{a},\vec{s}}+ e) ∈ \ZZ_q^n × \ZZ_q\).
+
+- Decision-LWE :: is the problem of deciding whether pairs \((\vec{a}, c) ∈ \ZZ_q^n × \ZZ_q\) are sampled according to \(L_{n, q, \chi}\) or the uniform distribution on \(\ZZ_q^n × \ZZ_q\).
+
+- Search-LWE :: is the problem of recovering \(\vec{s}\) from \((\vec{a}, c)=(\vec{a}, \Angle{\vec{a},\vec{s}} + e) ∈ \ZZ_q^n × \ZZ_q\) sampled according to \(L_{n, q, \chi}\).
+
+* Dual Lattice Attack
+** Short Integer Solutions
+
+Consider the scaled (by $q$) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \vec{A} \equiv 0 \bmod q\}.\] A short vector of $qΛ^*$ is equivalent to solving SIS on $\vec{A}$.
+
+*** Short Integer Solutions (SIS)
+
+Given $q \in \mathbb{Z}$, a matrix $\vec{A}$, and $t < q$; find $\vec{y}$ with $0 < \|\vec{y}\| \leq t$ and \[\vec{y}\, \vec{A} \equiv  \vec{0} \pmod{q}.\]
+
+** Strategy
+  
+- Find a short $\vec{y}$ solving SIS on $\vec{A}$. 
+- Given LWE samples $\vec{A}, \vec{c}$ where either $\vec{c} = \vec{A}\vec{s} + \vec{e}$ or $\vec{c}$ uniformly random. 
+- Compute $\Angle{\vec{y}, \vec{c}}$. 
+  - If $\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}$, then $\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y}\vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}$.
+  - If $\vec{c}$ is uniformly random, so is $\Angle{\vec{y}, \vec{c}}$.
+
+If $\vec{y}$ is sufficiently short, then $\Angle{\vec{y}, \vec{e}}$ will also be short, since $\vec{e}$ is also small, and can be distinguished from uniform values.
+
+** Degrees of Freedom
+** Constructing a Basis
+** Lattice Reduction
+
+  A *reduced lattice* basis is made of short vectors, in particular the first vector.
+  - Construct a basis of the dual from the instance.
+  - Feed to a lattice reduction algorithm to obtain short vectors $\vec{v}_i$.
+  - Check if $\vec{v}_i\, \vec{A}$ are small.
+
+** BKW
+* Primal Lattice Attack (uSVP Version)
+
+** Dummy Slide                                                       :noexport:
+
+Some text[fn:1]
+
+** Fin
+:PROPERTIES:
+:BEAMER_OPT: standout
+:END:
+
+#+BEGIN_CENTER
+\Huge *Thank You*
+#+END_CENTER
+
+* Footnotes
+
+[fn:1] A footnote
+
+* Build Artefacts                                                     :noexport:
+
+** Emacs Config
+
+#+BEGIN_SRC emacs-lisp :tangle .dir-locals.el
+((magit-mode .
+             ((eval .
+                    (and
+                     (visual-line-mode 1)))))
+ (bibtex-mode . ((fill-column . 10000)))
+ (org-mode .
+           ((org-tags-column . -80)
+            (eval .
+                  (and
+                   (visual-fill-column-mode t)
+                   (flyspell-mode t))))))
+#+END_SRC
+
+** Makefile
+
+#+BEGIN_SRC makefile :tangle Makefile
+EMACS=emacs
+EMACSFLAGS=--batch -l ~/.emacs.d/org-export-init.el
+LATEXMK=latexmk
+LATEXMKFLAGS=-xelatex
+
+%.pdf: %.tex
+	$(LATEXMK) $(LATEXMKFLAGS) $<
+
+%.tex: %.org
+	$(EMACS) $(EMACSFLAGS) $< -f org-latex-export-to-latex
+
+clean:
+	rm -f *.bbl *.aux *.out *.synctex.gz *.log *.run.xml *.blg *-blx.bib *.fdb_latexmk *.fls *.toc *.vrb *.snm *.nav
+
+.PHONY: clean all
+.PRECIOUS: %.tex
+#+END_SRC
+
+** Autoexport to PDF
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
+# End:

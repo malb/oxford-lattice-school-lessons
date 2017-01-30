@@ -12,7 +12,7 @@
 #+TITLE: Lab 2
 #+SUBTITLE: Lattice Reduction & Attacks
 #+AUTHOR: Martin R. Albrecht and Léo Ducas
-#+DATE: March 23, 2017
+#+DATE: 23 March 2017
 
 In this lab, we will make intensive use of Fplll[fn:1] and Fpylll[fn:2]. Fplll is a C++11 library for operating on lattices using floating point arithmetic. It implements Gram-Schmidt orthogonalisation, LLL, BKZ, BKZ 2.0 footfullcite:AC:CheNgu11, Slide reduction footfullcite:STOC:GamNgu08 and Self-Dual BKZ footfullcite:EPRINT:MicWal15.
 
@@ -176,7 +176,7 @@ Calling BKZ works similarly: there is a high-level function =BKZ.reduction()= an
 fpylll.algorithms
 #+END_EXAMPLE
 
-These are re-implementations of BKZ-syle algorithms in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:7]
+These are re-implementations of BKZ-syle algorithms in Python which makes them rather hackable, i.e. we can modify different parts of the algorithms relatively easily. To use those, we first have to import them. We opt for BKZ 2.0:[fn:6]
 
 #+BEGIN_SRC sage
 from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
@@ -202,7 +202,7 @@ par = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 
 #+RESULTS:
 
-The parameter =strategies= takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in =BKZ.DEFAULT_STRATEGY= were computed using fplll’s =strategizer=.[fn:8]
+The parameter =strategies= takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in =BKZ.DEFAULT_STRATEGY= were computed using fplll’s =strategizer=.[fn:7]
 
 #+BEGIN_SRC sage
 BKZ.DEFAULT_STRATEGY
@@ -249,7 +249,7 @@ Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vo
 
 Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \Vol(L)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where $m$ is the dimension of the lattice, we get $α = δ^{-2m/(m-1)}$.footfullcite:RSA:LinPei11 Check how well this assumption holds for various block sizes of BKZ.
 
-That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:[fn:6]
+That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:[fn:8]
 
 - Check out the =dump_gso_filename= option for =BKZ.Param=.
 
@@ -260,7 +260,7 @@ That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms 
 If you are running from within Sage, you can simply call =line()= to plot, e.g. 
 
 #+BEGIN_SRC sage :file lab-02-plot-line-sage.png
-line(zip(range(10),prime_range(30)), color="lightgrey", dpi=300r)
+line(zip(range(10),prime_range(30)), color="lightgrey", dpi=150r, thickness=2)
 #+END_SRC
 
 #+ATTR_LATEX: :width 0.6\textwidth
@@ -298,15 +298,16 @@ lwe = LindnerPeikert(50)
 1. Establish the BKZ block size required to distinguish with an advantage of, say, 60%.footfullcite:RSA:LinPei11
    
    Note that this entails finding the optimal number of samples \(m\), i.e that \(m\) which minimises the expression $δ_0^m ⋅ q^{n/m}$.footfullcite:PQCBook:MicReg09,EPRINT:AlbPlaSco15
-2. Construct a basis for the scaled dual lattice.
+2. Construct a basis for the scaled dual lattice.[fn:10]
 3. Run BKZ on on that basis to recover a short vector \(v\) in the scaled dual lattice.
 4. Use (possibly several) \(v\) to distinguish the outputs of the oracle from uniform.
 5. Attempt bigger, harder instances.
 6. Improve the running time by employing cleverer techniques, such as progressive BKZ footfullcite:EPRINT:AWHT16, running in the low-advantage regime or sparse-ish re-randomisation of already reduced bases.
 
-* Primal Attack
+* TODO Primal Attack
 
-Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
+- Run uSVP attack
+- Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
 * Lattice Challenge
 
@@ -712,7 +713,6 @@ histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
 #+RESULTS:
 [[file:lab-02-solution-dual-attack-histogram.png]]
 
-
 * Footnotes
 
 [fn:1] https://github/com/fplll/fplll
@@ -725,15 +725,18 @@ histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
 
 [fn:5] https://doc.sagemath.org/html/en/tutorial/tour_help.html
 
-[fn:6] We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” https://www.python.org/dev/peps/pep-0020/
+[fn:6] Check out https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple_bkz.py for a simple implementation of BKZ.
 
-[fn:7] Check out https://github.com/fplll/fpylll/blob/master/src/fpylll/algorithms/simple_bkz.py for a simple implementation of BKZ.
+[fn:7] https://github.com/fplll/strategizer
 
-[fn:8] https://github.com/fplll/strategizer
+[fn:8] We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” https://www.python.org/dev/peps/pep-0020/
 
 [fn:9] http://matplotlib.org
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-latex-export-to-latex))) nil t)
 # End:
+
+[fn:10] See http://doc.sagemath.org/html/en/constructions/linear_algebra.html#kernels
+
 
