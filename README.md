@@ -18,7 +18,7 @@ Signatures from lattices
 - [overview/reminder] Finkle-Pohst Enumeration (no pruning …)
 - [overview/reminder] short: BKZ, and quality prediction (root Hermite factor, GSA, …)
 - Mounting simple attacks on SIS (approx-SVP) and LWE (uSVP) 
-- Finding $m$ is an exercise
+- Finding the optimal number of sample $m$ is an exercise (see [LinPei])
 - Need to check with *Phong* what he’ll cover
 
 ### Lecture 3 (Martin & Léo, 60 minutes, Thu)
