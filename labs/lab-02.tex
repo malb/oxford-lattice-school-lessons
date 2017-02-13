@@ -1,4 +1,4 @@
-% Created 2017-01-27 Fri 18:14
+% Created 2017-02-08 Wed 09:34
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,a4paper,nobib]{tufte-handout}
 \usepackage{fontspec}
@@ -63,7 +63,7 @@ Fpylll is a Python wrapper and extension of Fplll, making its data structures an
 That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!\footnote{\url{https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md}}
 
 \section{Introduction}
-\label{sec:orga3d3eba}
+\label{sec:org2bfdadb}
 In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
 To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
@@ -76,7 +76,7 @@ from fpylll import *
 \textbf{Note} by calling \texttt{from fpylll import *} we overwite Sage’s own \texttt{set\_random\_seed}. You can still call it as \texttt{sage.all.set\_random\_seed}.
 
 \subsection{Integer Matrices}
-\label{sec:org5ad486b}
+\label{sec:orgb8eaffc}
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant \(q^{50}\) where \(q\) is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
@@ -89,7 +89,7 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 \textbf{Reminder:} Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.\footnote{\url{https://doc.sagemath.org/html/en/tutorial/tour\_help.html}}
 
 \subsection{Gram-Schmidt Orthogonalisation}
-\label{sec:org080e1d8}
+\label{sec:org88ff322}
 
 To run LLL we have two choices. We can either run the high-level \texttt{LLL.reduction()} function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a \texttt{MatGSO} object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
@@ -147,7 +147,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{LLL}
-\label{sec:org8943c30}
+\label{sec:orgac4b771}
 
 We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. \texttt{M}, are automatically also applied to the underlying integer matrix, e.g. \texttt{A}.
 
@@ -216,7 +216,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{BKZ}
-\label{sec:org9ee87ed}
+\label{sec:org2a58399}
 
 Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations of the BKZ algorithm in 
 
@@ -293,19 +293,19 @@ i & time & r\(_{\text{0}}\)\\
 \end{center}
 
 \section{Lattice Reduction}
-\label{sec:org1e87bcc}
+\label{sec:org0b0f1b2}
 
 In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 \subsection{root-Hermite factors}
-\label{sec:orgd51479c}
+\label{sec:org653a42c}
 
 Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org5960d21}
+\label{sec:orgd6f4f3f}
 
-Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \Vol(L)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where \(m\) is the dimension of the lattice, we get \(α = δ^{-2m/(m-1)}\).\footfullcite{RSA:LinPei11} Check how well this assumption holds for various block sizes of BKZ.
+Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \det(Λ)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where \(m\) is the dimension of the lattice, we get \(α = δ^{-2m/(m-1)}\).\footfullcite{RSA:LinPei11} Check how well this assumption holds for various block sizes of BKZ.
 
 That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:\footnote{We apologise for violating the Zen of Python so much: “There should be one — and preferably only one — obvious way to do it.” \url{https://www.python.org/dev/peps/pep-0020/}}
 
@@ -346,7 +346,7 @@ plt.close()
 \end{center} 
 
 \section{Dual Attack}
-\label{sec:orgcafe51a}
+\label{sec:orge974cf5}
 
 In this exercise, you are asked to break a decision-LWE instance using the dual lattice attack.
 
@@ -370,7 +370,7 @@ Note that this entails finding the optimal number of samples \(m\), i.e that \(m
 \end{enumerate}
 
 \section{{\bfseries\sffamily TODO} Primal Attack}
-\label{sec:org6ab2d14}
+\label{sec:orgad9036d}
 
 \begin{itemize}
 \item Run uSVP attack
@@ -378,16 +378,16 @@ Note that this entails finding the optimal number of samples \(m\), i.e that \(m
 \end{itemize}
 
 \section{Lattice Challenge}
-\label{sec:orgadbc55d}
+\label{sec:orgff3de43}
 
 Get your name up here: \url{https://www.latticechallenge.org/lwe\_challenge/challenge.php}
 
 \appendix
 
 \section{Example Solutions}
-\label{sec:orgda5fee6}
+\label{sec:org5c96db9}
 \subsection{root-Hermite factors}
-\label{sec:orgb4dce8a}
+\label{sec:org5114a72}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -472,7 +472,7 @@ n: 130, bits: 40, β: 60, δ_0: 1.0114, pred: 2^22.12, real: 2^21.67
 \end{verbatim}
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org9396f45}
+\label{sec:org736c207}
 
 \texttt{dump\_gso\_filename}
 
@@ -664,7 +664,7 @@ g
 \end{center}
 
 \subsection{Dual attack}
-\label{sec:org414bf7c}
+\label{sec:org873782b}
 We will need to invert \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\]
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}

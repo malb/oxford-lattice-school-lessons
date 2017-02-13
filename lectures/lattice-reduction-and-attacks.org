@@ -16,8 +16,7 @@
 #+LATEX_HEADER: \DeclareMathOperator{\Vol}{Vol}
 #+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
 
-
-* Lattice Point Enumeration
+* Lattice Point Enumeration                                           :noexport:
 
 ** Finding Shortest Vectors
 
@@ -200,14 +199,14 @@ From \[\|π_{d}(\vec{w})\|^2 \leq \|π_{d-1}(\vec{w})\|^2 ≤ … ≤ \|π_{1}(\
 #+BEGIN_EXPORT latex
 \begin{align*}
 \pi_k\left(\vec{w}\right) &= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\\
-&=  \pi_{k+1}(\vec{w}) + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right) \vec{b}_k^*
+&=  \pi_{k+1}(\vec{w}) + \left(\alert{v_k}  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right) \vec{b}_k^*
 \end{align*}
 #+END_EXPORT
 and
 #+BEGIN_EXPORT latex
 \begin{align*}
 \|\pi_k\left(\vec{w}\right)\|^2 
-&=  \|\pi_{k+1}(\vec{w})\|^2 + \left(v_k  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right)^2 \|\vec{b}_k^*\|^2
+&=  \|\pi_{k+1}(\vec{w})\|^2 + \left(\alert{v_k}  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right)^2 \|\vec{b}_k^*\|^2
 \end{align*}
 #+END_EXPORT
 
@@ -267,18 +266,184 @@ range(ceil(c-o), floor(c+o)+1)
 
 …
 
-** Enumeration
+** Implementation
 
-- shortest vectors :: reduce $R$ whenever a shortet vector than bound is found
+#+BEGIN_SRC sage
+from fpylll import *
+set_random_seed(1337)
+A = IntegerMatrix.random(30, "qary", k=15, bits=20)
+_ = LLL.reduction(A)
+M = GSO.Mat(A)
+_ = M.update_gso()
+E = Enumeration(M)
+sol, norm = E.enumerate(0, M.d, M.get_r(0,0), 0)
+sol[:8]
+#+END_SRC
+
+#+RESULTS:
+: (1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -2.0, 1.0)
+
+** Closing Remarks
+
+- shortest vectors :: reduce $R$ whenever vector with shorter norm found
 - short enough vectors :: stop when vector with target norm is found
 - target radius :: $R = \|\vec{b}_1\|$ always works, picking a small $R$ reduces the search space, e.g. $R ≈ \Vol(L)^{1/d}$
-- pruning :: not all choices for $v_k$ equally likely lead to a solution, skip some
-
+- pruning :: not all choices for $v_k$ lead to a solution with same probability, skip some
+- preprocessing :: the more reduced the basis, the faster enumeration
+- complexity :: $d^{\Theta(d)}$, but fastest in practice.
 
 * BKZ
+** BKZ
+
+- Input basis is LLL reduced, the *first block* is $\vec{b}_1,\dots,\vec{b}_{β}$.
+- Call the SVP oracle to obtain a short vector, $\vec{b}_1'$, in the space spanned by these vectors.
+- Now have $β+1$ vectors spanning a $β$ dimensional space, call LLL to obtain a set of $β$ linearly independent vectors.
+- The *second block* is made of vectors which are the projection of $\vec{b}_2,\dots, \vec{b}_{β+1}$ onto the space which is orthognal to $\vec{b}_1$.
+- Again, call SVP oracle to obtain a short vector in this space, $\vec{b}_2'$, which can be viewed as the projection of some $\vec{b}_2''$ in the lattice.
+- Call LLL on $\vec{b}_2, \vec{b}_3,\dots, \vec{b}_{β+1}, \vec{b}_2''$ to update the list of basis vectors.
+
+… start again when reaching end, repeat until nothing changes
+
+** BKZ 2.0
+
+- early abort :: BKZ eventually terminates when there is nothing left to do. However, most work is done in the first few tours
+- recursive preprocessing :: use BKZ with smaller block size to preprocess blocks before calling the SVP oracle
+- (extreme) pruning :: choose pruning parameters which lead to low probability of success, rerandomise and repeat to boost probability
+- Gaussian heuristic :: use the Gaussian heuristic to set radius for enumeration search
+
+*** 
+
+fullcite:PhD:Chen13, implementation: https://github.com/fplll/fplll
+
+** root-Hermite Factors
+
+- Hermite factor: $δ_0^n$
+- root-Hermite factor:  \(δ_0\)
+- log root-Hermite factor: \(\log_2 δ_0\)
+
+The shortest non-zero vector $\vec{b}_1$ in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^n⋅ \Vol(Λ)^{1/n}.\]
+
+** Gaussian Heuristic
+
+Let \(Λ \subset \ZZ^n\) be a lattice and let \(S \in \mathbb{R}^n\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
+
+As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{n}{2 π e}} \Vol(Λ)^{1/n}.\]
+
+** Geometric Series Assumption
+
+The norms of the Gram-Schmidt vectors after lattice reduction satisfy footfullcite:STACS:Schnorr03 \[\|b_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
+
+Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^n \Vol(Λ)^{1/n}\) and \(\Vol(Λ) = \prod_{i=1}^{n} \|b_i^*\|\), we get \[α = δ^{-2n/(n-1)}.\] 
+
+** BKZ Quality
+
+Assuming the *Gaussian Heuristic* (GH) and the *Geometric Series Assumption* (GSA), a limiting value of the root-Hermite factor $δ_0$ achievable by BKZ is footfullcite:PhD:Chen13: \[\lim_{n \rightarrow \infty} δ_0 = \left(v_β^{\frac{-1}{β}}\right)^{\frac{1}{β-1}}  ≈  \left( \frac{β}{2 \pi e} (\pi β)^{\frac{1}{β}}  \right)^{\frac{1}{2(β-1)}}\]
+
+where $v_β$ is the volume of the unit ball in dimension $β$. Experimental evidence suggests that we may apply this as an estimate for $\delta_0$ also in practice.
+
+** BKZ Quality
+
+#+BEGIN_EXPORT latex
+\begin{tikzpicture}
+\pgfplotsset{width=\textwidth, height=0.6\textwidth}
+
+\begin{axis}[xlabel={$\beta$},ylabel={$\delta_0$},legend pos=north east, legend style={fill=none},  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
+         	
+\addplot[black, thick] coordinates {
+(50, 1.01206486355485) (60, 1.01145310214785) (70, 1.01083849117278)
+(80, 1.01026264533039) (90, 1.00973613406057) (100, 1.00925872103633)
+(110, 1.00882653150498) (120, 1.00843474281592) (130, 1.00807860284815)
+(140, 1.00775378902354) (150, 1.00745650119215) (160, 1.00718344897388)
+(170, 1.00693180103572) (180, 1.00669912477197) (190, 1.00648332800111)
+(200, 1.00628260691082) (210, 1.00609540127612) (220, 1.00592035664374)
+(230, 1.00575629268952) (240, 1.00560217684407) (250, 1.00545710232739)
+};
+\addlegendentry{$(\frac{\beta}{2\pi e} \cdot (\pi\, \beta)^{1/\beta} )^{\frac{1}{2(\beta-1)}}$};
+
+\end{axis}
+\end{tikzpicture}
+#+END_EXPORT
+
+** Running Time
+
+#+BEGIN_SRC sage :file bkz-quality.png :tangle lecture-bkz-quality.sage :exports results
+# -*- coding: utf-8 -*-
+from fpylll import *
+
+set_random_seed(1)
+n, bits = 120, 40
+A = IntegerMatrix.random(n, "qary", k=n/2, bits=bits)
+beta = 60
+tours = 4
+
+fn = "/tmp/logs.txt"
+par = BKZ.Param(block_size=beta,
+                strategies=BKZ.DEFAULT_STRATEGY,
+                dump_gso_filename=fn,
+                max_loops=tours) 
+par.flags & BKZ.MAX_LOOPS # max_loops sets flag for you
+
+delta_0 = (beta/(2*pi*e) * (pi*beta)^(1/ZZ(beta)))^(1/(2*beta-1))
+alpha = delta_0^(-2*n/(n-1))
+
+norms = [map(log, [(alpha^i * delta_0^n * 2^(bits/2))^2 for i in range(n)])]
+
+BKZ.reduction(A, par)
+
+for i, l in enumerate(open(fn).readlines()):
+    if i > tours:
+        break
+    _norms =  l.split(":")[1] # stop off other information
+    _norms = _norms.strip().split(" ") # split string
+    _norms = map(float, _norms) # map to floats
+    norms.append(_norms)
+        
+colours = ["#4D4D4D", "#5DA5DA", "#FAA43A", "#60BD68", 
+           "#F17CB0", "#B2912F", "#B276B2", "#DECF3F", "#F15854"]
+
+g  = line(zip(range(n), norms[0]), legend_label="GSA", color=colours[0], transparent=True)
+g += line(zip(range(n), norms[1]), legend_label="lll", color=colours[1])
+
+for i,_norms in enumerate(norms[2:]):
+    g += line(zip(range(n), _norms), 
+              legend_label="tour %d"%i, color=colours[i+2])
+g
+#+END_SRC
+
+#+ATTR_LATEX: :width 0.8\textwidth
+#+RESULTS:
+[[file:bkz-quality.png]]
+
+Most work is done in first 3-4 tours.
+
+** Running Time
+
+Per tour, BKZ calls 
+- $c_{\textnormal{pre},β}$ :: prepare $n$ SVP calls
+- $c_{\textnormal{svp},β}$ :: $n$ SVP oracle calls in block size $≤ β$
+- $c_{\textnormal{lll}}$  :: $n$ LLL calls to insert the vector into the basis
+
+Total cost: \[≈ 4\,n \cdot (c_{\textnormal{pre},β} + c_{\textnormal{svp},β} + c_{\textnormal{lll}})\]
+
+** Running Time
+
+We assume 
+- $c_{\textnormal{pre},β} < c_{\textnormal{svp},β}$[fn:1] and
+- $c_{\textnormal{lll}} \ll c_{\textnormal{svp},β}$ 
+to obtain \[≈ 4\,n\, c_{\textnormal{svp},β}\]
+
+Asymptotically, sieving is the most efficient heuristic SVP algorithm, with a cost footfullcite:SODA:BDGL16 of \[c_{\textnormal{svp},β} = 2^{0.292\,β + o(1)}.\]
+
+** Asymptotic Behaviour
+
+The log of the time complexity for running BKZ to achieve a root-Hermite factor $\delta_0$ is:
+
+\begin{eqnarray*}
+\Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) & & \textnormal{for enumeration},\\
+\Omega \left( \frac{-\log\log \delta_0}{\log\delta_0} \right) & & \textnormal{for sieving}.
+\end{eqnarray*}
 
 * LWE
-
 ** Learning with Errors
 
 Let \(n,\,q\) be positive integers, $\chi$ be a probability distribution on $\ZZ$ and $\vec{s}$ be a secret vector in \(\ZZ_q^n\). We denote by $L_{n,q,\chi}$ the probability distribution on \(\ZZ_q^n × \ZZ_q\) obtained by choosing \(\vec{a} ∈ \ZZ_q^n\) uniformly at random, choosing \(e ∈ \ZZ\) according to χ and considering it in \(\ZZ_q\), and returning \((\vec{a}, c) = (\vec{a}, \Angle{\vec{a},\vec{s}}+ e) ∈ \ZZ_q^n × \ZZ_q\).
@@ -298,29 +463,176 @@ Given $q \in \mathbb{Z}$, a matrix $\vec{A}$, and $t < q$; find $\vec{y}$ with $
 
 ** Strategy
   
-- Find a short $\vec{y}$ solving SIS on $\vec{A}$. 
 - Given LWE samples $\vec{A}, \vec{c}$ where either $\vec{c} = \vec{A}\vec{s} + \vec{e}$ or $\vec{c}$ uniformly random. 
+- Find a short $\vec{y}$ solving SIS on $\vec{A}$. 
 - Compute $\Angle{\vec{y}, \vec{c}}$. 
   - If $\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}$, then $\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y}\vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}$.
   - If $\vec{c}$ is uniformly random, so is $\Angle{\vec{y}, \vec{c}}$.
 
 If $\vec{y}$ is sufficiently short, then $\Angle{\vec{y}, \vec{e}}$ will also be short, since $\vec{e}$ is also small, and can be distinguished from uniform values.
 
-** Degrees of Freedom
-** Constructing a Basis
+** Required Quality
+
+Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of length $\|\vec{v}\|$ in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing $\Angle{\vec{v},\vec{e}}$ from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
+
 ** Lattice Reduction
 
-  A *reduced lattice* basis is made of short vectors, in particular the first vector.
+  A reduced lattice basis is made of short vectors, in particular the first vector has norm $δ_0^m \cdot \Vol(qΛ^*)^{1/m}$
   - Construct a basis of the dual from the instance.
   - Feed to a lattice reduction algorithm to obtain short vectors $\vec{v}_i$.
   - Check if $\vec{v}_i\, \vec{A}$ are small.
 
-** BKW
+** Constructing a Basis
+
+- We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
+- Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\vec{A}\) using Gaussian elimination.
+- With high probability it will have dimension $(m-n) × m$
+- Write $\mat{Y} = [\vec{I}_{(m-n) \times (m-n)} | \mat{Y}']$
+- Extend to \(q\)-ary lattice by stacking with  $[\vec{0}_{n \times (m-n)} \mid q ⋅ \vec{I}_{n \times n}]$
+- Our basis is:
+  #+BEGIN_EXPORT latex
+\begin{align*}
+  \mat{L} = \begin{pmatrix}
+    \mat{I}_{(m-n) \times (m-n)} & \mat{Y}'\\
+    0 & q\, \mat{I}_{n \times n}
+  \end{pmatrix}
+\end{align*}
+  #+END_EXPORT
+
+** Degrees of Freedom
+
+We get to choose:
+
+- the dimension $m$, i.e. the number of samples we use
+- the target advantage $ε$ for distinguishing 
+
+** Choosing $m$
+
+Example: $q=2^{17}, n=1024, δ_0 = 1.005$
+
+#+BEGIN_EXPORT latex
+\begin{tikzpicture}
+\pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
+
+\begin{axis}[xlabel={$m$},ylabel={$\log_2 δ_0^m \cdot q^{n/m}$},legend pos=north east, legend style={fill=none},  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
+         	
+\addplot[black, thick] coordinates {
+(1024, 24.3681934379047) (1040, 24.2217829988335) (1056, 24.0832979676877) (1072, 23.9523834754557)
+(1088, 23.8287055277737) (1104, 23.7119494922699) (1120, 23.6018187155654) (1136, 23.4980332571473)
+(1152, 23.4003287287538) (1168, 23.3084552291511) (1184, 23.2221763652800) (1200, 23.1412683517112)
+(1216, 23.0655191811960) (1232, 22.9947278598492) (1248, 22.9287037011642) (1264, 22.8672656736477)
+(1280, 22.8102417973808) (1296, 22.7574685852802) (1312, 22.7087905252422) (1328, 22.6640595997224)
+(1344, 22.6231348396308) (1360, 22.5858819097171) (1376, 22.5521727228821) (1392, 22.5218850810884)
+(1408, 22.4949023407553) (1424, 22.4711131007098) (1440, 22.4504109109423) (1456, 22.4326940005646)
+(1472, 22.4178650235097) (1488, 22.4058308206380) (1504, 22.3965021970288) (1520, 22.3897937133371)
+(1536, 22.3856234901903) (1552, 22.3839130246851) (1568, 22.3845870181180) (1584, 22.3875732141578)
+(1600, 22.3928022467260) (1616, 22.4002074969161) (1632, 22.4097249583272) (1648, 22.4212931102443)
+(1664, 22.4348527981335) (1680, 22.4503471209671) (1696, 22.4677213249258) (1712, 22.4869227030623)
+(1728, 22.5079005005382) (1744, 22.5306058250782) (1760, 22.5549915623077) (1776, 22.5810122956677)
+(1792, 22.6086242306189) (1808, 22.6377851228712) (1824, 22.6684542103905) (1840, 22.7005921489523)
+(1856, 22.7341609510298) (1872, 22.7691239278147) (1888, 22.8054456341876) (1904, 22.8430918164611)
+(1920, 22.8820293627379) (1936, 22.9222262557286) (1952, 22.9636515278910) (1968, 23.0062752187576)
+(1984, 23.0500683343274) (2000, 23.0950028084075) (2016, 23.1410514657954) (2032, 23.1881879872003)
+};
+\end{axis}
+\end{tikzpicture}
+#+END_EXPORT
+
+\[m = \sqrt{\frac{n\,\log q}{\log(\delta_0)}}\]
+
+** Choosing $ε$
+
+#+BEGIN_EXPORT latex
+\begin{tikzpicture}
+\pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
+
+\begin{axis}[xlabel={$\varepsilon = 1/2^i$},ylabel={\(\log_2\left(\textnormal{BKZ cost}\right)\)},legend pos=north east, legend style={fill=none},  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
+         	
+\addplot[black, thick] coordinates {
+( 1, 410.3) ( 2, 374.0) ( 3, 355.0) ( 4, 342.4)
+( 5, 333.1) ( 6, 325.5) ( 7, 319.6) ( 8, 314.4)
+( 9, 310.0) (10, 305.9) (11, 302.7) (12, 299.4)
+(13, 296.5) (14, 293.9) (15, 291.5) (16, 289.5)
+(17, 287.4) (18, 285.4) (19, 283.6) (20, 282.2)
+(21, 280.4) (22, 279.0) (23, 277.5) (24, 276.0)
+(25, 274.9) (26, 273.7) (27, 272.5) (28, 271.4)
+(29, 270.2) (30, 269.3) (31, 268.1) (32, 267.3)
+(33, 266.4) (34, 265.5) (35, 264.6) (36, 263.7)
+(37, 262.9) (38, 262.3) (39, 261.4) (40, 260.5)
+(41, 259.9) (42, 259.4) (43, 258.5) (44, 257.9)
+(45, 257.3) (46, 256.7) (47, 256.1) (48, 255.6)
+(49, 255.0) (50, 254.4) (51, 253.8) (52, 253.2)
+(53, 252.6) (54, 252.0) (55, 251.7) (56, 251.2)
+(57, 250.6) (58, 250.3) (59, 249.7) (60, 249.1)
+(61, 248.8) (62, 248.2) (63, 247.9)
+};
+\end{axis}
+\end{tikzpicture}
+#+END_EXPORT
+
+** Choosing $ε$
+
+Boost the advantage to constant, repeat experiment $≈ 1/ε^2$ times
+
+#+BEGIN_EXPORT latex
+\begin{tikzpicture}
+\pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
+
+\begin{axis}[xlabel={$\varepsilon = 1/2^i$},ylabel={\(\log_2\left( 2^{2\,i} \cdot \textnormal{BKZ cost}\right)\)},legend pos=north east, legend style={fill=none},  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
+         	
+\addplot[black, thick] coordinates {
+( 1, 412.3) ( 2, 378.0) ( 3, 361.0) ( 4, 350.4)
+( 5, 343.1) ( 6, 337.5) ( 7, 333.6) ( 8, 330.4)
+( 9, 328.0) (10, 325.9) (11, 324.7) (12, 323.4)
+(13, 322.5) (14, 321.9) (15, 321.5) (16, 321.5)
+(17, 321.4) (18, 321.4) (19, 321.6) (20, 322.2)
+(21, 322.4) (22, 323.0) (23, 323.5) (24, 324.0)
+(25, 324.9) (26, 325.7) (27, 326.5) (28, 327.4)
+(29, 328.2) (30, 329.3) (31, 330.1) (32, 331.3)
+(33, 332.4) (34, 333.5) (35, 334.6) (36, 335.7)
+(37, 336.9) (38, 338.3) (39, 339.4) (40, 340.5)
+(41, 341.9) (42, 343.4) (43, 344.5) (44, 345.9)
+(45, 347.3) (46, 348.7) (47, 350.1) (48, 351.6)
+(49, 353.0) (50, 354.4) (51, 355.8) (52, 357.2)
+(53, 358.6) (54, 360.0) (55, 361.7) (56, 363.2)
+(57, 364.6) (58, 366.3) (59, 367.7) (60, 369.1)
+(61, 370.8) (62, 372.2) (63, 373.9)};
+\end{axis}
+\end{tikzpicture}
+#+END_EXPORT
+
+** Amortising Costs
+
+Our discussion on choosing $ε$ was based on the assumption that producing $1/ε^2$ vectors costs $1/ε^2$ calls to BKZ in block size $β$.
+
+Two options:
+
+- Use fact that sieving outputs \(2^{0.2075\cdot β}\) vectors footfullcite:EPRINT:ADPS15
+- Perform strong lattice reduction once, use light rerandomisation and cheaper lattice reduction for subsequent vectors. footfullcite:EPRINT:Albrecht17
+
+** Small Secrets
+
+Problem: most LWE-based schemes only give $n$ samples: *left kernel is trivial*
+
+- But instances are in LWE normal form: $\vec{s}_i \sample \chi$
+- Construct basis for \[Λ = \{(\vec{y},\vec{x}) \in \ZZ^{m} × \ZZ^n : \vec{y}⋅ \vec{A} ≡ \vec{x} \bmod q\}.\]
+- Given a short vector in \((\vec{w},\vec{v}) \in Λ\), we have \[\vec{w}⋅\vec{c} = \vec{w}⋅(\vec{A}⋅\vec{s} + \vec{e}) = \Angle{\vec{v},\vec{s}} + \Angle{\vec{w},\vec{e}}.\]
+- Analysis proceeds as before with $m ≤ 2n$.
+
+** Honourable Mention: BKW
+
+- The BKW algorithm is a combinatorial version of this attack.
+- It proceeds by splitting the components of the vectors $\vec{a}_i$ into blocks of $k$ components.
+- Then, it searches for collisions in the first block in an ``elimination table'' holding entries for (possibly) all $q^k$ different values for that block.
+- This table is constructed by sampling fresh $(\vec{a}_i, c_i)$ pairs from the LWE oracle.
+- By subtracting vectors with colliding components in the first block, a vector of dimension $n-k$ is recovered.
+- Applying the same subtraction to the corresponding $c_i$ values, produces an error of size $\sqrt{2}α\,q$.
+
 * Primal Lattice Attack (uSVP Version)
 
 ** Dummy Slide                                                       :noexport:
 
-Some text[fn:1]
+Some text[fn:2]
 
 ** Fin
 :PROPERTIES:
@@ -330,10 +642,6 @@ Some text[fn:1]
 #+BEGIN_CENTER
 \Huge *Thank You*
 #+END_CENTER
-
-* Footnotes
-
-[fn:1] A footnote
 
 * Build Artefacts                                                     :noexport:
 
@@ -375,6 +683,13 @@ clean:
 #+END_SRC
 
 ** Autoexport to PDF
+
+
+* Footnotes
+
+[fn:1] For current code, this is a bold lie.
+
+[fn:2] A footnote
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)

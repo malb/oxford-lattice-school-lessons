@@ -247,7 +247,7 @@ Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vo
 
 ** GS norms & Geometric series assumption
 
-Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \Vol(L)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where $m$ is the dimension of the lattice, we get $α = δ^{-2m/(m-1)}$.footfullcite:RSA:LinPei11 Check how well this assumption holds for various block sizes of BKZ.
+Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \det(Λ)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where $m$ is the dimension of the lattice, we get $α = δ^{-2m/(m-1)}$.footfullcite:RSA:LinPei11 Check how well this assumption holds for various block sizes of BKZ.
 
 That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:[fn:8]
 
