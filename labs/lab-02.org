@@ -733,10 +733,10 @@ histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
 
 [fn:9] http://matplotlib.org
 
+[fn:10] See http://doc.sagemath.org/html/en/constructions/linear_algebra.html#kernels
+
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-latex-export-to-latex))) nil t)
 # End:
-
-[fn:10] See http://doc.sagemath.org/html/en/constructions/linear_algebra.html#kernels
 
 
