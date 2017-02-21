@@ -317,11 +317,11 @@ fullcite:PhD:Chen13, implementation: https://github.com/fplll/fplll
 
 ** root-Hermite Factors
 
+The shortest non-zero vector $\vec{b}_1$ in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^n⋅ \Vol(Λ)^{1/n}.\]
+
 - Hermite factor: $δ_0^n$
 - root-Hermite factor:  \(δ_0\)
 - log root-Hermite factor: \(\log_2 δ_0\)
-
-The shortest non-zero vector $\vec{b}_1$ in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^n⋅ \Vol(Λ)^{1/n}.\]
 
 ** Gaussian Heuristic
 
@@ -331,9 +331,9 @@ As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{n}{2 π 
 
 ** Geometric Series Assumption
 
-The norms of the Gram-Schmidt vectors after lattice reduction satisfy footfullcite:STACS:Schnorr03 \[\|b_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
+The norms of the Gram-Schmidt vectors after lattice reduction satisfy footfullcite:STACS:Schnorr03 \[\|\vec{b}_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
 
-Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^n \Vol(Λ)^{1/n}\) and \(\Vol(Λ) = \prod_{i=1}^{n} \|b_i^*\|\), we get \[α = δ^{-2n/(n-1)}.\] 
+Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^n \cdot \Vol(Λ)^{1/n}\) and \(\Vol(Λ) = \prod_{i=1}^{n} \|\vec{b}_i^*\|\), we get \[α = δ^{-2n/(n-1)}.\] 
 
 ** BKZ Quality
 
@@ -503,7 +503,7 @@ Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of 
 
 We get to choose:
 
-- the dimension $m$, i.e. the number of samples we use
+- the dimension $m$, i.e. the number of samples we use, and
 - the target advantage $ε$ for distinguishing 
 
 ** Choosing $m$
@@ -607,7 +607,7 @@ Our discussion on choosing $ε$ was based on the assumption that producing $1/ε
 
 Two options:
 
-- Use fact that sieving outputs \(2^{0.2075\cdot β}\) vectors footfullcite:EPRINT:ADPS15
+- Use fact that sieving outputs \(2^{0.2075\cdot β}\) vectors. footfullcite:EPRINT:ADPS15
 - Perform strong lattice reduction once, use light rerandomisation and cheaper lattice reduction for subsequent vectors. footfullcite:EPRINT:Albrecht17
 
 ** Small Secrets
@@ -621,18 +621,111 @@ Problem: most LWE-based schemes only give $n$ samples: *left kernel is trivial*
 
 ** Honourable Mention: BKW
 
-- The BKW algorithm is a combinatorial version of this attack.
-- It proceeds by splitting the components of the vectors $\vec{a}_i$ into blocks of $k$ components.
-- Then, it searches for collisions in the first block in an ``elimination table'' holding entries for (possibly) all $q^k$ different values for that block.
-- This table is constructed by sampling fresh $(\vec{a}_i, c_i)$ pairs from the LWE oracle.
-- By subtracting vectors with colliding components in the first block, a vector of dimension $n-k$ is recovered.
-- Applying the same subtraction to the corresponding $c_i$ values, produces an error of size $\sqrt{2}α\,q$.
+***                                                                 :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.6
+:END:
+
+Assume $(\vec{a}_{21},\vec{a}_{22}) = (0, 1)$, then:
+
+#+BEGIN_LATEX
+\footnotesize
+\begin{align*}
+   & \left(
+      \begin{array}{rr|rrr|r}
+        \phantom{xn}\vec{a}_{11}         & \phantom{xn}\vec{a}_{12}         & \vec{a}_{13} & \cdots & \vec{a}_{1n} & c_1\\
+        \alert{\vec{a}_{21}} & \alert{\vec{a}_{22}} & \vec{a}_{23} & \cdots & \vec{a}_{2n} & c_2\\
+        \vdots               & \vdots               & \ddots       & \vdots & \vdots\\
+        \vec{a}_{m1}         & \vec{a}_{m2}         & \vec{a}_{m3} & \cdots & \vec{a}_{mn} & c_{m}
+      \end{array}
+                                                                               \right)\\
+  -& \left[
+      \begin{array}{rr|rrr|r}
+        0         & 0         & \vec{t}_{13}   & \cdots & \vec{t}_{1n}   & c_{t,1}\\
+        \alert{0} & \alert{1} & \vec{t}_{23}   & \cdots & \vec{t}_{2n}   & c_{t,2}\\
+        \vdots    & \vdots    & \ddots         & \vdots & \vdots\\
+        q-1       & q-1       & \vec{t}_{q^23} & \cdots & \vec{t}_{q^2n} & c_{t,q^2}
+        \end{array}\right]\\
+   \Rightarrow &
+     \left(\begin{array}{rr|rrr|r}
+             \phantom{xn}\vec{a}_{11} & \phantom{xn}\vec{a}_{12} & \vec{a}_{13}      & \cdots & \vec{a}_{1n}      & \tilde{c}_1\\
+             \alert{0}    & \alert{0}    & \vec{a}_{23} & \cdots & \vec{a}_{2n} & \tilde{c}_2\\
+             \vdots       & \vdots       & \ddots            & \vdots & \vdots\\
+             \vec{a}_{m1} & \vec{a}_{m2} & \vec{a}_{m3}      & \cdots & \vec{a}_{mn}      & c_{m}
+           \end{array}\right)
+  \end{align*}
+#+END_LATEX
+
+***                                                                 :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_COL: 0.4
+:END:
+
+#+BEAMER: \scriptsize
+
+fullcite:Regev:2009:LLE
+
+fullcite:EPRINT:ACFFP12
+
+fullcite:EPRINT:GuoJohSta16a
 
 * Primal Lattice Attack (uSVP Version)
+** Bounded Distance Decoding and unique SVP
 
-** Dummy Slide                                                       :noexport:
+Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that $\vec{A}⋅\vec{w} - \vec{c} \bmod q$ is rather small.
 
-Some text[fn:2]
+In other words, we know there’s an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
+          \vec{A}^T &  0 \\
+          \vec{c}^T   & t \\
+        \end{array} \right) \in \ZZ_q^{(n+1) \times (m+1)}\] since \[(\vec{s} \mid -1) ⋅ \vec{B} = (\vec{e} \mid -t) \bmod q.\]
+
+** Constructing a Basis
+
+- Compute reduced row echelon form \([\vec{I}_{n × n} \mid \vec{A}']\) of $\vec{A}^T \in \ZZ_q^{n \times m}$ with $m>n$.
+- Stack on top of \([\vec{0}_{(m-n) \times n} \mid q\,\vec{I}_{(m-n) × (m-n)}]\) to handle modular reductions
+- Stack on top of \([\vec{c}^T \mid t]\)
+- To obtain \[\vec{B}=\left(\begin{array}{ccc}
+         \vec{I}_{n × n} & \vec{A}' &  0 \\
+         \vec{0}_{(m-n) \times n} & q\,\vec{I}_{(m-n) × (m-n)} & 0\\
+          \vec{c}^T  & & t \\
+        \end{array} \right) \in \ZZ^{(m+1) \times (m+1)}\]
+- In practice, we always pick \(t=1\)
+
+** HSVP vs uSVP
+
+- Any algorithm which can solve κ-HSVP, such as a lattice reduction algorithm, can be used linearly many times to solve \(γ\)-uSVP with approximation factor $γ=κ^2$.footfullcite:Lovasz86
+- Whenever $κ > \sqrt{n}$, for $n$ the dimension of the lattice, then any algorithm solving κ-HSVP can be used to solve γ-uSVP for $γ ≈ \sqrt{n} κ$.footfullcite:ISIT:LLLS11
+
+** Success Condition (2008)
+
+In practice, algorithms behave better. Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^m\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
+
+** Success Condition (2013)
+
+- We can predict the length of the unusually short vector \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
+
+- In general, we expect no other unusually short vectors, so we may assume footfullcite:EPRINT:AlbFitGopf13 \[λ_2(\vec{B}) ≈ \sqrt{\frac{m}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/m}.\]
+
+- The same paper also gives observed values for \(τ\) for BKZ-5 and BKZ-10.
+
+** Success Condition (2015)
+
+*** Lemma footfullcite:EPRINT:AlbPlaSco15
+
+Given an LWE instance characterised by $n$, $α$, $q$. Any lattice reduction algorithm achieving log root-Hermite factor \[\log{δ_0} = \frac{\log^2{\left(ε' τ α \sqrt{2e}\right)}}{4 n \log{q}}\] solves LWE with success probability greater than $ε_τ ⋅ \left( 1-\left(ε' ⋅  \exp{\left(\frac{1-ε'^2}{2}\right)}\right)^m \right)$ for some $ε' > 1$ and some fixed $τ ≤ 1$, and $0 < ε_τ < 1$ as a function of $τ$.
+
+***                                                          :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+
+This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the gap.
+
+** Success Condition (2016)
+
+
 
 ** Fin
 :PROPERTIES:
@@ -684,13 +777,12 @@ clean:
 
 ** Autoexport to PDF
 
-
-* Footnotes
-
-[fn:1] For current code, this is a bold lie.
-
-[fn:2] A footnote
-
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
 # End:
+
+* Footnotes
+
+[fn:1] For current code, this is a blatant lie.
+
+
