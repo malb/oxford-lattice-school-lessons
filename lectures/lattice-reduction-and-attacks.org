@@ -16,8 +16,7 @@
 #+LATEX_HEADER: \DeclareMathOperator{\Vol}{Vol}
 #+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
 
-* Lattice Point Enumeration                                           :noexport:
-
+* Lattice Point Enumeration
 ** Finding Shortest Vectors
 
 Given some lattice $Λ(\mat{B})$, find $\vec{v} \in Λ(\mat{B})$ with $\vec{v} \neq 0$ such that $\|\vec{v}\|^2$ is minimal.
@@ -366,7 +365,7 @@ where $v_β$ is the volume of the unit ball in dimension $β$. Experimental evid
 
 ** Running Time
 
-#+BEGIN_SRC sage :file bkz-quality.png :tangle lecture-bkz-quality.sage :exports results
+#+BEGIN_SRC sage :tangle lecture-bkz-quality.sage :exports none
 # -*- coding: utf-8 -*-
 from fpylll import *
 
@@ -401,18 +400,21 @@ for i, l in enumerate(open(fn).readlines()):
 colours = ["#4D4D4D", "#5DA5DA", "#FAA43A", "#60BD68", 
            "#F17CB0", "#B2912F", "#B276B2", "#DECF3F", "#F15854"]
 
-g  = line(zip(range(n), norms[0]), legend_label="GSA", color=colours[0], transparent=True)
+g  = line(zip(range(n), norms[0]), legend_label="GSA", color=colours[0],
+          frame=True, axes=False, transparent=True,
+          axes_labels=["$i$", "$2\\,\\log_2 \\|\mathbf{b}^*_i\\|$"])
 g += line(zip(range(n), norms[1]), legend_label="lll", color=colours[1])
 
 for i,_norms in enumerate(norms[2:]):
     g += line(zip(range(n), _norms), 
               legend_label="tour %d"%i, color=colours[i+2])
-g
+g.save("bkz-quality.pdf")
 #+END_SRC
 
-#+ATTR_LATEX: :width 0.8\textwidth
 #+RESULTS:
-[[file:bkz-quality.png]]
+
+#+ATTR_LATEX: :width 0.8\textwidth
+[[./bkz-quality.pdf]]
 
 Most work is done in first 3-4 tours.
 
@@ -436,7 +438,7 @@ Asymptotically, sieving is the most efficient heuristic SVP algorithm, with a co
 
 ** Asymptotic Behaviour
 
-The log of the time complexity for running BKZ to achieve a root-Hermite factor $\delta_0$ is:
+The log of the time complexity for running BKZ to achieve a root-Hermite factor $\delta_0$ is:footfullcite:EPRINT:AlbPlaSco15
 
 \begin{eqnarray*}
 \Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) & & \textnormal{for enumeration},\\
@@ -696,17 +698,17 @@ In other words, we know there’s an unusually short vector in the \(q\)-ary lat
 ** HSVP vs uSVP
 
 - Any algorithm which can solve κ-HSVP, such as a lattice reduction algorithm, can be used linearly many times to solve \(γ\)-uSVP with approximation factor $γ=κ^2$.footfullcite:Lovasz86
-- Whenever $κ > \sqrt{n}$, for $n$ the dimension of the lattice, then any algorithm solving κ-HSVP can be used to solve γ-uSVP for $γ ≈ \sqrt{n} κ$.footfullcite:ISIT:LLLS11
+- Whenever $κ > \sqrt{d}$ then any algorithm solving κ-HSVP can be used to solve γ-uSVP for $γ ≈ \sqrt{d} κ$.footfullcite:ISIT:LLLS11
 
 ** Success Condition (2008)
 
-In practice, algorithms behave better. Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^m\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
+In practice, algorithms behave better. Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^d\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
 
 ** Success Condition (2013)
 
 - We can predict the length of the unusually short vector \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
 
-- In general, we expect no other unusually short vectors, so we may assume footfullcite:EPRINT:AlbFitGopf13 \[λ_2(\vec{B}) ≈ \sqrt{\frac{m}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/m}.\]
+- In general, we expect no other unusually short vectors, so we may assume footfullcite:EPRINT:AlbFitGopf13 \[λ_2(\vec{B}) ≈ \sqrt{\frac{d}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/d}.\]
 
 - The same paper also gives observed values for \(τ\) for BKZ-5 and BKZ-10.
 
@@ -725,18 +727,23 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 
 ** Success Condition (2016)
 
-- Let $d = m+1$ the dimension of the lattice.
-- Let $\vec{e}^*_{m+1-b}$ be the projection of \(\vec{e}\) orthogonally onto the first \(d-b\) vectors of the Gram-Schmidt basis \(\mat{B}^*\)
-- BKZ-like algorithms will run an SVP oracle on th last block of dimension \(b\).
+- Let $\vec{e}^*_{d-b}$ be the projection of \(\vec{e}\) orthogonally onto the first \(d-b\) vectors of the Gram-Schmidt basis \(\mat{B}^*\)
+- BKZ-like algorithms will call an SVP oracle on th last block of dimension \(b\).
 - If \(\vec{e}^*_{d-b}\) is a shortest vector in that block, it will be found
-- If \(\vec{e}^*_i\) is a shortest vector for all projections up to \(m+1-b\) it will “travel to the front” eventually.
+- If \(\vec{e}^*_i\) is a shortest vector for all projections up to \(d-b\) it will “travel to the front”.
 
 ** Success Condition (2016)
 
 - Assume \(\|\vec{e}^*_{d-b}\| ≈ σ ⋅ \sqrt{b}\).
-- Applying the GSA, we expect the shortest vector to be found in the last block to have norm \[α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.\]
-
-- Thus footfullcite:EPRINT:ADPS15 \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
+- Applying the GSA, we expect the shortest vector to be found in the last block to have norm
+  #+BEGIN_EXPORT latex
+\begin{eqnarray*}
+ \|\vec{b}_{d-b+1}^*\| &=&  α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &=& δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &=& δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.
+\end{eqnarray*}
+  #+END_EXPORT
+- Thus footfullcite:EPRINT:ADPS15 we expect success if \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
 
 ** Success Condition (2016)
 
@@ -744,6 +751,12 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 
 # sage: %time set_random_seed(1337); L, R, e, norms = experiment(m=178, block_size=58)
 # sage: plot_norms(norms, 58, log(3.2^2*180,2)).save("../lectures/usvp-2016-visualisation.pdf")
+
+** Comparison for $q=2^{15}, σ=3.2$
+
+[[./usvp-comparison.pdf]]
+
+** Small Secrets
 
 ** Fin
 :PROPERTIES:
