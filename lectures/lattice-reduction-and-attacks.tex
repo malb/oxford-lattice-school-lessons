@@ -1,4 +1,4 @@
-% Created 2017-02-20 Mon 16:08
+% Created 2017-02-24 Fri 13:18
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation,smaller]{beamer}
 \RequirePackage{etex}
@@ -207,8 +207,8 @@ urlcolor=gray
 
 
 \section{BKZ}
-\label{sec:orgf975430}
-\begin{frame}[label={sec:org3883b8f}]{BKZ}
+\label{sec:orgcb8585b}
+\begin{frame}[label={sec:org46c0130}]{BKZ}
 \begin{itemize}
 \item Input basis is LLL reduced, the \alert{first block} is \(\vec{b}_1,\dots,\vec{b}_{β}\).
 \item Call the SVP oracle to obtain a short vector, \(\vec{b}_1'\), in the space spanned by these vectors.
@@ -221,7 +221,7 @@ urlcolor=gray
 … start again when reaching end, repeat until nothing changes
 \end{frame}
 
-\begin{frame}[label={sec:org9c1e2e3}]{BKZ 2.0}
+\begin{frame}[label={sec:orga56eca6}]{BKZ 2.0}
 \begin{description}
 \item[{early abort}] BKZ eventually terminates when there is nothing left to do. However, most work is done in the first few tours
 \item[{recursive preprocessing}] use BKZ with smaller block size to preprocess blocks before calling the SVP oracle
@@ -234,35 +234,35 @@ urlcolor=gray
 \end{block}
 \end{frame}
 
-\begin{frame}[label={sec:org156a425}]{root-Hermite Factors}
-The shortest non-zero vector \(\vec{b}_1\) in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^n⋅ \Vol(Λ)^{1/n}.\]
+\begin{frame}[label={sec:org2d610cc}]{root-Hermite Factors}
+The shortest non-zero vector \(\vec{b}_1\) in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^d⋅ \Vol(Λ)^{1/d}.\]
 
 \begin{itemize}
-\item Hermite factor: \(δ_0^n\)
+\item Hermite factor: \(δ_0^d\)
 \item root-Hermite factor:  \(δ_0\)
 \item log root-Hermite factor: \(\log_2 δ_0\)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org7e3da3f}]{Gaussian Heuristic}
-Let \(Λ \subset \ZZ^n\) be a lattice and let \(S \in \mathbb{R}^n\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
+\begin{frame}[label={sec:orga5340f3}]{Gaussian Heuristic}
+Let \(Λ \subset \ZZ^d\) be a lattice and let \(S \in \mathbb{R}^d\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
 
-As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{n}{2 π e}} \Vol(Λ)^{1/n}.\]
+As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{d}{2 π e}} \Vol(Λ)^{1/d}.\]
 \end{frame}
 
-\begin{frame}[label={sec:org9e5e394}]{Geometric Series Assumption}
+\begin{frame}[label={sec:orgb8be3a3}]{Geometric Series Assumption}
 The norms of the Gram-Schmidt vectors after lattice reduction satisfy \footfullcite{STACS:Schnorr03} \[\|\vec{b}_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
 
-Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^n \cdot \Vol(Λ)^{1/n}\) and \(\Vol(Λ) = \prod_{i=1}^{n} \|\vec{b}_i^*\|\), we get \[α = δ^{-2n/(n-1)}.\] 
+Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^d \cdot \Vol(Λ)^{1/d}\) and \(\Vol(Λ) = \prod_{i=1}^{d} \|\vec{b}_i^*\|\), we get \[α = δ^{-2d/(d-1)}.\] 
 \end{frame}
 
-\begin{frame}[label={sec:orged1686a}]{BKZ Quality}
+\begin{frame}[label={sec:org32ee476}]{BKZ Quality}
 Assuming the \alert{Gaussian Heuristic} (GH) and the \alert{Geometric Series Assumption} (GSA), a limiting value of the root-Hermite factor \(δ_0\) achievable by BKZ is \footfullcite{PhD:Chen13}: \[\lim_{n \rightarrow \infty} δ_0 = \left(v_β^{\frac{-1}{β}}\right)^{\frac{1}{β-1}}  ≈  \left( \frac{β}{2 \pi e} (\pi β)^{\frac{1}{β}}  \right)^{\frac{1}{2(β-1)}}\]
 
 where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental evidence suggests that we may apply this as an estimate for \(\delta_0\) also in practice.
 \end{frame}
 
-\begin{frame}[label={sec:orgbbcf3da}]{BKZ Quality}
+\begin{frame}[label={sec:orgf2461bf}]{BKZ Quality}
 \begin{tikzpicture}
 \pgfplotsset{width=\textwidth, height=0.6\textwidth}
 
@@ -283,7 +283,7 @@ where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental 
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org6b8d797}]{Running Time}
+\begin{frame}[label={sec:orgcd28383}]{Running Time}
 \begin{center}
 \includegraphics[width=0.8\textwidth]{bkz-quality.png}
 \end{center}
@@ -291,7 +291,7 @@ where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental 
 Most work is done in first 3-4 tours.
 \end{frame}
 
-\begin{frame}[label={sec:org4c0d730}]{Running Time}
+\begin{frame}[label={sec:orgec36f40}]{Running Time}
 Per tour, BKZ calls 
 \begin{description}
 \item[{\(c_{\textnormal{pre},β}\)}] prepare \(n\) SVP calls
@@ -302,7 +302,7 @@ Per tour, BKZ calls
 Total cost: \[≈ 4\,n \cdot (c_{\textnormal{pre},β} + c_{\textnormal{svp},β} + c_{\textnormal{lll}})\]
 \end{frame}
 
-\begin{frame}[label={sec:org59d3cd5}]{Running Time}
+\begin{frame}[label={sec:org26877cd}]{Running Time}
 We assume 
 \begin{itemize}
 \item \(c_{\textnormal{pre},β} < c_{\textnormal{svp},β}\)\footnote{For current code, this is a blatant lie.} and
@@ -313,7 +313,7 @@ to obtain \[≈ 4\,n\, c_{\textnormal{svp},β}\]
 Asymptotically, sieving is the most efficient heuristic SVP algorithm, with a cost \footfullcite{SODA:BDGL16} of \[c_{\textnormal{svp},β} = 2^{0.292\,β + o(1)}.\]
 \end{frame}
 
-\begin{frame}[label={sec:org45fd7ac}]{Asymptotic Behaviour}
+\begin{frame}[label={sec:orga4b86ac}]{Asymptotic Behaviour}
 The log of the time complexity for running BKZ to achieve a root-Hermite factor \(\delta_0\) is:
 
 \begin{eqnarray*}
@@ -323,8 +323,8 @@ The log of the time complexity for running BKZ to achieve a root-Hermite factor 
 \end{frame}
 
 \section{LWE}
-\label{sec:org1918790}
-\begin{frame}[label={sec:orgf1bb227}]{Learning with Errors}
+\label{sec:org4454989}
+\begin{frame}[label={sec:org48d46bb}]{Learning with Errors}
 Let \(n,\,q\) be positive integers, \(\chi\) be a probability distribution on \(\ZZ\) and \(\vec{s}\) be a secret vector in \(\ZZ_q^n\). We denote by \(L_{n,q,\chi}\) the probability distribution on \(\ZZ_q^n × \ZZ_q\) obtained by choosing \(\vec{a} ∈ \ZZ_q^n\) uniformly at random, choosing \(e ∈ \ZZ\) according to χ and considering it in \(\ZZ_q\), and returning \((\vec{a}, c) = (\vec{a}, \Angle{\vec{a},\vec{s}}+ e) ∈ \ZZ_q^n × \ZZ_q\).
 
 \begin{description}
@@ -335,8 +335,8 @@ Let \(n,\,q\) be positive integers, \(\chi\) be a probability distribution on \(
 \end{frame}
 
 \section{Dual Lattice Attack}
-\label{sec:orgf6c4398}
-\begin{frame}[label={sec:orga609a23}]{Short Integer Solutions}
+\label{sec:org9f71e02}
+\begin{frame}[label={sec:orgda9f619}]{Short Integer Solutions}
 Consider the scaled (by \(q\)) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \vec{A} \equiv 0 \bmod q\}.\] A short vector of \(qΛ^*\) is equivalent to solving SIS on \(\vec{A}\).
 
 \begin{block}{Short Integer Solutions (SIS)}
@@ -344,7 +344,7 @@ Given \(q \in \mathbb{Z}\), a matrix \(\vec{A}\), and \(t < q\); find \(\vec{y}\
 \end{block}
 \end{frame}
 
-\begin{frame}[label={sec:org33ef4a3}]{Strategy}
+\begin{frame}[label={sec:org55c2956}]{Strategy}
 \begin{itemize}
 \item Given LWE samples \(\vec{A}, \vec{c}\) where either \(\vec{c} = \vec{A}\vec{s} + \vec{e}\) or \(\vec{c}\) uniformly random.
 \item Find a short \(\vec{y}\) solving SIS on \(\vec{A}\).
@@ -358,11 +358,11 @@ Given \(q \in \mathbb{Z}\), a matrix \(\vec{A}\), and \(t < q\); find \(\vec{y}\
 If \(\vec{y}\) is sufficiently short, then \(\Angle{\vec{y}, \vec{e}}\) will also be short, since \(\vec{e}\) is also small, and can be distinguished from uniform values.
 \end{frame}
 
-\begin{frame}[label={sec:org1fe64a7}]{Required Quality}
-Given an LWE instance characterised by \(n\), \(α\), \(q\) and a vector \(\vec{v}\) of length \(\|\vec{v}\|\) in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing \(\Angle{\vec{v},\vec{e}}\) from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
+\begin{frame}[label={sec:org42b9253}]{Required Quality}
+Given an LWE instance characterised by \(n\), \(α\), \(q\) and a vector \(\vec{v}\) of length \(\|\vec{v}\|\) in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing \footfullcite{RSA:LinPei11} \(\Angle{\vec{v},\vec{e}}\) from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
 \end{frame}
 
-\begin{frame}[label={sec:org3f68154}]{Lattice Reduction}
+\begin{frame}[label={sec:org578948c}]{Lattice Reduction}
 A reduced lattice basis is made of short vectors, in particular the first vector has norm \(δ_0^m \cdot \Vol(qΛ^*)^{1/m}\)
 \begin{itemize}
 \item Construct a basis of the dual from the instance.
@@ -371,7 +371,7 @@ A reduced lattice basis is made of short vectors, in particular the first vector
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgfb8063f}]{Constructing a Basis}
+\begin{frame}[label={sec:org445d75d}]{Constructing a Basis}
 \begin{itemize}
 \item We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
 \item Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\vec{A}\) using Gaussian elimination.
@@ -388,16 +388,16 @@ A reduced lattice basis is made of short vectors, in particular the first vector
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgc8b9a4f}]{Degrees of Freedom}
+\begin{frame}[label={sec:org4167626}]{Degrees of Freedom}
 We get to choose:
 
 \begin{itemize}
-\item the dimension \(m\), i.e. the number of samples we use, and
-\item the target advantage \(ε\) for distinguishing
+\item the \alert{dimension} \(m\), i.e. the number of samples we use, and
+\item the target \alert{advantage} \(ε\) for distinguishing
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgcadc254}]{Choosing \(m\)}
+\begin{frame}[label={sec:orgb9c9070}]{Choosing \(m\)}
 Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 
 \begin{tikzpicture}
@@ -429,7 +429,7 @@ Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 \[m = \sqrt{\frac{n\,\log q}{\log(\delta_0)}}\]
 \end{frame}
 
-\begin{frame}[label={sec:orga774413}]{Choosing \(ε\)}
+\begin{frame}[label={sec:orgac450b1}]{Choosing \(ε\)}
 \begin{tikzpicture}
 \pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
 
@@ -457,7 +457,7 @@ Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org8b459de}]{Choosing \(ε\)}
+\begin{frame}[label={sec:org56f7d1a}]{Choosing \(ε\)}
 Boost the advantage to constant, repeat experiment \(≈ 1/ε^2\) times
 
 \begin{tikzpicture}
@@ -486,7 +486,7 @@ Boost the advantage to constant, repeat experiment \(≈ 1/ε^2\) times
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org29f620b}]{Amortising Costs}
+\begin{frame}[label={sec:orgeac6642}]{Amortising Costs}
 Our discussion on choosing \(ε\) was based on the assumption that producing \(1/ε^2\) vectors costs \(1/ε^2\) calls to BKZ in block size \(β\).
 
 Two options:
@@ -497,7 +497,7 @@ Two options:
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org75f31c7}]{Small Secrets}
+\begin{frame}[label={sec:org6f87fe6}]{Small Secrets}
 Problem: most LWE-based schemes only give \(n\) samples: \alert{left kernel is trivial}
 
 \begin{itemize}
@@ -508,7 +508,7 @@ Problem: most LWE-based schemes only give \(n\) samples: \alert{left kernel is t
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org1c027e3}]{Honourable Mention: BKW}
+\begin{frame}[label={sec:orgfc8c1c4}]{Honourable Mention: BKW}
 \begin{columns}
 \begin{column}{0.6\columnwidth}
 Assume \((\vec{a}_{21},\vec{a}_{22}) = (0, 1)\), then:
@@ -555,8 +555,8 @@ Assume \((\vec{a}_{21},\vec{a}_{22}) = (0, 1)\), then:
 \end{frame}
 
 \section{Primal Lattice Attack (uSVP Version)}
-\label{sec:orgb501035}
-\begin{frame}[label={sec:orgc7d2ebe}]{Bounded Distance Decoding and unique SVP}
+\label{sec:org384d800}
+\begin{frame}[label={sec:org3e8537a}]{Bounded Distance Decoding and unique SVP}
 Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that \(\vec{A}⋅\vec{w} - \vec{c} \bmod q\) is rather small.
 
 In other words, we know there’s an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
@@ -565,7 +565,7 @@ In other words, we know there’s an unusually short vector in the \(q\)-ary lat
         \end{array} \right) \in \ZZ_q^{(n+1) \times (m+1)}\] since \[(\vec{s} \mid -1) ⋅ \vec{B} = (\vec{e} \mid -t) \bmod q.\]
 \end{frame}
 
-\begin{frame}[label={sec:org83e1128}]{Constructing a Basis}
+\begin{frame}[label={sec:org7874207}]{Constructing a Basis}
 \begin{itemize}
 \item Compute reduced row echelon form \([\vec{I}_{n × n} \mid \vec{A}']\) of \(\vec{A}^T \in \ZZ_q^{n \times m}\) with \(m>n\).
 \item Stack on top of \([\vec{0}_{(m-n) \times n} \mid q\,\vec{I}_{(m-n) × (m-n)}]\) to handle modular reductions
@@ -579,18 +579,18 @@ In other words, we know there’s an unusually short vector in the \(q\)-ary lat
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org3b73b9e}]{HSVP vs uSVP}
+\begin{frame}[label={sec:org89e697c}]{HSVP vs uSVP}
 \begin{itemize}
 \item Any algorithm which can solve κ-HSVP, such as a lattice reduction algorithm, can be used linearly many times to solve \(γ\)-uSVP with approximation factor \(γ=κ^2\).\footfullcite{Lovasz86}
 \item Whenever \(κ > \sqrt{n}\), for \(n\) the dimension of the lattice, then any algorithm solving κ-HSVP can be used to solve γ-uSVP for \(γ ≈ \sqrt{n} κ\).\footfullcite{ISIT:LLLS11}
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org5145c77}]{Success Condition (2008)}
+\begin{frame}[label={sec:org3e01dbb}]{Success Condition (2008)}
 In practice, algorithms behave better. Lattice reduction is expected/observed \footfullcite{EC:GamNgu08} to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^m\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
 \end{frame}
 
-\begin{frame}[label={sec:orgbb7d7ac}]{Success Condition (2013)}
+\begin{frame}[label={sec:org338a36b}]{Success Condition (2013)}
 \begin{itemize}
 \item We can predict the length of the unusually short vector \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
 
@@ -600,7 +600,7 @@ In practice, algorithms behave better. Lattice reduction is expected/observed \f
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orga23329e}]{Success Condition (2015)}
+\begin{frame}[label={sec:org87b3ae9}]{Success Condition (2015)}
 \begin{block}{Lemma \footfullcite{EPRINT:AlbPlaSco15}}
 Given an LWE instance characterised by \(n\), \(α\), \(q\). Any lattice reduction algorithm achieving log root-Hermite factor \[\log{δ_0} = \frac{\log^2{\left(ε' τ α \sqrt{2e}\right)}}{4 n \log{q}}\] solves LWE with success probability greater than \(ε_τ ⋅ \left( 1-\left(ε' ⋅  \exp{\left(\frac{1-ε'^2}{2}\right)}\right)^m \right)\) for some \(ε' > 1\) and some fixed \(τ ≤ 1\), and \(0 < ε_τ < 1\) as a function of \(τ\).
 \end{block}
@@ -608,12 +608,32 @@ Given an LWE instance characterised by \(n\), \(α\), \(q\). Any lattice reducti
 This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the gap.
 \end{frame}
 
-\begin{frame}[label={sec:org03e61b3}]{Success Condition (2016)}
+\begin{frame}[label={sec:org8bb51fd}]{Success Condition (2016)}
+\begin{itemize}
+\item Let \(d = m+1\) the dimension of the lattice.
+\item Let \(\vec{e}^*_{m+1-b}\) be the projection of \(\vec{e}\) orthogonally onto the first \(d-b\) vectors of the Gram-Schmidt basis \(\mat{B}^*\)
+\item BKZ-like algorithms will run an SVP oracle on th last block of dimension \(b\).
+\item If \(\vec{e}^*_{d-b}\) is a shortest vector in that block, it will be found
+\item If \(\vec{e}^*_i\) is a shortest vector for all projections up to \(m+1-b\) it will “travel to the front” eventually.
+\end{itemize}
 \end{frame}
 
+\begin{frame}[label={sec:org39f48b5}]{Success Condition (2016)}
+\begin{itemize}
+\item Assume \(\|\vec{e}^*_{d-b}\| ≈ σ ⋅ \sqrt{b}\).
+\item Applying the GSA, we expect the shortest vector to be found in the last block to have norm \[α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.\]
 
+\item Thus \footfullcite{EPRINT:ADPS15} \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
+\end{itemize}
+\end{frame}
 
-\begin{frame}[standout,label={sec:orgc2c3931}]{Fin}
+\begin{frame}[label={sec:org842da7e}]{Success Condition (2016)}
+\begin{center}
+\includegraphics[width=.9\linewidth]{./usvp-2016-visualisation.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}[standout,label={sec:org0b95f06}]{Fin}
 \begin{center}
 \Huge \alert{Thank You}
 \end{center}

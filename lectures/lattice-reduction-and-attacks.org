@@ -317,23 +317,23 @@ fullcite:PhD:Chen13, implementation: https://github.com/fplll/fplll
 
 ** root-Hermite Factors
 
-The shortest non-zero vector $\vec{b}_1$ in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^n⋅ \Vol(Λ)^{1/n}.\]
+The shortest non-zero vector $\vec{b}_1$ in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^d⋅ \Vol(Λ)^{1/d}.\]
 
-- Hermite factor: $δ_0^n$
+- Hermite factor: $δ_0^d$
 - root-Hermite factor:  \(δ_0\)
 - log root-Hermite factor: \(\log_2 δ_0\)
 
 ** Gaussian Heuristic
 
-Let \(Λ \subset \ZZ^n\) be a lattice and let \(S \in \mathbb{R}^n\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
+Let \(Λ \subset \ZZ^d\) be a lattice and let \(S \in \mathbb{R}^d\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
 
-As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{n}{2 π e}} \Vol(Λ)^{1/n}.\]
+As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{d}{2 π e}} \Vol(Λ)^{1/d}.\]
 
 ** Geometric Series Assumption
 
 The norms of the Gram-Schmidt vectors after lattice reduction satisfy footfullcite:STACS:Schnorr03 \[\|\vec{b}_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
 
-Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^n \cdot \Vol(Λ)^{1/n}\) and \(\Vol(Λ) = \prod_{i=1}^{n} \|\vec{b}_i^*\|\), we get \[α = δ^{-2n/(n-1)}.\] 
+Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^d \cdot \Vol(Λ)^{1/d}\) and \(\Vol(Λ) = \prod_{i=1}^{d} \|\vec{b}_i^*\|\), we get \[α = δ^{-2d/(d-1)}.\] 
 
 ** BKZ Quality
 
@@ -473,7 +473,7 @@ If $\vec{y}$ is sufficiently short, then $\Angle{\vec{y}, \vec{e}}$ will also be
 
 ** Required Quality
 
-Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of length $\|\vec{v}\|$ in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing $\Angle{\vec{v},\vec{e}}$ from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
+Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of length $\|\vec{v}\|$ in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing footfullcite:RSA:LinPei11 $\Angle{\vec{v},\vec{e}}$ from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
 
 ** Lattice Reduction
 
@@ -503,8 +503,8 @@ Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of 
 
 We get to choose:
 
-- the dimension $m$, i.e. the number of samples we use, and
-- the target advantage $ε$ for distinguishing 
+- the *dimension* $m$, i.e. the number of samples we use, and
+- the target *advantage* $ε$ for distinguishing 
 
 ** Choosing $m$
 
@@ -725,7 +725,25 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 
 ** Success Condition (2016)
 
+- Let $d = m+1$ the dimension of the lattice.
+- Let $\vec{e}^*_{m+1-b}$ be the projection of \(\vec{e}\) orthogonally onto the first \(d-b\) vectors of the Gram-Schmidt basis \(\mat{B}^*\)
+- BKZ-like algorithms will run an SVP oracle on th last block of dimension \(b\).
+- If \(\vec{e}^*_{d-b}\) is a shortest vector in that block, it will be found
+- If \(\vec{e}^*_i\) is a shortest vector for all projections up to \(m+1-b\) it will “travel to the front” eventually.
 
+** Success Condition (2016)
+
+- Assume \(\|\vec{e}^*_{d-b}\| ≈ σ ⋅ \sqrt{b}\).
+- Applying the GSA, we expect the shortest vector to be found in the last block to have norm \[α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d} = δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.\]
+
+- Thus footfullcite:EPRINT:ADPS15 \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
+
+** Success Condition (2016)
+
+[[./usvp-2016-visualisation.pdf]]
+
+# sage: %time set_random_seed(1337); L, R, e, norms = experiment(m=178, block_size=58)
+# sage: plot_norms(norms, 58, log(3.2^2*180,2)).save("../lectures/usvp-2016-visualisation.pdf")
 
 ** Fin
 :PROPERTIES:
