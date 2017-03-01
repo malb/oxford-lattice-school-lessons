@@ -286,7 +286,7 @@ sol[:8]
 
 - shortest vectors :: reduce $R$ whenever vector with shorter norm found
 - short enough vectors :: stop when vector with target norm is found
-- target radius :: $R = \|\vec{b}_1\|$ always works, picking a small $R$ reduces the search space, e.g. $R ≈ \Vol(L)^{1/d}$
+- target radius :: $R = \|\vec{b}_1\|$ always works, picking a small $R$ reduces the search space, e.g. $R ≈ \sqrt{d/(2πe)} \Vol(L)^{1/d}$
 - pruning :: not all choices for $v_k$ lead to a solution with same probability, skip some
 - preprocessing :: the more reduced the basis, the faster enumeration
 - complexity :: $d^{\Theta(d)}$, but fastest in practice.
