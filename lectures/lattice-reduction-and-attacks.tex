@@ -1,4 +1,4 @@
-% Created 2017-02-24 Fri 15:34
+% Created 2017-03-01 Wed 18:45
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation,smaller]{beamer}
 \RequirePackage{etex}
@@ -206,242 +206,9 @@ urlcolor=gray
 \end{frame}
 
 
-\section{Lattice Point Enumeration}
-\label{sec:orgae5f98c}
-\begin{frame}[label={sec:org55ec5b9}]{Finding Shortest Vectors}
-Given some lattice \(Λ(\mat{B})\), find \(\vec{v} \in Λ(\mat{B})\) with \(\vec{v} \neq 0\) such that \(\|\vec{v}\|^2\) is minimal.
-\end{frame}
-
-\begin{frame}[label={sec:org355fcb4}]{Finding Short Vectors}
-Given some \textbf{matrix} \(\mat{B}\) and some \textbf{bound} \(R\), find \(\vec{v} = \sum_{i=1}^{d} v_i \vec{b}_i\) where at least one \(v_i \neq 0\) such that \(\|\vec{v}\|^2 \leq R^2\).
-\end{frame}
-
-\begin{frame}[fragile,label={sec:org7e19015}]{Rephrasing in Gram-Schmidt Basis}
- \begin{columns}[t]
-\begin{column}{0.6\columnwidth}
-Given some basis \(\mat{B}\) for some lattice \(Λ(\mat{B})\) we can compute the Gram-Schmidt orthogonalisation \[\mat{B} = μ \cdot \mat{B}^*\]
-
-Any vector in \(\vec{w} \in Λ(B)\) can be written as 
-\begin{align*}
-\vec{w} &= \sum_{i=1}^d v_i \vec{b}_i = \sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\\
-        &= \sum_{j=1}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^* 
-\end{align*}
-\end{column}
-
-\begin{column}{0.4\columnwidth}
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-B = matrix(ZZ, [[-1,  1, -2], 
-                [ 0, -2,  0], 
-                [10, -1, -2]])
-Bs, mu = B.gram_schmidt()
-Bs
-\end{lstlisting}
-
-\begin{verbatim}
-[   -1     1    -2]
-[ -1/3  -5/3  -2/3]
-[ 44/5     0 -22/5]
-\end{verbatim}
-
-
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-v = vector([1,2,3])
-v*B == v*(mu*Bs) == (v*mu)*Bs
-\end{lstlisting}
-
-\begin{verbatim}
-True
-\end{verbatim}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[fragile,label={sec:org840edcb}]{Orthogonal Projections}
- \begin{columns}[t]
-\begin{column}{0.55\columnwidth}
-The same representation applies to projections of \(\vec{w}\):
-
-\begin{align*}
-\pi_k\left(\vec{w}\right) &= \pi_k\left(\sum_{i=1}^{d} v_i \left(\vec{b}_i^* + \sum_{j=1}^{i-1} \mu_{ij} \vec{b}_j^* \right)\right)\\
-                        &= \sum_{j=\alert{k}}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*
-\end{align*}
-\end{column}
-
-\begin{column}{0.45\columnwidth}
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-k, d = 1, 3
-w_1 = 0
-for j in range(k, d):
-    c = v[j]
-    for i in range(j+1, d):
-        c += v[i]*mu[i,j]
-    w_1 += c*Bs[j]
-w_1
-\end{lstlisting}
-
-\begin{verbatim}
-(155/6, -17/6, -43/3)
-\end{verbatim}
-
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-def proj(u, v):
-    return v*u/(u*u) * u
-
-w = v * mu * Bs
-w - proj(Bs[0], w)
-\end{lstlisting}
-
-\begin{verbatim}
-(155/6, -17/6, -43/3)
-\end{verbatim}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[fragile,label={sec:orgbcc423d}]{Bounding Norms}
- \begin{columns}[t]
-\begin{column}{0.6\columnwidth}
-Since \(\vec{b}_i^*\) are orthogonal, we can write:
-
-\begin{align*}
-\|π_k\left(\vec{w}\right)\|^2 &= \left\|\sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\right\|^2\\
-&= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right)^2 \|\vec{b}_j^*\|^2
-\end{align*}
-
-
-
-Thus \[\|π_{k}(\vec{w})\| ≥ \|π_{k+1}(\vec{w})\|,\] i.e. vectors don’t become longer by projecting.
-\end{column}
-
-\begin{column}{0.4\columnwidth}
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-k, d = 1, 3
-r = 0
-for j in range(k, d):
-    c = v[j]
-    for i in range(j+1, d):
-        c += v[i]*mu[i,j]
-    r += c^2 * abs(Bs[j])^2
-r
-\end{lstlisting}
-
-\begin{verbatim}
-5285/6
-\end{verbatim}
-
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-def proj(u, v):
-    return v*u/(u*u) * u
-
-w = v * mu * Bs
-abs(w - proj(Bs[0], w))^2
-\end{lstlisting}
-
-\begin{verbatim}
-5285/6
-\end{verbatim}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[label={sec:org48aad03}]{Key Idea}
-From \[\|π_{d}(\vec{w})\|^2 \leq \|π_{d-1}(\vec{w})\|^2 ≤ … ≤ \|π_{1}(\vec{w})\|^2 ≤ \|\vec{w}\|^2 \leq R^2,\] find candidates for \(π_{k+1}(\vec{w})\) and extend solution to \(π_{k}(\vec{w})\) using
-\begin{align*}
-\pi_k\left(\vec{w}\right) &= \sum_{j=k}^{d} \left(v_j  + \sum_{i=j+1}^{d} v_i\, \mu_{ij} \right) \vec{b}_j^*\\
-&=  \pi_{k+1}(\vec{w}) + \left(\alert{v_k}  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right) \vec{b}_k^*
-\end{align*}
-and
-\begin{align*}
-\|\pi_k\left(\vec{w}\right)\|^2 
-&=  \|\pi_{k+1}(\vec{w})\|^2 + \left(\alert{v_k}  + \sum_{i=k+1}^{d} v_i\, \mu_{ik} \right)^2 \|\vec{b}_k^*\|^2
-\end{align*}
-\end{frame}
-
-\begin{frame}[fragile,label={sec:orgc48963d}]{Execution}
- \begin{columns}[t]
-\begin{column}{0.58\columnwidth}
-From the bound \(R\) we know \[v_d^2 \|\vec{b}_d^*\|^2 = \|π_d(\vec{w})\|^2 ≤ R^2\]
-
-Thus, the only valid candidates for \(v_d\) are \[\ZZ \cap [-R/\|\vec{b}_d^*\|,R/\|\vec{b}_d^*\|]\]
-
-For any choice of \(v_d\) in this interval, we know
-\begin{align*}
-\|π_{d-1}(\vec{w})\|^2 \leq& R^2\\
-v_d^2 \|\vec{b}_d^*\|^2 + (\alert{v_{d-1}} + v_d\, \mu_{d,d-1})^2 \cdot \|\vec{b}_{d-1}^*\|^2 \leq& R^2\\ 
-\end{align*}
-
-This defines an integral interval for \(v_{d-1}\)
-\end{column}
-
-\begin{column}{0.42\columnwidth}
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-R = abs(B[0])
-bnd = floor(abs(Bs[-1])/R)
-range(-bnd, bnd+1)
-\end{lstlisting}
-
-\begin{verbatim}
-[-4, -3, -2, -1, 0, 1, 2, 3, 4]
-\end{verbatim}
-
-\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-v_d = 0
-c = -v_d*mu[-1,-2]
-o = R^2 - v_d^2*abs(Bs[-1])^2
-o = sqrt(o)/abs(Bs[-2])
-range(ceil(c-o), floor(c+o)+1)
-\end{lstlisting}
-
-\begin{verbatim}
-[-1, 0, 1]
-\end{verbatim}
-
-…
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[fragile,label={sec:org2e4e861}]{Implementation}
- \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-from fpylll import *
-set_random_seed(1337)
-A = IntegerMatrix.random(30, "qary", k=15, bits=20)
-_ = LLL.reduction(A)
-M = GSO.Mat(A)
-_ = M.update_gso()
-E = Enumeration(M)
-sol, norm = E.enumerate(0, M.d, M.get_r(0,0), 0)
-sol[:8]
-\end{lstlisting}
-
-\begin{verbatim}
-(1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -2.0, 1.0)
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[label={sec:org64bf358}]{Closing Remarks}
-\begin{description}
-\item[{shortest vectors}] reduce \(R\) whenever vector with shorter norm found
-\item[{short enough vectors}] stop when vector with target norm is found
-\item[{target radius}] \(R = \|\vec{b}_1\|\) always works, picking a small \(R\) reduces the search space, e.g. \(R ≈ \sqrt{d/(2πe)} \Vol(L)^{1/d}\)
-\item[{pruning}] not all choices for \(v_k\) lead to a solution with same probability, skip some
-\item[{preprocessing}] the more reduced the basis, the faster enumeration
-\item[{complexity}] \(d^{\Theta(d)}\), but fastest in practice.
-\end{description}
-\end{frame}
-
 \section{BKZ}
-\label{sec:org2410d0f}
-\begin{frame}[label={sec:org37734be}]{BKZ}
+\label{sec:org23e8eeb}
+\begin{frame}[label={sec:org171853f}]{BKZ}
 \begin{itemize}
 \item Input basis is LLL reduced, the \alert{first block} is \(\vec{b}_1,\dots,\vec{b}_{β}\).
 \item Call the SVP oracle to obtain a short vector, \(\vec{b}_1'\), in the space spanned by these vectors.
@@ -454,7 +221,7 @@ sol[:8]
 … start again when reaching end, repeat until nothing changes
 \end{frame}
 
-\begin{frame}[label={sec:orgc56b3f9}]{BKZ 2.0}
+\begin{frame}[label={sec:org09eae8e}]{BKZ 2.0}
 \begin{description}
 \item[{early abort}] BKZ eventually terminates when there is nothing left to do. However, most work is done in the first few tours
 \item[{recursive preprocessing}] use BKZ with smaller block size to preprocess blocks before calling the SVP oracle
@@ -467,7 +234,7 @@ sol[:8]
 \end{block}
 \end{frame}
 
-\begin{frame}[label={sec:org6519a13}]{root-Hermite Factors}
+\begin{frame}[label={sec:org1565c93}]{root-Hermite Factors}
 The shortest non-zero vector \(\vec{b}_1\) in the output basis satisfies: \[\|\vec{b}_1\| = δ_0^d⋅ \Vol(Λ)^{1/d}.\]
 
 \begin{itemize}
@@ -477,25 +244,25 @@ The shortest non-zero vector \(\vec{b}_1\) in the output basis satisfies: \[\|\v
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgb768376}]{Gaussian Heuristic}
+\begin{frame}[label={sec:orgb0862e4}]{Gaussian Heuristic}
 Let \(Λ \subset \ZZ^d\) be a lattice and let \(S \in \mathbb{R}^d\) be a measurable subset of the real space. Then \[|S ∩ Λ| ≈ \Vol(S)/\Vol(Λ).\]
 
 As a corollary, considering spheres, we get: \[λ_1(Λ) ≈ \sqrt{\frac{d}{2 π e}} \Vol(Λ)^{1/d}.\]
 \end{frame}
 
-\begin{frame}[label={sec:orge89d44c}]{Geometric Series Assumption}
+\begin{frame}[label={sec:orgb383a22}]{Geometric Series Assumption}
 The norms of the Gram-Schmidt vectors after lattice reduction satisfy \footfullcite{STACS:Schnorr03} \[\|\vec{b}_i^*\| = α^{i-1} ⋅ \|\vec{b}_1\| \textnormal{ for some } 0 < α < 1.\]
 
 Combining this with the root-Hermite factor \(\|\vec{b}_1\| = δ_0^d \cdot \Vol(Λ)^{1/d}\) and \(\Vol(Λ) = \prod_{i=1}^{d} \|\vec{b}_i^*\|\), we get \[α = δ^{-2d/(d-1)}.\] 
 \end{frame}
 
-\begin{frame}[label={sec:orgba10eca}]{BKZ Quality}
+\begin{frame}[label={sec:org50f573d}]{BKZ Quality}
 Assuming the \alert{Gaussian Heuristic} (GH) and the \alert{Geometric Series Assumption} (GSA), a limiting value of the root-Hermite factor \(δ_0\) achievable by BKZ is \footfullcite{PhD:Chen13}: \[\lim_{n \rightarrow \infty} δ_0 = \left(v_β^{\frac{-1}{β}}\right)^{\frac{1}{β-1}}  ≈  \left( \frac{β}{2 \pi e} (\pi β)^{\frac{1}{β}}  \right)^{\frac{1}{2(β-1)}}\]
 
 where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental evidence suggests that we may apply this as an estimate for \(\delta_0\) also in practice.
 \end{frame}
 
-\begin{frame}[label={sec:orgab2e5ef}]{BKZ Quality}
+\begin{frame}[label={sec:orgbf01d0e}]{BKZ Quality}
 \begin{tikzpicture}
 \pgfplotsset{width=\textwidth, height=0.6\textwidth}
 
@@ -516,7 +283,7 @@ where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental 
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:orgdc8ec24}]{Running Time}
+\begin{frame}[label={sec:org8cf4cb9}]{Running Time}
 \begin{center}
 \includegraphics[width=0.8\textwidth]{./bkz-quality.pdf}
 \end{center}
@@ -524,7 +291,7 @@ where \(v_β\) is the volume of the unit ball in dimension \(β\). Experimental 
 Most work is done in first 3-4 tours.
 \end{frame}
 
-\begin{frame}[label={sec:org19f61b0}]{Running Time}
+\begin{frame}[label={sec:org9bf264a}]{Running Time}
 Per tour, BKZ calls 
 \begin{description}
 \item[{\(c_{\textnormal{pre},β}\)}] prepare \(n\) SVP calls
@@ -535,7 +302,7 @@ Per tour, BKZ calls
 Total cost: \[≈ 4\,n \cdot (c_{\textnormal{pre},β} + c_{\textnormal{svp},β} + c_{\textnormal{lll}})\]
 \end{frame}
 
-\begin{frame}[label={sec:orgf3107fc}]{Running Time}
+\begin{frame}[label={sec:orgc617bab}]{Running Time}
 We assume 
 \begin{itemize}
 \item \(c_{\textnormal{pre},β} < c_{\textnormal{svp},β}\)\footnote{For current code, this is a blatant lie.} and
@@ -546,18 +313,18 @@ to obtain \[≈ 4\,n\, c_{\textnormal{svp},β}\]
 Asymptotically, sieving is the most efficient heuristic SVP algorithm, with a cost \footfullcite{SODA:BDGL16} of \[c_{\textnormal{svp},β} = 2^{0.292\,β + o(1)}.\]
 \end{frame}
 
-\begin{frame}[label={sec:orgd1d9756}]{Asymptotic Behaviour}
+\begin{frame}[label={sec:org650bac7}]{Asymptotic Behaviour}
 The log of the time complexity for running BKZ to achieve a root-Hermite factor \(\delta_0\) is:\footfullcite{EPRINT:AlbPlaSco15}
 
-\begin{eqnarray*}
-\Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) & & \textnormal{for enumeration},\\
-\Omega \left( \frac{-\log\log \delta_0}{\log\delta_0} \right) & & \textnormal{for sieving}.
-\end{eqnarray*}
+\begin{align*}
+\Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) &  \textnormal{for enumeration},\\
+\Omega \left( \frac{-\log\log \delta_0}{\log\delta_0} \right) &  \textnormal{for sieving}.
+\end{align*}
 \end{frame}
 
 \section{LWE}
-\label{sec:org3392312}
-\begin{frame}[label={sec:orgb8212d8}]{Learning with Errors}
+\label{sec:org3d67e68}
+\begin{frame}[label={sec:org5737bdf}]{Learning with Errors}
 Let \(n,\,q\) be positive integers, \(\chi\) be a probability distribution on \(\ZZ\) and \(\vec{s}\) be a secret vector in \(\ZZ_q^n\). We denote by \(L_{n,q,\chi}\) the probability distribution on \(\ZZ_q^n × \ZZ_q\) obtained by choosing \(\vec{a} ∈ \ZZ_q^n\) uniformly at random, choosing \(e ∈ \ZZ\) according to χ and considering it in \(\ZZ_q\), and returning \((\vec{a}, c) = (\vec{a}, \Angle{\vec{a},\vec{s}}+ e) ∈ \ZZ_q^n × \ZZ_q\).
 
 \begin{description}
@@ -568,50 +335,55 @@ Let \(n,\,q\) be positive integers, \(\chi\) be a probability distribution on \(
 \end{frame}
 
 \section{Dual Lattice Attack}
-\label{sec:org9f7c1a3}
-\begin{frame}[label={sec:orgf07421e}]{Short Integer Solutions}
-Consider the scaled (by \(q\)) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \vec{A} \equiv 0 \bmod q\}.\] A short vector of \(qΛ^*\) is equivalent to solving SIS on \(\vec{A}\).
+\label{sec:orgf427ccc}
+\begin{frame}[label={sec:orgca5f381}]{Short Integer Solutions}
+Consider the scaled (by \(q\)) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \cdot \vec{A} \equiv 0 \bmod q\}.\] A short vector of \(qΛ^*\) is equivalent to solving SIS on \(\vec{A}\).
+
+\vspace{1em}
 
 \begin{block}{Short Integer Solutions (SIS)}
-Given \(q \in \mathbb{Z}\), a matrix \(\vec{A}\), and \(t < q\); find \(\vec{y}\) with \(0 < \|\vec{y}\| \leq t\) and \[\vec{y}\, \vec{A} \equiv  \vec{0} \pmod{q}.\]
+Given \(q \in \mathbb{Z}\), a matrix \(\vec{A}\), and \(t < q\); find \(\vec{y}\) with \(0 < \|\vec{y}\| \leq t\) and \[\vec{y}⋅ \vec{A} \equiv  \vec{0} \pmod{q}.\]
 \end{block}
 \end{frame}
 
-\begin{frame}[label={sec:org9be1a41}]{Strategy}
-\begin{itemize}
-\item Given LWE samples \(\vec{A}, \vec{c}\) where either \(\vec{c} = \vec{A}\vec{s} + \vec{e}\) or \(\vec{c}\) uniformly random.
+\begin{frame}[label={sec:orgf6555c5}]{Strategy}
+Given samples \(\vec{A}, \vec{c}\):
+
+\begin{enumerate}
 \item Find a short \(\vec{y}\) solving SIS on \(\vec{A}\).
-\item Compute \(\Angle{\vec{y}, \vec{c}}\). 
+\item Compute \(\Angle{\vec{y}, \vec{c}}\).
+\end{enumerate}
+
+Either \(\vec{c} = \vec{A}\vec{s} + \vec{e}\) or \(\vec{c}\) uniformly random:
+
 \begin{itemize}
-\item If \(\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}\), then \(\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y}\vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}\).
 \item If \(\vec{c}\) is uniformly random, so is \(\Angle{\vec{y}, \vec{c}}\).
+\item If \(\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}\), then \(\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y} \cdot \vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}\). If \(\vec{y}\) is sufficiently short, then \(\Angle{\vec{y}, \vec{e}}\) will also be short, since \(\vec{e}\) is also small.
 \end{itemize}
-\end{itemize}
-
-If \(\vec{y}\) is sufficiently short, then \(\Angle{\vec{y}, \vec{e}}\) will also be short, since \(\vec{e}\) is also small, and can be distinguished from uniform values.
 \end{frame}
 
-\begin{frame}[label={sec:org8dcea52}]{Required Quality}
-Given an LWE instance characterised by \(n\), \(α\), \(q\) and a vector \(\vec{v}\) of length \(\|\vec{v}\|\) in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing \footfullcite{RSA:LinPei11} \(\Angle{\vec{v},\vec{e}}\) from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
+\begin{frame}[label={sec:org15375f1}]{Required Quality}
+Given an LWE instance characterised by \(n\), \(α\), \(q\) and a vector \(\vec{v}\) of length \(\|\vec{v}\|\) in the scaled dual lattice \[qΛ^* = \{ \vec{x} \in \ZZ_q^m \ | \ \vec{x} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage  \footfullcite{RSA:LinPei11} of distinguishing \(\Angle{\vec{v},\vec{e}}\) from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
 \end{frame}
 
-\begin{frame}[label={sec:org0ecb541}]{Lattice Reduction}
+\begin{frame}[label={sec:orga5726bd}]{Lattice Reduction}
 A reduced lattice basis is made of short vectors, in particular the first vector has norm \(δ_0^m \cdot \Vol(qΛ^*)^{1/m}\)
-\begin{itemize}
-\item Construct a basis of the dual from the instance.
+
+\begin{enumerate}
+\item Construct bases of the dual for the instance.
 \item Feed to a lattice reduction algorithm to obtain short vectors \(\vec{v}_i\).
-\item Check if \(\vec{v}_i\, \vec{A}\) are small.
-\end{itemize}
+\item Check if \(\vec{v}_i\cdot \vec{A}\) are small.
+\end{enumerate}
 \end{frame}
 
-\begin{frame}[label={sec:orgff786cf}]{Constructing a Basis}
+\begin{frame}[label={sec:org3e6d2cc}]{Constructing a Basis}
 \begin{itemize}
-\item We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
-\item Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\vec{A}\) using Gaussian elimination.
+\item We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{x} \in \ZZ_q^m \ | \ \vec{x}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
+\item Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\mat{A}\) mod \(q\) using Gaussian elimination.
 \item With high probability it will have dimension \((m-n) × m\)
-\item Write \(\mat{Y} = [\vec{I}_{(m-n) \times (m-n)} | \mat{Y}']\)
-\item Extend to \(q\)-ary lattice by stacking with  \([\vec{0}_{n \times (m-n)} \mid q ⋅ \vec{I}_{n \times n}]\)
-\item Our basis is:
+\item Write \(\mat{Y} = [\mat{I}_{(m-n) \times (m-n)} | \mat{Y}']\)
+\item Extend to \(q\)-ary lattice by stacking on top of  \([\vec{0}_{n \times (m-n)} \mid q ⋅ \mat{I}_{n \times n}]\)
+\item The basis is
 \begin{align*}
   \mat{L} = \begin{pmatrix}
     \mat{I}_{(m-n) \times (m-n)} & \mat{Y}'\\
@@ -621,16 +393,14 @@ A reduced lattice basis is made of short vectors, in particular the first vector
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgd43fb68}]{Degrees of Freedom}
-We get to choose:
-
+\begin{frame}[label={sec:orgb1433d1}]{Degrees of Freedom}
 \begin{itemize}
 \item the \alert{dimension} \(m\), i.e. the number of samples we use, and
 \item the target \alert{advantage} \(ε\) for distinguishing
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgc78034b}]{Choosing \(m\)}
+\begin{frame}[label={sec:orgf3965fe}]{Choosing \(m\)}
 Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 
 \begin{tikzpicture}
@@ -659,10 +429,10 @@ Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 \end{axis}
 \end{tikzpicture}
 
-\[m = \sqrt{\frac{n\,\log q}{\log(\delta_0)}}\]
+\[m = \sqrt{\frac{n\,\log q}{\log δ_0}}\]
 \end{frame}
 
-\begin{frame}[label={sec:org7d53d1a}]{Choosing \(ε\)}
+\begin{frame}[label={sec:org11f0d25}]{Choosing \(ε\)}
 \begin{tikzpicture}
 \pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
 
@@ -690,8 +460,8 @@ Example: \(q=2^{17}, n=1024, δ_0 = 1.005\)
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org953df27}]{Choosing \(ε\)}
-Boost the advantage to constant, repeat experiment \(≈ 1/ε^2\) times
+\begin{frame}[label={sec:org87aa7e0}]{Choosing \(ε\)}
+Repeat experiment \(≈ 1/ε^2\) times for majority vote to achieve constant advantage
 
 \begin{tikzpicture}
 \pgfplotsset{width=1.0\textwidth, height=0.5\textwidth}
@@ -719,60 +489,82 @@ Boost the advantage to constant, repeat experiment \(≈ 1/ε^2\) times
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org3d9bb68}]{Amortising Costs}
-Our discussion on choosing \(ε\) was based on the assumption that producing \(1/ε^2\) vectors costs \(1/ε^2\) calls to BKZ in block size \(β\).
+\begin{frame}[label={sec:org12a4d8b}]{Amortising Costs}
+Producing \(1/ε^2\) short vectors is cheaper than \(1/ε^2\) calls to BKZ in block size \(β\).
 
 Two options:
 
 \begin{itemize}
-\item Use fact that sieving outputs \(2^{0.2075\cdot β}\) vectors. \footfullcite{EPRINT:ADPS15}
+\item Use that sieving outputs \(2^{0.2075\cdot β}\) vectors. \footfullcite{EPRINT:ADPS15}
 \item Perform strong lattice reduction once, use light rerandomisation and cheaper lattice reduction for subsequent vectors. \footfullcite{EPRINT:Albrecht17}
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org207d69a}]{Small Secrets}
-Problem: most LWE-based schemes only give \(n\) samples: \alert{left kernel is trivial}
+\begin{frame}[label={sec:org4895355}]{LWE Normal Form}
+\textbf{Problem:} most schemes give only \(n\) samples \alert{⇒ left kernel is trivial}
 
+But instances are in LWE normal form: \(\vec{s}_i \sample \chi\)
+
+\begin{block}{LWE Normal Form}
+Given samples \((\vec{a},c)=(\vec{a},\Angle{\vec{a},\alert{\vec{s}}} + e) \in \ZZ_q^n × \ZZ_q\)
+with \(\vec{a} \gets \mathcal{U}(\ZZ_q^n)\), \(e \gets χ\) and \(\vec{s} \in \ZZ_q^n\),
+we can construct samples
+\[(\vec{a}, c)=(\vec{a},⟨\vec{a},\alert{\vec{e}}⟩+ e) \in \ZZ_q^n × \ZZ_q\] with
+\(\vec{a} ← \mathcal{U}(\ZZ_q^n)\), \(e ← χ\) and \alert{\(\vec{e}\)} such that all components \alert{\[e_i ← χ\]} in polynomial time.\footfullcite{C:ACPS09}
+\end{block}
+\end{frame}
+
+\begin{frame}[label={sec:org6cbd55b}]{LWE Normal Form}
 \begin{itemize}
-\item But instances are in LWE normal form: \(\vec{s}_i \sample \chi\)
 \item Construct basis for \[Λ = \{(\vec{y},\vec{x}) \in \ZZ^{m} × \ZZ^n : \vec{y}⋅ \vec{A} ≡ \vec{x} \bmod q\}.\]
 \item Given a short vector in \((\vec{w},\vec{v}) \in Λ\), we have \[\vec{w}⋅\vec{c} = \vec{w}⋅(\vec{A}⋅\vec{s} + \vec{e}) = \Angle{\vec{v},\vec{s}} + \Angle{\vec{w},\vec{e}}.\]
-\item Analysis proceeds as before with \(m ≤ 2n\).
+\item Analysis proceeds as before with \(d ≤ 2n\).
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org74b487c}]{Honourable Mention: BKW}
+\begin{frame}[label={sec:org4381bcb}]{Small Secret}
+Assume \(\|\vec{s}\| \ll \|\vec{e}\|\), e.g. \(\vec{s}_i \gets \{-1,0,1\}\).
+
+\begin{itemize}
+\item Aim is to balance \(\|\Angle{\vec{v},\vec{s}}\| ≈ \|\Angle{\vec{w},\vec{e}}\|\).
+
+\item Consider the scaled dual attack lattice \[Λ(\mat{L}) = \{(\vec{x}, \vec{y}/c) \in \ZZ^m × {({1}/{c} ⋅ \ZZ)}^n : \vec{x} ⋅ \vec{A} ≡ \vec{y} \bmod q\} \] for some constant \(c\).
+
+\item Lattice reduction produces a vector \((\vec{v}',\vec{w}')\) with \[\|(\vec{v}',\vec{w}')\| ≈ δ_0^{(m+n)}⋅ {(q/c)}^{n/(m+n)}.\]
+
+\item The final error we aim to distinguish from uniform is \[e = \vec{v}' ⋅ \vec{A} ⋅ \vec{s} + \Angle{\vec{v}',\vec{e}}  = \Angle{c⋅ \vec{w}',\vec{s}} + \Angle{\vec{v}',\vec{e}}.\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgd9cdd80}]{Honourable Mention: BKW}
 \begin{columns}
 \begin{column}{0.6\columnwidth}
 Assume \((\vec{a}_{21},\vec{a}_{22}) = (0, 1)\), then:
 
-\begin{LATEX}
 \footnotesize
 \begin{align*}
-   & \left(
-      \begin{array}{rr|rrr|r}
-        \phantom{xn}\vec{a}_{11}         & \phantom{xn}\vec{a}_{12}         & \vec{a}_{13} & \cdots & \vec{a}_{1n} & c_1\\
-        \alert{\vec{a}_{21}} & \alert{\vec{a}_{22}} & \vec{a}_{23} & \cdots & \vec{a}_{2n} & c_2\\
-        \vdots               & \vdots               & \ddots       & \vdots & \vdots\\
-        \vec{a}_{m1}         & \vec{a}_{m2}         & \vec{a}_{m3} & \cdots & \vec{a}_{mn} & c_{m}
-      \end{array}
-                                                                               \right)\\
+  & \left(
+    \begin{array}{rr|rrr|r}
+      \phantom{xn}\vec{a}_{11}         & \phantom{xn}\vec{a}_{12}         & \vec{a}_{13} & \cdots & \vec{a}_{1n} & c_1\\
+      \alert{\vec{a}_{21}} & \alert{\vec{a}_{22}} & \vec{a}_{23} & \cdots & \vec{a}_{2n} & c_2\\
+      \vdots               & \vdots               & \ddots       & \vdots & \vdots\\
+      \vec{a}_{m1}         & \vec{a}_{m2}         & \vec{a}_{m3} & \cdots & \vec{a}_{mn} & c_{m}
+    \end{array}\right)\\
   -& \left[
-      \begin{array}{rr|rrr|r}
-        0         & 0         & \vec{t}_{13}   & \cdots & \vec{t}_{1n}   & c_{t,1}\\
-        \alert{0} & \alert{1} & \vec{t}_{23}   & \cdots & \vec{t}_{2n}   & c_{t,2}\\
-        \vdots    & \vdots    & \ddots         & \vdots & \vdots\\
-        q-1       & q-1       & \vec{t}_{q^23} & \cdots & \vec{t}_{q^2n} & c_{t,q^2}
-        \end{array}\right]\\
-   \Rightarrow &
-     \left(\begin{array}{rr|rrr|r}
-             \phantom{xn}\vec{a}_{11} & \phantom{xn}\vec{a}_{12} & \vec{a}_{13}      & \cdots & \vec{a}_{1n}      & \tilde{c}_1\\
-             \alert{0}    & \alert{0}    & \vec{a}_{23} & \cdots & \vec{a}_{2n} & \tilde{c}_2\\
-             \vdots       & \vdots       & \ddots            & \vdots & \vdots\\
-             \vec{a}_{m1} & \vec{a}_{m2} & \vec{a}_{m3}      & \cdots & \vec{a}_{mn}      & c_{m}
-           \end{array}\right)
-  \end{align*}
-\end{LATEX}
+     \begin{array}{rr|rrr|r}
+       0         & 0         & \vec{t}_{13}   & \cdots & \vec{t}_{1n}   & c_{t,1}\\
+       \alert{0} & \alert{1} & \vec{t}_{23}   & \cdots & \vec{t}_{2n}   & c_{t,2}\\
+       \vdots    & \vdots    & \ddots         & \vdots & \vdots\\
+       q-1       & q-1       & \vec{t}_{q^23} & \cdots & \vec{t}_{q^2n} & c_{t,q^2}
+     \end{array}\right]\\
+  \Rightarrow &
+                \left(\begin{array}{rr|rrr|r}
+                        \phantom{xn}\vec{a}_{11} & \phantom{xn}\vec{a}_{12} & \vec{a}_{13}      & \cdots & \vec{a}_{1n}      & \tilde{c}_1\\
+                        \alert{0}    & \alert{0}    & \vec{a}_{23} & \cdots & \vec{a}_{2n} & \tilde{c}_2\\
+                        \vdots       & \vdots       & \ddots            & \vdots & \vdots\\
+                        \vec{a}_{m1} & \vec{a}_{m2} & \vec{a}_{m3}      & \cdots & \vec{a}_{mn}      & c_{m}
+                      \end{array}\right)
+\end{align*}
 \end{column}
 
 \begin{column}{0.4\columnwidth}
@@ -788,22 +580,24 @@ Assume \((\vec{a}_{21},\vec{a}_{22}) = (0, 1)\), then:
 \end{frame}
 
 \section{Primal Lattice Attack (uSVP Version)}
-\label{sec:org854e8a0}
-\begin{frame}[label={sec:org892de37}]{Bounded Distance Decoding and unique SVP}
-Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that \(\vec{A}⋅\vec{w} - \vec{c} \bmod q\) is rather small.
+\label{sec:org85686c7}
+\begin{frame}[label={sec:orge66b3fc}]{Bounded Distance Decoding and unique SVP}
+Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that \(\vec{A}⋅\vec{w} - \vec{c} \pmod q\) is rather small.
 
-In other words, we know there’s an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
+In other words, we know there is an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
           \vec{A}^T &  0 \\
           \vec{c}^T   & t \\
         \end{array} \right) \in \ZZ_q^{(n+1) \times (m+1)}\] since \[(\vec{s} \mid -1) ⋅ \vec{B} = (\vec{e} \mid -t) \bmod q.\]
+
+Let’s find it.
 \end{frame}
 
-\begin{frame}[label={sec:org13f7a3c}]{Constructing a Basis}
+\begin{frame}[label={sec:orgfcf1293}]{Constructing a Basis}
 \begin{itemize}
 \item Compute reduced row echelon form \([\vec{I}_{n × n} \mid \vec{A}']\) of \(\vec{A}^T \in \ZZ_q^{n \times m}\) with \(m>n\).
 \item Stack on top of \([\vec{0}_{(m-n) \times n} \mid q\,\vec{I}_{(m-n) × (m-n)}]\) to handle modular reductions
 \item Stack on top of \([\vec{c}^T \mid t]\)
-\item To obtain \[\vec{B}=\left(\begin{array}{ccc}
+\item Obtain \[\vec{B}=\left(\begin{array}{ccc}
          \vec{I}_{n × n} & \vec{A}' &  0 \\
          \vec{0}_{(m-n) \times n} & q\,\vec{I}_{(m-n) × (m-n)} & 0\\
           \vec{c}^T  & & t \\
@@ -812,28 +606,26 @@ In other words, we know there’s an unusually short vector in the \(q\)-ary lat
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org6afff79}]{HSVP vs uSVP}
+\begin{frame}[label={sec:org34886da}]{HSVP vs uSVP}
 \begin{itemize}
 \item Any algorithm which can solve κ-HSVP, such as a lattice reduction algorithm, can be used linearly many times to solve \(γ\)-uSVP with approximation factor \(γ=κ^2\).\footfullcite{Lovasz86}
 \item Whenever \(κ > \sqrt{d}\) then any algorithm solving κ-HSVP can be used to solve γ-uSVP for \(γ ≈ \sqrt{d} κ\).\footfullcite{ISIT:LLLS11}
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org92384cc}]{Success Condition (2008)}
+\begin{frame}[label={sec:org880cce0}]{Success Condition (2008)}
 In practice, algorithms behave better. Lattice reduction is expected/observed \footfullcite{EC:GamNgu08} to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^d\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
 \end{frame}
 
-\begin{frame}[label={sec:org396ee36}]{Success Condition (2013)}
+\begin{frame}[label={sec:org0f97eb0}]{Success Condition (2013, 2016)}
 \begin{itemize}
-\item We can predict the length of the unusually short vector \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
+\item We can predict the length of the unusually short vector: \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
 
-\item In general, we expect no other unusually short vectors, so we may assume \footfullcite{EPRINT:AlbFitGopf13} \[λ_2(\vec{B}) ≈ \sqrt{\frac{d}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/d}.\]
-
-\item The same paper also gives observed values for \(τ\) for BKZ-5 and BKZ-10.
+\item In general, we expect no other unusually short vectors, so we may assume \footfullcite{EPRINT:AlbFitGopf13,PhD:Goepfert16} \[λ_2(\vec{B}) ≈ \sqrt{\frac{d}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/d}.\]
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org9d577a2}]{Success Condition (2015)}
+\begin{frame}[label={sec:orgfaa7687}]{Success Condition (2015)}
 \begin{block}{Lemma \footfullcite{EPRINT:AlbPlaSco15}}
 Given an LWE instance characterised by \(n\), \(α\), \(q\). Any lattice reduction algorithm achieving log root-Hermite factor \[\log{δ_0} = \frac{\log^2{\left(ε' τ α \sqrt{2e}\right)}}{4 n \log{q}}\] solves LWE with success probability greater than \(ε_τ ⋅ \left( 1-\left(ε' ⋅  \exp{\left(\frac{1-ε'^2}{2}\right)}\right)^m \right)\) for some \(ε' > 1\) and some fixed \(τ ≤ 1\), and \(0 < ε_τ < 1\) as a function of \(τ\).
 \end{block}
@@ -841,7 +633,7 @@ Given an LWE instance characterised by \(n\), \(α\), \(q\). Any lattice reducti
 This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the gap.
 \end{frame}
 
-\begin{frame}[label={sec:orgeeb4388}]{Success Condition (2016)}
+\begin{frame}[label={sec:org5c285b8}]{Success Condition (2016)}
 \begin{itemize}
 \item Let \(\vec{e}^*_{d-b}\) be the projection of \(\vec{e}\) orthogonally onto the first \(d-b\) vectors of the Gram-Schmidt basis \(\mat{B}^*\)
 \item BKZ-like algorithms will call an SVP oracle on th last block of dimension \(b\).
@@ -850,35 +642,55 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org9b3d7b6}]{Success Condition (2016)}
+\begin{frame}[label={sec:org8a16448}]{Success Condition (2016)}
 \begin{itemize}
 \item Assume \(\|\vec{e}^*_{d-b}\| ≈ σ ⋅ \sqrt{b}\).
 \item Applying the GSA, we expect the shortest vector to be found in the last block to have norm
-\begin{eqnarray*}
- \|\vec{b}_{d-b+1}^*\| &=&  α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
-                       &=& δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
-                       &=& δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.
-\end{eqnarray*}
+\begin{align*}
+ \|\vec{b}_{d-b+1}^*\| &=  α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &= δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &= δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.
+\end{align*}
 \item Thus \footfullcite{EPRINT:ADPS15} we expect success if \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org46eb8e8}]{Success Condition (2016)}
+\begin{frame}[label={sec:orga45f051}]{Success Condition (2016)}
 \begin{center}
 \includegraphics[width=.9\linewidth]{./usvp-2016-visualisation.pdf}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:org8030b92}]{Comparison for \(q=2^{15}, σ=3.2\)}
+\begin{frame}[label={sec:org1c866bb}]{Comparison for \(q=2^{15}, σ=3.2\)}
 \begin{center}
 \includegraphics[width=.9\linewidth]{./usvp-comparison.pdf}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:org67e2a32}]{Small Secrets}
+\begin{frame}[label={sec:org452d475}]{LWE Normal Form}
+\begin{itemize}
+\item Consider the lattice \[Λ = \{\vec{v} \in \ZZ^{n+m+1} | (\mat{A} | \vec{I}_m | \vec{c} ) ⋅ \vec{v} ≡ 0 \pmod{q} \}\]
+
+\item It contains an unusually short vector \((\vec{s} | \vec{e} | -1)\) since \[(\mat{A} | \vec{I}_m | \vec{c}) ⋅  (\vec{s} | \vec{e} | -1) ≡ \mat{A}⋅\vec{s} + \vec{e} - \vec{c} ≡ 0 \pmod{q}\]
+
+\item Analysis proceeds as before with \(d=n+m+1\).
+\end{itemize}
 \end{frame}
 
-\begin{frame}[standout,label={sec:org8e80622}]{Fin}
+\begin{frame}[label={sec:org7b4f967}]{Small Secrets}
+\begin{itemize}
+\item Let \(σ\) be the standard deviation of the components of \(\vec{e}\).
+\item When \(\|\vec{s}\| \ll \|\vec{e}\|\), the vector \((\vec{s} || \vec{e})\) is uneven in length.
+\item Rescale the first part to have the same norm as the second.\footfullcite{ACISP:BaiGal14} 
+\begin{itemize}
+\item When \(\vec{s}_i \sample \{-1,0,1\}\), the volume of the lattice is scaled by \(σ^n\).
+\item When \(\vec{s} \sample \{0,1\}\) the volume of the lattice is scaled by \({(2σ)}^n\) because we can scale by \(2σ\) and then rebalance.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[standout,label={sec:org99956ba}]{Fin}
 \begin{center}
 \Huge \alert{Thank You}
 \end{center}

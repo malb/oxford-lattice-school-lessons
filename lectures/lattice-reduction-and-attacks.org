@@ -16,7 +16,7 @@
 #+LATEX_HEADER: \DeclareMathOperator{\Vol}{Vol}
 #+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
 
-* Lattice Point Enumeration
+* Lattice Point Enumeration                                           :noexport:
 ** Finding Shortest Vectors
 
 Given some lattice $Λ(\mat{B})$, find $\vec{v} \in Λ(\mat{B})$ with $\vec{v} \neq 0$ such that $\|\vec{v}\|^2$ is minimal.
@@ -440,10 +440,12 @@ Asymptotically, sieving is the most efficient heuristic SVP algorithm, with a co
 
 The log of the time complexity for running BKZ to achieve a root-Hermite factor $\delta_0$ is:footfullcite:EPRINT:AlbPlaSco15
 
-\begin{eqnarray*}
-\Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) & & \textnormal{for enumeration},\\
-\Omega \left( \frac{-\log\log \delta_0}{\log\delta_0} \right) & & \textnormal{for sieving}.
-\end{eqnarray*}
+#+BEGIN_EXPORT latex
+\begin{align*}
+\Omega \left( \frac{-\log\left(\frac{-\log\log \delta_0}{\log \delta_0}\right) \log\log\delta_0}{\log\delta_0} \right) &  \textnormal{for enumeration},\\
+\Omega \left( \frac{-\log\log \delta_0}{\log\delta_0} \right) &  \textnormal{for sieving}.
+\end{align*}
+#+END_EXPORT
 
 * LWE
 ** Learning with Errors
@@ -457,41 +459,46 @@ Let \(n,\,q\) be positive integers, $\chi$ be a probability distribution on $\ZZ
 * Dual Lattice Attack
 ** Short Integer Solutions
 
-Consider the scaled (by $q$) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \vec{A} \equiv 0 \bmod q\}.\] A short vector of $qΛ^*$ is equivalent to solving SIS on $\vec{A}$.
+Consider the scaled (by $q$) dual lattice: \[q Λ^* = \{ \vec{x} \in \mathbb{Z}^m \enspace | \enspace \vec{x} \cdot \vec{A} \equiv 0 \bmod q\}.\] A short vector of $qΛ^*$ is equivalent to solving SIS on $\vec{A}$.
+
+#+BEAMER: \vspace{1em}
 
 *** Short Integer Solutions (SIS)
 
-Given $q \in \mathbb{Z}$, a matrix $\vec{A}$, and $t < q$; find $\vec{y}$ with $0 < \|\vec{y}\| \leq t$ and \[\vec{y}\, \vec{A} \equiv  \vec{0} \pmod{q}.\]
+Given $q \in \mathbb{Z}$, a matrix $\vec{A}$, and $t < q$; find $\vec{y}$ with $0 < \|\vec{y}\| \leq t$ and \[\vec{y}⋅ \vec{A} \equiv  \vec{0} \pmod{q}.\]
 
 ** Strategy
   
-- Given LWE samples $\vec{A}, \vec{c}$ where either $\vec{c} = \vec{A}\vec{s} + \vec{e}$ or $\vec{c}$ uniformly random. 
-- Find a short $\vec{y}$ solving SIS on $\vec{A}$. 
-- Compute $\Angle{\vec{y}, \vec{c}}$. 
-  - If $\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}$, then $\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y}\vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}$.
-  - If $\vec{c}$ is uniformly random, so is $\Angle{\vec{y}, \vec{c}}$.
+Given samples $\vec{A}, \vec{c}$:
 
-If $\vec{y}$ is sufficiently short, then $\Angle{\vec{y}, \vec{e}}$ will also be short, since $\vec{e}$ is also small, and can be distinguished from uniform values.
+1) Find a short $\vec{y}$ solving SIS on $\vec{A}$. 
+2) Compute $\Angle{\vec{y}, \vec{c}}$. 
+
+Either $\vec{c} = \vec{A}\vec{s} + \vec{e}$ or $\vec{c}$ uniformly random:
+
+- If $\vec{c}$ is uniformly random, so is $\Angle{\vec{y}, \vec{c}}$.
+- If $\vec{c} = \vec{A} \cdot \vec{s} + \vec{e}$, then $\Angle{\vec{y}, \vec{c}} = \Angle{\vec{y} \cdot \vec{A}, \vec{s}} + \Angle{\vec{y}, \vec{e}} \equiv \Angle{\vec{y}, \vec{e}} \pmod{q}$. If $\vec{y}$ is sufficiently short, then $\Angle{\vec{y}, \vec{e}}$ will also be short, since $\vec{e}$ is also small.
 
 ** Required Quality
 
-Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of length $\|\vec{v}\|$ in the scaled dual lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage of distinguishing footfullcite:RSA:LinPei11 $\Angle{\vec{v},\vec{e}}$ from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
+Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of length $\|\vec{v}\|$ in the scaled dual lattice \[qΛ^* = \{ \vec{x} \in \ZZ_q^m \ | \ \vec{x} ⋅  \vec{A} \equiv 0 \bmod{q} \},\] the advantage  footfullcite:RSA:LinPei11 of distinguishing $\Angle{\vec{v},\vec{e}}$ from random is close to \[\exp\left(-π (\|\vec{v}\| \cdot α)^2\right).\]
 
 ** Lattice Reduction
 
-  A reduced lattice basis is made of short vectors, in particular the first vector has norm $δ_0^m \cdot \Vol(qΛ^*)^{1/m}$
-  - Construct a basis of the dual from the instance.
-  - Feed to a lattice reduction algorithm to obtain short vectors $\vec{v}_i$.
-  - Check if $\vec{v}_i\, \vec{A}$ are small.
+A reduced lattice basis is made of short vectors, in particular the first vector has norm $δ_0^m \cdot \Vol(qΛ^*)^{1/m}$
+
+1) Construct bases of the dual for the instance.
+2) Feed to a lattice reduction algorithm to obtain short vectors $\vec{v}_i$.
+3) Check if $\vec{v}_i\cdot \vec{A}$ are small.
 
 ** Constructing a Basis
 
-- We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{w} \in \ZZ_q^m \ | \ \vec{w}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
-- Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\vec{A}\) using Gaussian elimination.
+- We seek a basis for the \(q\)-ary lattice \[qΛ^* = \{ \vec{x} \in \ZZ_q^m \ | \ \vec{x}⋅ \vec{A} \equiv 0 \bmod{q} \}\]
+- Compute a row-echelon form \(\mat{Y}\) of the basis for the left-kernel of \(\mat{A}\) mod $q$ using Gaussian elimination.
 - With high probability it will have dimension $(m-n) × m$
-- Write $\mat{Y} = [\vec{I}_{(m-n) \times (m-n)} | \mat{Y}']$
-- Extend to \(q\)-ary lattice by stacking with  $[\vec{0}_{n \times (m-n)} \mid q ⋅ \vec{I}_{n \times n}]$
-- Our basis is:
+- Write $\mat{Y} = [\mat{I}_{(m-n) \times (m-n)} | \mat{Y}']$
+- Extend to \(q\)-ary lattice by stacking on top of  $[\vec{0}_{n \times (m-n)} \mid q ⋅ \mat{I}_{n \times n}]$
+- The basis is
   #+BEGIN_EXPORT latex
 \begin{align*}
   \mat{L} = \begin{pmatrix}
@@ -502,8 +509,6 @@ Given an LWE instance characterised by $n$, $α$, $q$ and a vector $\vec{v}$ of 
   #+END_EXPORT
 
 ** Degrees of Freedom
-
-We get to choose:
 
 - the *dimension* $m$, i.e. the number of samples we use, and
 - the target *advantage* $ε$ for distinguishing 
@@ -540,7 +545,7 @@ Example: $q=2^{17}, n=1024, δ_0 = 1.005$
 \end{tikzpicture}
 #+END_EXPORT
 
-\[m = \sqrt{\frac{n\,\log q}{\log(\delta_0)}}\]
+\[m = \sqrt{\frac{n\,\log q}{\log δ_0}}\]
 
 ** Choosing $ε$
 
@@ -574,7 +579,7 @@ Example: $q=2^{17}, n=1024, δ_0 = 1.005$
 
 ** Choosing $ε$
 
-Boost the advantage to constant, repeat experiment $≈ 1/ε^2$ times
+Repeat experiment $≈ 1/ε^2$ times for majority vote to achieve constant advantage
 
 #+BEGIN_EXPORT latex
 \begin{tikzpicture}
@@ -605,21 +610,44 @@ Boost the advantage to constant, repeat experiment $≈ 1/ε^2$ times
 
 ** Amortising Costs
 
-Our discussion on choosing $ε$ was based on the assumption that producing $1/ε^2$ vectors costs $1/ε^2$ calls to BKZ in block size $β$.
+Producing $1/ε^2$ short vectors is cheaper than $1/ε^2$ calls to BKZ in block size $β$.
 
 Two options:
 
-- Use fact that sieving outputs \(2^{0.2075\cdot β}\) vectors. footfullcite:EPRINT:ADPS15
+- Use that sieving outputs \(2^{0.2075\cdot β}\) vectors. footfullcite:EPRINT:ADPS15
 - Perform strong lattice reduction once, use light rerandomisation and cheaper lattice reduction for subsequent vectors. footfullcite:EPRINT:Albrecht17
 
-** Small Secrets
+** LWE Normal Form
 
-Problem: most LWE-based schemes only give $n$ samples: *left kernel is trivial*
+_Problem:_ most schemes give only $n$ samples *⇒ left kernel is trivial*
 
-- But instances are in LWE normal form: $\vec{s}_i \sample \chi$
+But instances are in LWE normal form: $\vec{s}_i \sample \chi$
+
+*** LWE Normal Form
+
+Given samples \((\vec{a},c)=(\vec{a},\Angle{\vec{a},\alert{\vec{s}}} + e) \in \ZZ_q^n × \ZZ_q\)
+with $\vec{a} \gets \mathcal{U}(\ZZ_q^n)$, $e \gets χ$ and $\vec{s} \in \ZZ_q^n$,
+we can construct samples
+\[(\vec{a}, c)=(\vec{a},⟨\vec{a},\alert{\vec{e}}⟩+ e) \in \ZZ_q^n × \ZZ_q\] with
+$\vec{a} ← \mathcal{U}(\ZZ_q^n)$, $e ← χ$ and *$\vec{e}$* such that all components *\[e_i ← χ\]* in polynomial time.footfullcite:C:ACPS09
+
+** LWE Normal Form
+
 - Construct basis for \[Λ = \{(\vec{y},\vec{x}) \in \ZZ^{m} × \ZZ^n : \vec{y}⋅ \vec{A} ≡ \vec{x} \bmod q\}.\]
 - Given a short vector in \((\vec{w},\vec{v}) \in Λ\), we have \[\vec{w}⋅\vec{c} = \vec{w}⋅(\vec{A}⋅\vec{s} + \vec{e}) = \Angle{\vec{v},\vec{s}} + \Angle{\vec{w},\vec{e}}.\]
-- Analysis proceeds as before with $m ≤ 2n$.
+- Analysis proceeds as before with $d ≤ 2n$.
+
+** Small Secret
+
+Assume $\|\vec{s}\| \ll \|\vec{e}\|$, e.g. \(\vec{s}_i \gets \{-1,0,1\}\).
+
+- Aim is to balance \(\|\Angle{\vec{v},\vec{s}}\| ≈ \|\Angle{\vec{w},\vec{e}}\|\).
+
+- Consider the scaled dual attack lattice \[Λ(\mat{L}) = \{(\vec{x}, \vec{y}/c) \in \ZZ^m × {({1}/{c} ⋅ \ZZ)}^n : \vec{x} ⋅ \vec{A} ≡ \vec{y} \bmod q\} \] for some constant $c$.
+
+- Lattice reduction produces a vector $(\vec{v}',\vec{w}')$ with \[\|(\vec{v}',\vec{w}')\| ≈ δ_0^{(m+n)}⋅ {(q/c)}^{n/(m+n)}.\]
+
+- The final error we aim to distinguish from uniform is \[e = \vec{v}' ⋅ \vec{A} ⋅ \vec{s} + \Angle{\vec{v}',\vec{e}}  = \Angle{c⋅ \vec{w}',\vec{s}} + \Angle{\vec{v}',\vec{e}}.\]
 
 ** Honourable Mention: BKW
 
@@ -631,33 +659,32 @@ Problem: most LWE-based schemes only give $n$ samples: *left kernel is trivial*
 
 Assume $(\vec{a}_{21},\vec{a}_{22}) = (0, 1)$, then:
 
-#+BEGIN_LATEX
+#+BEGIN_EXPORT latex
 \footnotesize
 \begin{align*}
-   & \left(
-      \begin{array}{rr|rrr|r}
-        \phantom{xn}\vec{a}_{11}         & \phantom{xn}\vec{a}_{12}         & \vec{a}_{13} & \cdots & \vec{a}_{1n} & c_1\\
-        \alert{\vec{a}_{21}} & \alert{\vec{a}_{22}} & \vec{a}_{23} & \cdots & \vec{a}_{2n} & c_2\\
-        \vdots               & \vdots               & \ddots       & \vdots & \vdots\\
-        \vec{a}_{m1}         & \vec{a}_{m2}         & \vec{a}_{m3} & \cdots & \vec{a}_{mn} & c_{m}
-      \end{array}
-                                                                               \right)\\
+  & \left(
+    \begin{array}{rr|rrr|r}
+      \phantom{xn}\vec{a}_{11}         & \phantom{xn}\vec{a}_{12}         & \vec{a}_{13} & \cdots & \vec{a}_{1n} & c_1\\
+      \alert{\vec{a}_{21}} & \alert{\vec{a}_{22}} & \vec{a}_{23} & \cdots & \vec{a}_{2n} & c_2\\
+      \vdots               & \vdots               & \ddots       & \vdots & \vdots\\
+      \vec{a}_{m1}         & \vec{a}_{m2}         & \vec{a}_{m3} & \cdots & \vec{a}_{mn} & c_{m}
+    \end{array}\right)\\
   -& \left[
-      \begin{array}{rr|rrr|r}
-        0         & 0         & \vec{t}_{13}   & \cdots & \vec{t}_{1n}   & c_{t,1}\\
-        \alert{0} & \alert{1} & \vec{t}_{23}   & \cdots & \vec{t}_{2n}   & c_{t,2}\\
-        \vdots    & \vdots    & \ddots         & \vdots & \vdots\\
-        q-1       & q-1       & \vec{t}_{q^23} & \cdots & \vec{t}_{q^2n} & c_{t,q^2}
-        \end{array}\right]\\
-   \Rightarrow &
-     \left(\begin{array}{rr|rrr|r}
-             \phantom{xn}\vec{a}_{11} & \phantom{xn}\vec{a}_{12} & \vec{a}_{13}      & \cdots & \vec{a}_{1n}      & \tilde{c}_1\\
-             \alert{0}    & \alert{0}    & \vec{a}_{23} & \cdots & \vec{a}_{2n} & \tilde{c}_2\\
-             \vdots       & \vdots       & \ddots            & \vdots & \vdots\\
-             \vec{a}_{m1} & \vec{a}_{m2} & \vec{a}_{m3}      & \cdots & \vec{a}_{mn}      & c_{m}
-           \end{array}\right)
-  \end{align*}
-#+END_LATEX
+     \begin{array}{rr|rrr|r}
+       0         & 0         & \vec{t}_{13}   & \cdots & \vec{t}_{1n}   & c_{t,1}\\
+       \alert{0} & \alert{1} & \vec{t}_{23}   & \cdots & \vec{t}_{2n}   & c_{t,2}\\
+       \vdots    & \vdots    & \ddots         & \vdots & \vdots\\
+       q-1       & q-1       & \vec{t}_{q^23} & \cdots & \vec{t}_{q^2n} & c_{t,q^2}
+     \end{array}\right]\\
+  \Rightarrow &
+                \left(\begin{array}{rr|rrr|r}
+                        \phantom{xn}\vec{a}_{11} & \phantom{xn}\vec{a}_{12} & \vec{a}_{13}      & \cdots & \vec{a}_{1n}      & \tilde{c}_1\\
+                        \alert{0}    & \alert{0}    & \vec{a}_{23} & \cdots & \vec{a}_{2n} & \tilde{c}_2\\
+                        \vdots       & \vdots       & \ddots            & \vdots & \vdots\\
+                        \vec{a}_{m1} & \vec{a}_{m2} & \vec{a}_{m3}      & \cdots & \vec{a}_{mn}      & c_{m}
+                      \end{array}\right)
+\end{align*}
+#+END_EXPORT
 
 ***                                                                 :B_column:
 :PROPERTIES:
@@ -676,19 +703,21 @@ fullcite:EPRINT:GuoJohSta16a
 * Primal Lattice Attack (uSVP Version)
 ** Bounded Distance Decoding and unique SVP
 
-Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that $\vec{A}⋅\vec{w} - \vec{c} \bmod q$ is rather small.
+Given \(\vec{A}, \vec{c}\) with \(\vec{c} = \vec{A} ⋅ \vec{s} + \vec{e}\), we know that for some \(\vec{w}\) we have that $\vec{A}⋅\vec{w} - \vec{c} \pmod q$ is rather small.
 
-In other words, we know there’s an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
+In other words, we know there is an unusually short vector in the \(q\)-ary lattice \[\vec{B}=\left(\begin{array}{cc}
           \vec{A}^T &  0 \\
           \vec{c}^T   & t \\
         \end{array} \right) \in \ZZ_q^{(n+1) \times (m+1)}\] since \[(\vec{s} \mid -1) ⋅ \vec{B} = (\vec{e} \mid -t) \bmod q.\]
+
+Let’s find it.
 
 ** Constructing a Basis
 
 - Compute reduced row echelon form \([\vec{I}_{n × n} \mid \vec{A}']\) of $\vec{A}^T \in \ZZ_q^{n \times m}$ with $m>n$.
 - Stack on top of \([\vec{0}_{(m-n) \times n} \mid q\,\vec{I}_{(m-n) × (m-n)}]\) to handle modular reductions
 - Stack on top of \([\vec{c}^T \mid t]\)
-- To obtain \[\vec{B}=\left(\begin{array}{ccc}
+- Obtain \[\vec{B}=\left(\begin{array}{ccc}
          \vec{I}_{n × n} & \vec{A}' &  0 \\
          \vec{0}_{(m-n) \times n} & q\,\vec{I}_{(m-n) × (m-n)} & 0\\
           \vec{c}^T  & & t \\
@@ -704,13 +733,11 @@ In other words, we know there’s an unusually short vector in the \(q\)-ary lat
 
 In practice, algorithms behave better. Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^d\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
 
-** Success Condition (2013)
+** Success Condition (2013, 2016)
 
-- We can predict the length of the unusually short vector \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
+- We can predict the length of the unusually short vector: \[λ_1(\vec{B}) ≈ \sqrt{m} ⋅ σ.\]
 
-- In general, we expect no other unusually short vectors, so we may assume footfullcite:EPRINT:AlbFitGopf13 \[λ_2(\vec{B}) ≈ \sqrt{\frac{d}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/d}.\]
-
-- The same paper also gives observed values for \(τ\) for BKZ-5 and BKZ-10.
+- In general, we expect no other unusually short vectors, so we may assume footfullcite:EPRINT:AlbFitGopf13,PhD:Goepfert16 \[λ_2(\vec{B}) ≈ \sqrt{\frac{d}{2\,π,e}} ⋅ \Vol(\vec{B})^{1/d}.\]
 
 ** Success Condition (2015)
 
@@ -737,11 +764,11 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 - Assume \(\|\vec{e}^*_{d-b}\| ≈ σ ⋅ \sqrt{b}\).
 - Applying the GSA, we expect the shortest vector to be found in the last block to have norm
   #+BEGIN_EXPORT latex
-\begin{eqnarray*}
- \|\vec{b}_{d-b+1}^*\| &=&  α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
-                       &=& δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
-                       &=& δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.
-\end{eqnarray*}
+\begin{align*}
+ \|\vec{b}_{d-b+1}^*\| &=  α^{d-b} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &= δ_0^{-2(d-b)} ⋅ δ_0^d ⋅ {\Vol(\mat{B})}^{1/d}\\
+                       &= δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}.
+\end{align*}
   #+END_EXPORT
 - Thus footfullcite:EPRINT:ADPS15 we expect success if \[σ ⋅ \sqrt{b} ≤ δ_0^{2b-d} ⋅ {\Vol(\mat{B})}^{1/d}\]
 
@@ -756,7 +783,23 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 
 [[./usvp-comparison.pdf]]
 
+** LWE Normal Form
+
+- Consider the lattice \[Λ = \{\vec{v} \in \ZZ^{n+m+1} | (\mat{A} | \vec{I}_m | \vec{c} ) ⋅ \vec{v} ≡ 0 \pmod{q} \}\]
+
+- It contains an unusually short vector $(\vec{s} | \vec{e} | -1)$ since \[(\mat{A} | \vec{I}_m | \vec{c}) ⋅  (\vec{s} | \vec{e} | -1) ≡ \mat{A}⋅\vec{s} + \vec{e} - \vec{c} ≡ 0 \pmod{q}\]
+
+- Analysis proceeds as before with \(d=n+m+1\).
+
 ** Small Secrets
+
+
+- Let \(σ\) be the standard deviation of the components of \(\vec{e}\).
+- When $\|\vec{s}\| \ll \|\vec{e}\|$, the vector $(\vec{s} || \vec{e})$ is uneven in length.
+- Rescale the first part to have the same norm as the second.footfullcite:ACISP:BaiGal14 
+  - When $\vec{s}_i \sample \{-1,0,1\}$, the volume of the lattice is scaled by $σ^n$.
+  - When $\vec{s} \sample \{0,1\}$ the volume of the lattice is scaled by ${(2σ)}^n$ because we can scale by $2σ$ and then rebalance.
+
 
 ** Fin
 :PROPERTIES:
