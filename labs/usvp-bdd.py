@@ -6,7 +6,7 @@ from sage.all import next_prime, RR, matrix, vector, identity_matrix, ZZ, sqrt, 
 def experiment(n=65, q=next_prime(ceil(2**9)), sigma=8, m=178, block_size=56, tours=6):
     alpha = sigma/q
     L, e = gen_instance(n, alpha, q, m)
-    R, norms = run_instance(L, block_size, tours, sigma/sqrt(2*pi))
+    R, norms = run_instance(L, block_size, tours, e)
     return L, R, e, norms
 
 
@@ -31,7 +31,7 @@ def gen_instance(n, alpha, q, m, t=1):
     return L, e
 
 
-def run_instance(L, block_size, tours, stddev):
+def run_instance(L, block_size, tours, evec):
     from fpylll import BKZ, LLL, GSO, IntegerMatrix
     from fpylll.algorithms.bkz2 import BKZReduction as BKZ2
     from sage.all import e
@@ -48,17 +48,25 @@ def run_instance(L, block_size, tours, stddev):
     n = ZZ(L.nrows())
     alpha = delta_0**(-2*n/(n-1))
 
+    if len(evec) == n - 1:
+        evec = vector(list(evec) + [1])
+
     LLL.reduction(A)
     M = GSO.Mat(A)
     M.update_gso()
 
     vol = sqrt(prod([RR(M.get_r(i, i)) for i in range(n)]))
 
-    norms  = [map(lambda x: RR(log(x,2)),
+    norms  = [map(lambda x: RR(log(x, 2)),
                   [(alpha**i * delta_0**n * vol**(1/n))**2 for i in range(n)])]
 
-    norms += [map(lambda x: RR(log(x,2)),
-                  [(stddev*sqrt(n-i))**2 for i in range(n)])]
+    def proj(v, i):
+        return v - vector(RR, M.to_canonical(list(M.from_canonical(v, 0, i))))
+
+    # norms += [map(lambda x: RR(log(x,2)),
+    #               [(stddev*sqrt(n-i))**2 for i in range(n)])]
+    norms += [map(lambda x: RR(log(x, 2)),
+                  [proj(evec, i).norm()**2 for i in range(1, n-1)])]
 
     norms += [[log(RR(M.get_r(i, i)), 2) for i in range(n)]]
 
@@ -72,7 +80,7 @@ def run_instance(L, block_size, tours, stddev):
 
 
 def plot_norms(norms, block_size, bound):
-    from sage.all import line, Graphics
+    from sage.all import line
     from itertools import cycle
 
     n = len(norms[0])
