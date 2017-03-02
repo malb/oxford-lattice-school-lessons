@@ -205,7 +205,6 @@ par = BKZ.Param(60, strategies=BKZ.DEFAULT_STRATEGY, max_loops=4, flags=flags)
 The parameter =strategies= takes a list of “reduction strategies” or a filename for a JSON file containing such strategies. For each block size these strategies determine what pruning coefficients are used and what kind of recursive preprocessing is applied before enumeration. The strategies in =BKZ.DEFAULT_STRATEGY= were computed using fplll’s =strategizer=.[fn:7]
 
 #+BEGIN_SRC sage
-BKZ.DEFAULT_STRATEGY
 strategies = load_strategies_json(BKZ.DEFAULT_STRATEGY)
 print strategies[60]
 #+END_SRC
@@ -304,12 +303,12 @@ lwe = LindnerPeikert(50)
 5. Attempt bigger, harder instances.
 6. Improve the running time by employing cleverer techniques, such as progressive BKZ footfullcite:EPRINT:AWHT16, running in the low-advantage regime or sparse-ish re-randomisation of already reduced bases.
 
-* TODO Primal Attack
+* COMMENT Primal Attack
 
 - Run uSVP attack
 - Improve the previous by introducing a pruned enumeration on the whole lattice after BKZ reduction
 
-* Lattice Challenge
+* COMMENT Lattice Challenge
 
 Get your name up here: https://www.latticechallenge.org/lwe_challenge/challenge.php
 
@@ -622,7 +621,7 @@ def block_sizef(delta_0):
 #+END_SRC
 
 
-We will also need to lift from $\bmod q$ to the integers by mapping to the element closest to zero.
+We will also need to lift from mod $q$ to the integers by mapping to the element closest to zero.
 
 #+BEGIN_SRC sage
 def balanced_lift(e):
