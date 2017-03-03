@@ -7,7 +7,6 @@
 
 #+PROPERTY: header-args:sage :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw
 #+TITLE: A subfield lattice attack on overstretched NTRU assumptions
-#+SUBTITLE:  
 #+AUTHOR: Martin R. Albrecht
 #+EMAIL: martin.albrecht@royalholloway.ac.uk
 #+DATE: Oxford Lattice School
@@ -34,12 +33,12 @@
 
 ** NTRUEncrypt
 
-- Key Generation :: $\cR = \Z[X]/(X^n+1)$, modulus $q$, width parameter $σ$
+- Key Generation :: $\cR = \Z[x]/(x^n+1)$, modulus $q$, width parameter $σ$
   - Sample $f \gets D_{\cR, σ}$ (invertible mod $q$)
   - Sample $g \gets D_{\cR, σ}$
   - Publish $h = {[g/f]}_q$
 
-- Encrypt :: $m ∈ \{0,1\}$
+- Encrypt :: $m ∈ \{0,1\}^n$
   - Sample $s,e \gets D_{\cR,χ}, D_{\cR,χ}$
   - Return $2\, (h ⋅ s + e) + m$
     
@@ -91,10 +90,7 @@ sage: block_matrix([[1, H],[0, q]])
 
 - The lattice \(\Lambda^q_h\) defined by an NTRU instance for parameters $\cR, q, σ$ has dimension \(2n\) and volume \(q^n\).
 - If \(h\) were uniformly random, the Gaussian heuristic predicts that the shortest vectors of \(\Lambda_h^q\) have norm \(≈ \sqrt{n q} \).
-- Whenever \[\Vert f \Vert ≈ \Vert g \Vert ≈ \sqrt{n}\,σ \ll \sqrt{n\,q},\] then \(\Lambda^q_h\) has 
-#+BEGIN_CENTER
-*unusually short vectors*.
-#+END_CENTER
+- Whenever \[\Vert f \Vert ≈ \Vert g \Vert ≈ \sqrt{n}\,σ \ll \sqrt{n\,q},\] then \(\Lambda^q_h\) has *unusually short vectors*.
  
 ** NTRU
 
@@ -119,11 +115,11 @@ The NTRU assumption has been utilised for
 
 - In particular, finding a vector $o(q)$ would break many applications such as encryption.
 
-- This requires strong lattice reduction and NTRU remains asymptotically secure.footfullcite:HofPilSil98 footfullcite:EPRINT:HPSSWZ15a
+- This requires strong lattice reduction and NTRU remains asymptotically secure.footfullcite:HofPipSil98 footfullcite:EPRINT:HPSSWZ15a
 
 ** Best Attacks
 
-- Practical :: combined lattice-reduction and meet-in-the-middle attack footfullcite:HofSilWhy06 of Howgrave-Graham. footfullcite:C:HowgraveGraham07
+- Practical :: combined lattice-reduction and meet-in-the-middle attack footfullcite:HofSilWhy06 of Howgrave-Graham. footfullcite:C:HowgraveGraham07 footfullcite:EPRINT:Wunderer16
 
 - Asymptotic :: BKW variant, with a heuristic complexity $2^{\Theta(n/\log \log q)}$.footfullcite:C:KirFou15
 
@@ -131,13 +127,13 @@ The NTRU assumption has been utilised for
 
 ** Cyclotomic Number Fields and Subfields
 
-- In this talk, I’ll focus on Cyclotomic number rings of degree $n = 2^k$ for ease of exposure, but everything can be made general.
+- I’ll focus on Cyclotomic number rings of degree $n = 2^k$ for ease of exposure, but everything can be made general.
 
-- Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
+- Let \(\cR ≃ \Z[x]/(x^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
 
 - Let $\L = \Q(ζ_{m'})$ with $m' | m$ be a subfield of $\K$.
 
-- The ring of integers of $\L$ is $\cR' ≃ \Z[X]/(X^{n'} + 1)$ with $n' = m'/2$.
+- The ring of integers of $\L$ is $\cR' ≃ \Z[x]/(x^{n'} + 1)$ with $n' = m'/2$.
 
 - We write the canonical inclusion $\cR' \subset \cR$ explicitly as $L : \cR' \rightarrow \cR$.
 
@@ -145,15 +141,14 @@ The NTRU assumption has been utilised for
 
 ** Geometry
 
-The ring \(\cR\) is viewed as a lattice by endowing it with the inner product
+The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_e e(a) \bar e(b)\] where $e$ ranges over all the $n$ embeddings $\mathbb K \rightarrow \mathbb C$. 
 
-\begin{equation}
-\langle a , b\rangle = \sum_e e(a) \bar e(b)
-\end{equation}
+- This defines a Euclidean norm denoted by $\| \cdot \|$.
 
-where $e$ ranges over all the $n$ embeddings $\mathbb K \rightarrow \mathbb C$.
+- We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max_e |e(a)|.\]
 
-This defines a Euclidean norm denoted by $\| \cdot \|$.
+- It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
+
 
 ** Lattice Reduction
 
@@ -279,27 +274,6 @@ To lift the solution from the sub-ring $\cR'$ to $\cR$ compute $(x,y)$ as
 - \(y = L(y') ⋅ h / L(h') \bmod q\),
 where $L$ is the canonical inclusion map.
 
-** Summary
-
-We have found a short multiple of $(f,g)$:
-\[(x,y)  = u ⋅ (f,g) ∈ Λ_h^q \quad \text{with } u = L(v) ⋅ \tilde f \in \cR\]
-
-#+BEAMER: \pause
-
-We have
-\[\|(x,y)\| ≤ |v| ⋅ |f|^{r-1} ⋅ \|(f,g)\|\]
-by writing $\tilde f$ as the product of $r-1$ many $\psi(f)$ where the \(\psi\)'s are automorphisms of $\K$.
-
-#+BEAMER: \pause
-
-\[\|(x,y)\| ≤ |x'| ⋅ |f'^{-1}| ⋅ |f|^{r-1} ⋅ \|(f,g)\| \]
-by decomposing $v = x' / f'$.
-
-#+BEAMER: \pause
-
-\[\|(x,y)\| ≤ β^{Θ(n/(βr))} ⋅ {(nσ)}^{Θ(r)}\]
-by our heuristic.
-
 ** Quasi-polynomial $q$
 
 #+ATTR_BEAMER: :overlay +-
@@ -314,13 +288,12 @@ by our heuristic.
   - Expected norm of recovered vector:  \[ β^{Θ(n/β r)} \cdot n^{Θ(r)} = \exp\left(Θ\left(\log^{1+ \frac{2}{3}\,ε}{λ} \log\log λ\right) \right) < \sqrt q.\]
 
 ** Fin
-:PROPERTIES:
-:BEAMER_OPT: standout
-:END:
 
 #+BEGIN_CENTER
-*Thank You*
+\Huge *Thank You*
 #+END_CENTER
+
+fullcite:EPRINT:AlbBaiDuc16
 
 * Build Artefacts                                                     :noexport:
 

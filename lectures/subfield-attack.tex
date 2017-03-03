@@ -1,4 +1,4 @@
-% Created 2017-03-02 Thu 17:57
+% Created 2017-03-03 Fri 15:23
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation,smaller]{beamer}
 \RequirePackage{etex}
@@ -217,18 +217,18 @@ urlcolor=gray
 
 
 \section{Introduction}
-\label{sec:org4aee7db}
+\label{sec:org62d380d}
 
-\begin{frame}[label={sec:org40b5023}]{NTRUEncrypt}
+\begin{frame}[label={sec:orgc6e9aef}]{NTRUEncrypt}
 \begin{description}
-\item[{Key Generation}] \(\cR = \Z[X]/(X^n+1)\), modulus \(q\), width parameter \(σ\)
+\item[{Key Generation}] \(\cR = \Z[x]/(x^n+1)\), modulus \(q\), width parameter \(σ\)
 \begin{itemize}
 \item Sample \(f \gets D_{\cR, σ}\) (invertible mod \(q\))
 \item Sample \(g \gets D_{\cR, σ}\)
 \item Publish \(h = {[g/f]}_q\)
 \end{itemize}
 
-\item[{Encrypt}] \(m ∈ \{0,1\}\)
+\item[{Encrypt}] \(m ∈ \{0,1\}^n\)
 \begin{itemize}
 \item Sample \(s,e \gets D_{\cR,χ}, D_{\cR,χ}\)
 \item Return \(2\, (h ⋅ s + e) + m\)
@@ -247,7 +247,7 @@ urlcolor=gray
 \end{itemize}}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgfe9a6ea}]{The NTRU lattice \(\Lambda^q_h\)}
+\begin{frame}[fragile,label={sec:orgd33f7b8}]{The NTRU lattice \(\Lambda^q_h\)}
  \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 sage: K.<zeta> = CyclotomicField(8)
@@ -280,25 +280,22 @@ sage: block_matrix([[1, H],[0, q]])
 \end{small}
 \end{frame}
 
-\begin{frame}[label={sec:org51dc29f}]{The NTRU lattice \(\Lambda^q_h\)}
+\begin{frame}[label={sec:orgba6e8c9}]{The NTRU lattice \(\Lambda^q_h\)}
 \begin{itemize}
 \item The lattice \(\Lambda^q_h\) defined by an NTRU instance for parameters \(\cR, q, σ\) has dimension \(2n\) and volume \(q^n\).
 \item If \(h\) were uniformly random, the Gaussian heuristic predicts that the shortest vectors of \(\Lambda_h^q\) have norm \(≈ \sqrt{n q}\).
-\item Whenever \[\Vert f \Vert ≈ \Vert g \Vert ≈ \sqrt{n}\,σ \ll \sqrt{n\,q},\] then \(\Lambda^q_h\) has
+\item Whenever \[\Vert f \Vert ≈ \Vert g \Vert ≈ \sqrt{n}\,σ \ll \sqrt{n\,q},\] then \(\Lambda^q_h\) has \alert{unusually short vectors}.
 \end{itemize}
-\begin{center}
-\alert{unusually short vectors}.
-\end{center}
 \end{frame}
 
-\begin{frame}[label={sec:orge22db89}]{NTRU}
+\begin{frame}[label={sec:org344bd7a}]{NTRU}
 \begin{definition}[NTRU Assumption]
 It is hard to find a short vector in the \cR-module \[\Lambda_h^q = \{(x,y) \in \cR^2 \text{ s.t. } hx - y = 0 \bmod q\}\]
 with \(\cR = \Z[X]/(P(X))\) and the promise that a short solution \((f,g)\) — the private key — exists.\footfullcite{HofPipSil96} \footfullcite{HofPipSil98}
 \end{definition}
 \end{frame}
 
-\begin{frame}[label={sec:org164215e}]{NTRU Applications}
+\begin{frame}[label={sec:org274f0a4}]{NTRU Applications}
 The NTRU assumption has been utilised for
 
 \begin{itemize}
@@ -308,36 +305,36 @@ The NTRU assumption has been utilised for
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgd641f62}]{Lattice Attacks}
+\begin{frame}[label={sec:org6e02429}]{Lattice Attacks}
 \begin{itemize}
 \item Recovering a short enough vector of some target norm \(τ\), potentially longer than \((f,g)\), is sufficient for an attack.\footfullcite{EC:CopSha97}
 
 \item In particular, finding a vector \(o(q)\) would break many applications such as encryption.
 
-\item This requires strong lattice reduction and NTRU remains asymptotically secure.\footfullcite{HofPilSil98} \footfullcite{EPRINT:HPSSWZ15a}
+\item This requires strong lattice reduction and NTRU remains asymptotically secure.\footfullcite{HofPipSil98} \footfullcite{EPRINT:HPSSWZ15a}
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org1a55b57}]{Best Attacks}
+\begin{frame}[label={sec:org78bb197}]{Best Attacks}
 \begin{description}
-\item[{Practical}] combined lattice-reduction and meet-in-the-middle attack \footfullcite{HofSilWhy06} of Howgrave-Graham. \footfullcite{C:HowgraveGraham07}
+\item[{Practical}] combined lattice-reduction and meet-in-the-middle attack \footfullcite{HofSilWhy06} of Howgrave-Graham. \footfullcite{C:HowgraveGraham07} \footfullcite{EPRINT:Wunderer16}
 
 \item[{Asymptotic}] BKW variant, with a heuristic complexity \(2^{\Theta(n/\log \log q)}\).\footfullcite{C:KirFou15}
 \end{description}
 \end{frame}
 
 \section{Preliminaries}
-\label{sec:org24e40ed}
+\label{sec:org90e24f8}
 
-\begin{frame}[label={sec:orgc49a5a7}]{Cyclotomic Number Fields and Subfields}
+\begin{frame}[label={sec:org0d52ef9}]{Cyclotomic Number Fields and Subfields}
 \begin{itemize}
-\item In this talk, I’ll focus on Cyclotomic number rings of degree \(n = 2^k\) for ease of exposure, but everything can be made general.
+\item I’ll focus on Cyclotomic number rings of degree \(n = 2^k\) for ease of exposure, but everything can be made general.
 
-\item Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and \(n = m/2\).
+\item Let \(\cR ≃ \Z[x]/(x^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and \(n = m/2\).
 
 \item Let \(\L = \Q(ζ_{m'})\) with \(m' | m\) be a subfield of \(\K\).
 
-\item The ring of integers of \(\L\) is \(\cR' ≃ \Z[X]/(X^{n'} + 1)\) with \(n' = m'/2\).
+\item The ring of integers of \(\L\) is \(\cR' ≃ \Z[x]/(x^{n'} + 1)\) with \(n' = m'/2\).
 
 \item We write the canonical inclusion \(\cR' \subset \cR\) explicitly as \(L : \cR' \rightarrow \cR\).
 
@@ -345,25 +342,26 @@ The NTRU assumption has been utilised for
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org0e2c049}]{Geometry}
-The ring \(\cR\) is viewed as a lattice by endowing it with the inner product
+\begin{frame}[label={sec:org51c4c38}]{Geometry}
+The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_e e(a) \bar e(b)\] where \(e\) ranges over all the \(n\) embeddings \(\mathbb K \rightarrow \mathbb C\). 
 
-\begin{equation}
-\langle a , b\rangle = \sum_e e(a) \bar e(b)
-\end{equation}
+\begin{itemize}
+\item This defines a Euclidean norm denoted by \(\| \cdot \|\).
 
-where \(e\) ranges over all the \(n\) embeddings \(\mathbb K \rightarrow \mathbb C\).
+\item We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max_e |e(a)|.\]
 
-This defines a Euclidean norm denoted by \(\| \cdot \|\).
+\item It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
+\end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org8365f41}]{Lattice Reduction}
+
+\begin{frame}[label={sec:org85a40b2}]{Lattice Reduction}
 Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(Λ)\] for a computational cost \[\poly \cdot 2^{\Theta(\beta)},\] with \(λ_1(Λ)\) the length of a shortest vector of \(Λ\).\footfullcite{AC:CheNgu11}
 \end{frame}
 
 \section{Subfield Lattice Attack}
-\label{sec:org42b47f5}
-\begin{frame}[label={sec:org7ee0903}]{Overview}
+\label{sec:org548022b}
+\begin{frame}[label={sec:org8630829}]{Overview}
 \begin{displaymath}
   \xymatrix{
     \K = \Q(ζ_m)   & & & \\
@@ -376,7 +374,7 @@ Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(
 \end{frame}
 
 
-\begin{frame}[label={sec:org9d14283}]{1. Norming Down}
+\begin{frame}[label={sec:org3634187}]{1. Norming Down}
 Define \(f' = \Norm_{\K/\L}(f)\), \(g' = \Norm_{\K/\L}(g)\), and  \(h' = \Norm_{\K/\L}(h)\), then \((f',g')\) is a vector of \(\Lambda^q_{h'}\) and it may be an unusually short one.
 
 \begin{table}[htbp]
@@ -393,7 +391,7 @@ Define \(f' = \Norm_{\K/\L}(f)\), \(g' = \Norm_{\K/\L}(g)\), and  \(h' = \Norm_{
 \end{frame}
 
 
-\begin{frame}[label={sec:org1e5bc28}]{1. Norming Down}
+\begin{frame}[label={sec:orgfd123a7}]{1. Norming Down}
 We assume that the following lemma holds also for all reasonable distributions considered in cryptographic constructions.
 
 \begin{lemma}
@@ -407,7 +405,7 @@ make sure to say that the first three bounds are kinda trivial using the operato
 \end{frame}
 
 
-\begin{frame}[label={sec:orgd3f7f64}]{2. Lattice Reduction in the Subfield}
+\begin{frame}[label={sec:org69ed996}]{2. Lattice Reduction in the Subfield}
 Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain a vector \((x',y') ∈ Λ_{h'}^q\) with
 
 \begin{tikzpicture}
@@ -439,7 +437,7 @@ Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain
 \end{frame}
 
 
-\begin{frame}[label={sec:org10f4b33}]{The Right Kind of \((x',y')\)}
+\begin{frame}[label={sec:org464299a}]{The Right Kind of \((x',y')\)}
 \((x',y')\) is a solution in the subfield, how could that be useful?
 
 \pause
@@ -451,7 +449,7 @@ Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain
 \end{frame}
 
 
-\begin{frame}[label={sec:orge2e86d3}]{\((x',y') = v ⋅ (f',g')\)}
+\begin{frame}[label={sec:org8755ef8}]{\((x',y') = v ⋅ (f',g')\)}
 \begin{theorem}
 Let \(f',g' \in \cR'\) be such that \(⟨ f'⟩\) and \(⟨ g'⟩\) are coprime ideals and that \(h'⋅ f' = g' \bmod q\) for some \(h' \in \cR'\). If \((x',y') \in Λ_{h'}^q\) has length verifying
 \[\|(x',y') \| < \frac q {\|(f',g')\|},\]
@@ -459,7 +457,7 @@ then \((x',y') = v ⋅ (f',g')\) for some \(v ∈ \cR'\).
 \end{theorem}
 \end{frame}
 
-\begin{frame}[label={sec:org0fade84}]{3. Lifting the Short Vector}
+\begin{frame}[label={sec:org8205f84}]{3. Lifting the Short Vector}
 To lift the solution from the sub-ring \(\cR'\) to \(\cR\) compute \((x,y)\) as
 \begin{itemize}
 \item \(x = L(x')\)  and
@@ -468,28 +466,7 @@ To lift the solution from the sub-ring \(\cR'\) to \(\cR\) compute \((x,y)\) as
 where \(L\) is the canonical inclusion map.
 \end{frame}
 
-\begin{frame}[label={sec:org3c713ae}]{Summary}
-We have found a short multiple of \((f,g)\):
-\[(x,y)  = u ⋅ (f,g) ∈ Λ_h^q \quad \text{with } u = L(v) ⋅ \tilde f \in \cR\]
-
-\pause
-
-We have
-\[\|(x,y)\| ≤ |v| ⋅ |f|^{r-1} ⋅ \|(f,g)\|\]
-by writing \(\tilde f\) as the product of \(r-1\) many \(\psi(f)\) where the \(\psi\)'s are automorphisms of \(\K\).
-
-\pause
-
-\[\|(x,y)\| ≤ |x'| ⋅ |f'^{-1}| ⋅ |f|^{r-1} ⋅ \|(f,g)\| \]
-by decomposing \(v = x' / f'\).
-
-\pause
-
-\[\|(x,y)\| ≤ β^{Θ(n/(βr))} ⋅ {(nσ)}^{Θ(r)}\]
-by our heuristic.
-\end{frame}
-
-\begin{frame}[label={sec:org007a0c9}]{Quasi-polynomial \(q\)}
+\begin{frame}[label={sec:orga308dbe}]{Quasi-polynomial \(q\)}
 \begin{itemize}[<+->]
 \item Consider \(n = \Theta\left( λ \log^ε λ \log\log λ \right)\) and \(q = \exp(\Theta({\log^{1+ε} λ}))\)
 
@@ -507,9 +484,11 @@ by our heuristic.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[standout,label={sec:orgdba90d0}]{Fin}
+\begin{frame}[label={sec:orgd24c7f1}]{Fin}
 \begin{center}
-\alert{Thank You}
+\Huge \alert{Thank You}
 \end{center}
+
+\fullcite{EPRINT:AlbBaiDuc16}
 \end{frame}
 \end{document}
