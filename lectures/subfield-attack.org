@@ -33,7 +33,7 @@
 
 ** NTRUEncrypt
 
-- Key Generation :: $\cR = \Z[x]/(x^n+1)$, modulus $q$, width parameter $σ$
+- Key Generation :: $\cR = \Z[X]/(X^n+1)$, modulus $q$, width parameter $σ$
   - Sample $f \gets D_{\cR, σ}$ (invertible mod $q$)
   - Sample $g \gets D_{\cR, σ}$
   - Publish $h = {[g/f]}_q$
@@ -129,11 +129,11 @@ The NTRU assumption has been utilised for
 
 - I’ll focus on Cyclotomic number rings of degree $n = 2^k$ for ease of exposure, but everything can be made general.
 
-- Let \(\cR ≃ \Z[x]/(x^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
+- Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
 
 - Let $\L = \Q(ζ_{m'})$ with $m' | m$ be a subfield of $\K$.
 
-- The ring of integers of $\L$ is $\cR' ≃ \Z[x]/(x^{n'} + 1)$ with $n' = m'/2$.
+- The ring of integers of $\L$ is $\cR' ≃ \Z[X]/(X^{n'} + 1)$ with $n' = m'/2$.
 
 - We write the canonical inclusion $\cR' \subset \cR$ explicitly as $L : \cR' \rightarrow \cR$.
 
@@ -141,11 +141,11 @@ The NTRU assumption has been utilised for
 
 ** Geometry
 
-The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_e e(a) \bar e(b)\] where $e$ ranges over all the $n$ embeddings $\mathbb K \rightarrow \mathbb C$. 
+The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_{i=0}^{n-1} a_i ⋅ b_i.\] 
 
 - This defines a Euclidean norm denoted by $\| \cdot \|$.
 
-- We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max_e |e(a)|.\]
+- We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max |a_i|.\]
 
 - It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
 
@@ -158,7 +158,7 @@ Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(
 ** Overview
 
 #+BEGIN_EXPORT LaTeX
-\begin{displaymath}
+\begin{displaymath} 
   \xymatrix{
     \K = \Q(ζ_m)   & & & \\
     & \cR = \Z[ζ_m]  \ar@{-}[ul] & (h,{\color{mLightBrown} f,g}) \ar@{->}[dd]& (x,y) = {\color{mLightBrown}u⋅( f,g)}\\
@@ -168,7 +168,6 @@ Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(
     }
 \end{displaymath}
 #+END_EXPORT
-
 
 ** 1. Norming Down
 
@@ -180,26 +179,11 @@ Define $f' = \Norm_{\K/\L}(f)$, $g' = \Norm_{\K/\L}(g)$, and  $h' = \Norm_{\K/\L
 | 256 |      300 |  32 |       3.66546 |      3.70752 |      103.69970 |                    118.64060 |
 | 256 |      300 |  64 |       3.71731 |      3.70752 |      210.20853 |                    237.28120 |
 
-
 ** 1. Norming Down
 
-We assume that the following lemma holds also for all reasonable distributions considered in cryptographic constructions.
+We assume that the following lemma holds also for all reasonable distributions considered in cryptographic constructions:
 
-*** Lemma                                                         :B_lemma:
-:PROPERTIES:
-:BEAMER_env: lemma
-:END:
-Let $f,g$ be sampled from continuous spherical Gaussians of variance $\sigma^2$. For any constant $c > 0$, there exists a constant $C$, such that,
-\[ \|g'\| \leq {\left(\sigma n^C\right)}^r ,\quad  \|f'\| \leq {\left(\sigma n^C\right)} ^r,\quad |f'| \leq {\left(\sigma n^C\right)}^r ,\quad |f'^{-1}| \leq {\left(n^C / \sigma \right)}^r \]
-except with probability $O(n^{-c})$.
-
-*** Note
-:PROPERTIES:
-:BEAMER_env: note
-:END:
-
-make sure to say that the first three bounds are kinda trivial using the operator's norm, and something a bit more subtle is required for the inverse.
-
+Let $f$ be sampled from spherical Gaussians of variance $\sigma^2$. Then, \[\|f'\| \leq {\sqrt{n}}^{r-1} ⋅ {\|f\|}^r\]
 
 ** 2. Lattice Reduction in the Subfield
 
@@ -245,16 +229,14 @@ Run lattice reduction with block size $β$ on lattice $Λ_{h'}^q$, to obtain a v
 \end{tikzpicture}
 #+END_EXPORT
 
-
 ** The Right Kind of $(x',y')$
 
 $(x',y')$ is a solution in the subfield, how could that be useful?
 
 #+BEAMER: \pause
 
-1. If $(x',y')$ is short enough, then it is an \(\cR\)-multiple of $(f',g')$.
+1. If $(x',y')$ is short enough, then it is an \(\cR'\)-multiple of $(f',g')$.
 2. This will allow us to lift $(x',y')$ to a short vector in $\Lambda^q_h$.
-
 
 ** $(x',y') = v ⋅ (f',g')$
 
@@ -274,18 +256,15 @@ To lift the solution from the sub-ring $\cR'$ to $\cR$ compute $(x,y)$ as
 - \(y = L(y') ⋅ h / L(h') \bmod q\),
 where $L$ is the canonical inclusion map.
 
-** Quasi-polynomial $q$
+** Performance
+
+
+Can solve in time complexity $\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}$ when
 
 #+ATTR_BEAMER: :overlay +-
-- Consider \(n = \Theta\left( λ \log^ε λ \log\log λ \right)\) and \(q = \exp(\Theta({\log^{1+ε} λ}))\)
+- *Direct lattice attack*: $\beta / \log \beta = \Theta\left( n / \log q \right)$
+- *Subfield attack*: $\beta / \log \beta = \Theta\left( n\, \log n / \log^2 q \right)$ whenever $r = \Theta(\log q / \log n) > 1$
 
-- *Direct lattice attack*: reduction up to block-size $\beta = \Theta(λ)$.
-
-  - Expected norm of recovered vector: \[β^{\Theta(n/β)} = \exp\left(\Theta\left( \log^{1+ε}λ \log\log λ \right)\right) > q.\]
-
-- *Subfield attack*: set $r = Θ(\log^{2ε/3} λ)$ and $β = Θ(λ / \log^{ε/3} λ)$.
-  
-  - Expected norm of recovered vector:  \[ β^{Θ(n/β r)} \cdot n^{Θ(r)} = \exp\left(Θ\left(\log^{1+ \frac{2}{3}\,ε}{λ} \log\log λ\right) \right) < \sqrt q.\]
 
 ** Fin
 
