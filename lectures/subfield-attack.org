@@ -1,0 +1,322 @@
+#+OPTIONS: H:2 toc:t num:t
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+
+#+LaTeX_CLASS: mbeamer
+
+#+PROPERTY: header-args:sage :tolatex lambda obj: r'\(%s\)' % latex(obj) :results raw
+#+TITLE: A subfield lattice attack on overstretched NTRU assumptions
+#+AUTHOR: Martin R. Albrecht
+#+EMAIL: martin.albrecht@royalholloway.ac.uk
+#+DATE: Oxford Lattice School
+#+STARTUP: beamer indent
+
+#+LATEX_HEADER: \newcommand{\cR}{\ensuremath{\mathcal{R}}\xspace}
+#+LATEX_HEADER: \newcommand{\Z}{\ensuremath{\mathbb Z}\xspace}
+#+LATEX_HEADER: \renewcommand{\C}{\ensuremath{\mathbb C}\xspace}
+#+LATEX_HEADER: \newcommand{\R}{\ensuremath{\mathbb R}\xspace}
+#+LATEX_HEADER: \newcommand{\K}{\ensuremath{\mathbb K}\xspace}
+#+LATEX_HEADER: \renewcommand{\L}{\ensuremath{\mathbb L}\xspace}
+#+LATEX_HEADER: \newcommand{\Q}{\ensuremath{\mathbb Q}\xspace}
+#+LATEX_HEADER: \newcommand{\OK}{\ensuremath{\mathcal O_{\K}}\xspace}
+#+LATEX_HEADER: \newcommand{\OL}{\ensuremath{\mathcal O_{\L}}\xspace}
+
+#+LATEX_HEADER: \DeclareMathOperator{\Vol}{Vol}
+#+LATEX_HEADER: \DeclareMathOperator{\Norm}{N}
+#+LATEX_HEADER: \DeclareMathOperator{\Tr}{Tr}
+#+LATEX_HEADER: \DeclareMathOperator{\Span}{Span}
+
+#+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
+
+* Introduction
+
+** NTRUEncrypt
+
+- Key Generation :: $\cR = \Z[X]/(X^n+1)$, modulus $q$, width parameter $σ$
+  - Sample $f \gets D_{\cR, σ}$ (invertible mod $q$)
+  - Sample $g \gets D_{\cR, σ}$
+  - Publish $h = {[g/f]}_q$
+
+- Encrypt :: $m ∈ \{0,1\}^n$
+  - Sample $s,e \gets D_{\cR,χ}, D_{\cR,χ}$
+  - Return $2\, (h ⋅ s + e) + m$
+    
+- Decrypt :: $c ∈ \cR_q$
+  - $m' = f ⋅ c = 2\, (g ⋅ s + f ⋅ e) + f ⋅ m$
+  - Return  $m' \bmod 2 ≡ f ⋅ m \bmod 2$
+
+*** Note
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+
+- point out χ
+
+** The NTRU lattice \(\Lambda^q_h\)
+
+#+BEGIN_SRC sage
+sage: K.<zeta> = CyclotomicField(8)
+sage: OK = K.ring_of_integers()
+sage: h = -36*zeta^3 + 44*zeta^2 + 14*zeta + 28
+sage: h
+#+END_SRC
+
+#+RESULTS:
+\(-36 \zeta_{8}^{3} + 44 \zeta_{8}^{2} + 14 \zeta_{8} + 28\)
+
+
+#+BEGIN_SRC sage :tolatex lambda obj: r'\(%s\)' % latex(obj).replace("0 ", "  ") :latexwrap '("\\begin{small}\n" . "\n\\end{small}")
+sage: H = h.matrix(); q = 97
+sage: block_matrix([[1, H],[0, q]])
+#+END_SRC
+
+#+RESULTS:
+\begin{small}
+\(\left(\begin{array}{rrrr|rrrr}
+1 &   &   &   & 28 & 14 & 44 & -36 \\
+  & 1 &   &   & 36 & 28 & 14 & 44 \\
+  &   & 1 &   & -44 & 36 & 28 & 14 \\
+  &   &   & 1 & -14 & -44 & 36 & 28 \\
+\hline
+   &   &   &   & 97 &   &   &   \\
+  &   &   &   &   & 97 &   &   \\
+  &   &   &   &   &   & 97 &   \\
+  &   &   &   &   &   &   & 97
+\end{array}\right)\)
+\end{small}
+
+** The NTRU lattice \(\Lambda^q_h\)
+
+- The lattice \(\Lambda^q_h\) defined by an NTRU instance for parameters $\cR, q, σ$ has dimension \(2n\) and volume \(q^n\).
+- If \(h\) were uniformly random, the Gaussian heuristic predicts that the shortest vectors of \(\Lambda_h^q\) have norm \(≈ \sqrt{n q} \).
+- Whenever \[\Vert f \Vert ≈ \Vert g \Vert ≈ \sqrt{n}\,σ \ll \sqrt{n\,q},\] then \(\Lambda^q_h\) has *unusually short vectors*.
+ 
+** NTRU
+
+***  NTRU Assumption                                           :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+It is hard to find a short vector in the \cR-module \[\Lambda_h^q = \{(x,y) \in \cR^2 \text{ s.t. } hx - y = 0 \bmod q\}\]
+with $\cR = \Z[X]/(P(X))$ and the promise that a short solution $(f,g)$ — the private key — exists.footfullcite:HofPipSil96 footfullcite:HofPipSil98
+
+** NTRU Applications
+
+The NTRU assumption has been utilised for
+
+- signatures schemes, footfullcite:C:DDLL13
+- fully homomorphic encryption,footfullcite:STOC:LopTroVai12,IMA:BLLN13
+- candidate constructions for multi-linear maps.footfullcite:EC:GarGenHal13
+
+** Lattice Attacks
+
+- Recovering a short enough vector of some target norm $τ$, potentially longer than $(f,g)$, is sufficient for an attack.footfullcite:EC:CopSha97
+
+- In particular, finding a vector $o(q)$ would break many applications such as encryption.
+
+- This requires strong lattice reduction and NTRU remains asymptotically secure.footfullcite:HofPipSil98 footfullcite:EPRINT:HPSSWZ15a
+
+** Best Attacks
+
+- Practical :: combined lattice-reduction and meet-in-the-middle attack footfullcite:HofSilWhy06 of Howgrave-Graham. footfullcite:C:HowgraveGraham07 footfullcite:EPRINT:Wunderer16
+
+- Asymptotic :: BKW variant, with a heuristic complexity $2^{\Theta(n/\log \log q)}$.footfullcite:C:KirFou15
+
+* Preliminaries
+
+** Cyclotomic Number Fields and Subfields
+
+- I’ll focus on Cyclotomic number rings of degree $n = 2^k$ for ease of exposure, but everything can be made general.
+
+- Let \(\cR ≃ \Z[X]/(X^{n}+1)\) be the ring of integers of the Cylotomic number field \(\K = \Q(ζ_m)\) for some \(m=2^k\) and $n = m/2$.
+
+- Let $\L = \Q(ζ_{m'})$ with $m' | m$ be a subfield of $\K$.
+
+- The ring of integers of $\L$ is $\cR' ≃ \Z[X]/(X^{n'} + 1)$ with $n' = m'/2$.
+
+- We write the canonical inclusion $\cR' \subset \cR$ explicitly as $L : \cR' \rightarrow \cR$.
+
+- The norm $\Norm_{\K/\L}: \K \rightarrow \L$ is the multiplicative map defined by \[\Norm_{\K/\L} : f \mapsto  \prod_{\psi \in G'} \psi(f)\] where $G'$ is the Galois subgroup corresponding to $\L$.
+
+** Geometry
+
+The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_{i=0}^{n-1} a_i ⋅ b_i.\] 
+
+- This defines a Euclidean norm denoted by $\| \cdot \|$.
+
+- We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max |a_i|.\]
+
+- It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
+
+
+** Lattice Reduction
+
+Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(Λ)\] for a computational cost \[\poly \cdot 2^{\Theta(\beta)},\] with $λ_1(Λ)$ the length of a shortest vector of $Λ$.footfullcite:AC:CheNgu11
+
+* Subfield Lattice Attack
+** Overview
+
+#+BEGIN_EXPORT LaTeX
+\begin{displaymath} 
+  \xymatrix{
+    \K = \Q(ζ_m)   & & & \\
+    & \cR = \Z[ζ_m]  \ar@{-}[ul] & (h,{\color{mLightBrown} f,g}) \ar@{->}[dd]& (x,y) = {\color{mLightBrown}u⋅( f,g)}\\
+    \L = \Q(ζ_{m'}) \ar@{-}[uu]   &  & &\\
+    \Q \ar@{-}[u]   & \cR' = \Z[ζ_{m'}]  \ar@{-}[ul] \ar@{-}[uu] & (h',{\color{mLightBrown} f',g'})& (h' \rightarrow (x', y'))  \ar@{-}[l]  \ar@{->}[uu]\\
+    &  \Z  \ar@{-}[u]  \ar@{-}[ul] & &
+    }
+\end{displaymath}
+#+END_EXPORT
+
+** 1. Norming Down
+
+Define $f' = \Norm_{\K/\L}(f)$, $g' = \Norm_{\K/\L}(g)$, and  $h' = \Norm_{\K/\L}(h)$, then $(f',g')$ is a vector of $\Lambda^q_{h'}$ and it may be an unusually short one.
+
+#+CAPTION: Observed norms, after relative norm operation. All norms are logs.
+| $n$ | $\log q$ | $r$ | $\Vert f \Vert$ | $\sqrt{2/3⋅n}$ | $\Vert f' \Vert$ | $\left(\sqrt{2/3⋅n} \right)^r$ |
+| 256 |      300 |   8 |       3.70893 |      3.70752 |       29.21967 |                     29.66015 |
+| 256 |      300 |  32 |       3.66546 |      3.70752 |      103.69970 |                    118.64060 |
+| 256 |      300 |  64 |       3.71731 |      3.70752 |      210.20853 |                    237.28120 |
+
+** 1. Norming Down
+
+We assume that the following lemma holds also for all reasonable distributions considered in cryptographic constructions:
+
+Let $f$ be sampled from spherical Gaussians of variance $\sigma^2$. Then, \[\|f'\| \leq {\sqrt{n}}^{r-1} ⋅ {\|f\|}^r\]
+
+** 2. Lattice Reduction in the Subfield
+
+Run lattice reduction with block size $β$ on lattice $Λ_{h'}^q$, to obtain a vector $(x',y') ∈ Λ_{h'}^q$ with
+
+# beta = 1.0219
+# n = 8192
+# sigma = 128
+# r = var("r")
+# f = log(beta**(n/r/beta) * (n*sigma)^r)
+# f = f.function(r)
+# for r in srange(1.0,12.1,0.2):
+#     if abs(r % 1.0) < 0.05:
+#         print
+#     print "(%4.1f, %6.2f) "%(r,f(r)),
+
+#+BEGIN_EXPORT LaTeX
+\begin{tikzpicture}
+  \begin{axis}[width=1.0\textwidth,
+    height=0.8\textheight,
+    ylabel={$\log \Vert (x',y') \Vert$},
+    xlabel=$r$,
+    xmin=1,xmax=12]
+    \addplot[smooth,thick,mLightBrown,mark=] plot coordinates {
+      ( 1.0, 187.53)  ( 1.2, 161.36)  ( 1.4, 143.45)  ( 1.6, 130.72)  ( 1.8, 121.43) 
+      ( 2.0, 114.56)  ( 2.2, 109.44)  ( 2.4, 105.63)  ( 2.6, 102.84)  ( 2.8, 100.84) 
+      ( 3.0,  99.48)  ( 3.2,  98.63)  ( 3.4,  98.21)  ( 3.6,  98.15)  ( 3.8,  98.38) 
+      ( 4.0,  98.87)  ( 4.2,  99.57)  ( 4.4, 100.47)  ( 4.6, 101.52)  ( 4.8, 102.72) 
+      ( 5.0, 104.05)  ( 5.2, 105.48)  ( 5.4, 107.02)  ( 5.6, 108.64)  ( 5.8, 110.35) 
+      ( 6.0, 112.12)  ( 6.2, 113.96)  ( 6.4, 115.86)  ( 6.6, 117.81)  ( 6.8, 119.81) 
+      ( 7.0, 121.85)  ( 7.2, 123.93)  ( 7.4, 126.05)  ( 7.6, 128.21)  ( 7.8, 130.40) 
+      ( 8.0, 132.61)  ( 8.2, 134.85)  ( 8.4, 137.12)  ( 8.6, 139.41)  ( 8.8, 141.73) 
+      ( 9.0, 144.06)  ( 9.2, 146.42)  ( 9.4, 148.79)  ( 9.6, 151.17)  ( 9.8, 153.58) 
+      (10.0, 156.00)  (10.2, 158.43)  (10.4, 160.87)  (10.6, 163.33)  (10.8, 165.80) 
+      (11.0, 168.28)  (11.2, 170.77)  (11.4, 173.27)  (11.6, 175.78)  (11.8, 178.30) 
+};
+  \end{axis}
+
+  \draw (3.5,4.5) node {$\|(x',y')\| ≤ β^{Θ(2n'/β)} ⋅ λ_1(Λ_{h'}^q)$};
+  \draw (4.3,3.7) node {$≤ β^{Θ(n/(β r))} ⋅ \|(f',g')\|$};
+  \draw (4.25,2.9) node {$≤ β^{Θ(n/(β r))} ⋅ {(n\,σ)}^{o(r)}$};
+
+\end{tikzpicture}
+#+END_EXPORT
+
+** The Right Kind of $(x',y')$
+
+$(x',y')$ is a solution in the subfield, how could that be useful?
+
+#+BEAMER: \pause
+
+1. If $(x',y')$ is short enough, then it is an \(\cR'\)-multiple of $(f',g')$.
+2. This will allow us to lift $(x',y')$ to a short vector in $\Lambda^q_h$.
+
+** $(x',y') = v ⋅ (f',g')$
+
+*** 
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+
+Let $f',g' \in \cR'$ be such that $⟨ f'⟩$ and $⟨ g'⟩$ are coprime ideals and that $h'⋅ f' = g' \bmod q$ for some $h' \in \cR'$. If $(x',y') \in Λ_{h'}^q$ has length verifying
+\[\|(x',y') \| < \frac q {\|(f',g')\|},\]
+then $(x',y') = v ⋅ (f',g')$ for some $v ∈ \cR'$.
+
+** 3. Lifting the Short Vector
+
+To lift the solution from the sub-ring $\cR'$ to $\cR$ compute $(x,y)$ as
+- \(x = L(x')\)  and 
+- \(y = L(y') ⋅ h / L(h') \bmod q\),
+where $L$ is the canonical inclusion map.
+
+** Performance
+
+
+Can solve in time complexity $\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}$ when
+
+#+ATTR_BEAMER: :overlay +-
+- *Direct lattice attack*: $\beta / \log \beta = \Theta\left( n / \log q \right)$
+- *Subfield attack*: $\beta / \log \beta = \Theta\left( n\, \log n / \log^2 q \right)$ whenever $r = \Theta(\log q / \log n) > 1$
+
+
+** Fin
+
+#+BEGIN_CENTER
+\Huge *Thank You*
+#+END_CENTER
+
+fullcite:EPRINT:AlbBaiDuc16
+
+* Build Artefacts                                                     :noexport:
+
+** Emacs Config
+
+#+BEGIN_SRC emacs-lisp :tangle .dir-locals.el
+((magit-mode .
+             ((eval .
+                    (and
+                     (visual-line-mode 1)))))
+ (bibtex-mode . ((fill-column . 10000)))
+ (org-mode .
+           ((org-tags-column . -80)
+            (eval .
+                  (and
+                   (visual-fill-column-mode t)
+                   (flyspell-mode t))))))
+#+END_SRC
+
+** Makefile
+
+#+BEGIN_SRC makefile :tangle Makefile
+EMACS=emacs
+EMACSFLAGS=--batch -l ~/.emacs.d/org-export-init.el
+LATEXMK=latexmk
+LATEXMKFLAGS=-xelatex
+
+%.pdf: %.tex
+	$(LATEXMK) $(LATEXMKFLAGS) $<
+
+%.tex: %.org
+	$(EMACS) $(EMACSFLAGS) $< -f org-latex-export-to-latex
+
+clean:
+	rm -f *.bbl *.aux *.out *.synctex.gz *.log *.run.xml *.blg *-blx.bib *.fdb_latexmk *.fls *.toc *.vrb *.snm *.nav
+
+.PHONY: clean all
+.PRECIOUS: %.tex
+#+END_SRC
+
+** Autoexport to PDF
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
+# End:
+
+* Footnotes
