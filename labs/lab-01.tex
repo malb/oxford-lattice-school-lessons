@@ -179,7 +179,37 @@ The generalization of the scheme is quite straightforward. The operations remain
 
 \subsection{Public-key encryption - ring setting}
 
-As a last improvement, we will now shift our scheme from the generic lattice setting, $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice.
+As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice. For this, we will work in a polynomial ring, e.g $R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
+
+In this setting, the scheme is adapted as follow:
+\begin{itemize}
+  \item \underline{ppGen:} $\mathbf{a} \in R$ a public uniformly random polynomial of $R$.
+  \item \underline{KeyGen:} The public key is $\mathbf{b} = \mathbf{s} \cdot \mathbf{a} + \mathbf{e} \in R$, with $\mathbf{s}, \mathbf{e} \in R$ sampled from the Gaussian distribution. The secret key is $\mathbf{s}$.
+  \item \underline{Enc:} To encrypt a binary polynomial $\mathbf{m}$, pick random $\mathbf{r}, \mathbf{e'}, \mathbf{e''} \in R$ from the Gaussian distribution and compute
+$$ (\mathbf{c}_0, \mathbf{c}_1) = (\mathbf{a}\cdot\mathbf{r} + \mathbf{e'}, \mathbf{b}\cdot \mathbf{r} + \mathbf{e''} + \mathbf{m} \cdot \lfloor q/2 \rceil) $$
+  \item \underline{Dec:}  To decrypt, one computes: 
+\begin{align*}
+   \mathbf{c}_1 - s \cdot \mathbf{c}_0 &= \mathbf{m} \cdot \lfloor q/2 \rceil + \mathbf{b}\cdot \mathbf{r} - \mathbf{s}\cdot\mathbf{a}\cdot\mathbf{r} + \mathbf{e''} - \mathbf{s}\cdot\mathbf{e'}\\
+                                       &= \mathbf{m} \cdot \lfloor q/2 \rceil + \mathbf{e}\cdot \mathbf{r} + \mathbf{e''} - \mathbf{s}\cdot\mathbf{e'} \\
+                                       &\approx  \mathbf{m} \cdot \lfloor q/2 \rceil
+\end{align*}
+So for each coefficient we apply the same rule as before, if it is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. 
+\end{itemize}
+
+\textbf{Ex 3:} For this adaptation, more code changes are needed. You can look at the code snippet below for an idea on how to use polynomial ring in Sage and its Gaussiam Sampler over Polynomials.
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from sage.stats.distributions.discrete_gaussian_polynomial \
+import DiscreteGaussianDistributionPolynomialSampler
+...
+
+Zq = ZZ.quotient(q*ZZ)
+Rq.<x> = Zq['x'].quotient_ring(x^n+1)
+P = DiscreteGaussianDistributionPolynomialSampler(Rq, n, sigma)
+P()
+
+\end{lstlisting}
+
 
 \section{Security evaluation}
 
@@ -270,6 +300,42 @@ print m_dec.apply_map(f)
 \end{lstlisting}
 
 \subsection{Public-key encryption - ring setting}
+
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from sage.stats.distributions.discrete_gaussian_polynomial \
+import DiscreteGaussianDistributionPolynomialSampler
+
+# Init, set dimension
+n = 16
+q = next_prime(n^2)
+sigma = sqrt(n/(2*pi.n()))
+
+Zq = ZZ.quotient(q*ZZ)
+Rq.<x> = Zq['x'].quotient_ring(x^n+1)
+P = DiscreteGaussianDistributionPolynomialSampler(Rq, n, sigma)
+
+# ppGen
+a = Rq.random_element()
+
+# KeyGen
+s = P()
+e = P()
+b = s * a + e
+
+# Encrypt bit m
+m = Rq([randint(0, 1) for _ in range(n)])
+print m
+
+r = P()
+c = (a*r + P(), b*r + P() + Rq(m) * round(q/2))
+
+# Decrypt
+m_dec = c[1] - s * c[0]
+f = lambda x: 1 if round(q/4) < x and x < round(3*q/4) else 0
+print Rq(map(f, m_dec.list()))
+\end{lstlisting}
 
 \section{Security evaluation}
 
