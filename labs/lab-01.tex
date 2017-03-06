@@ -1,0 +1,276 @@
+\documentclass[10pt,a4paper,nobib]{tufte-handout}
+%\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{newunicodechar}
+\usepackage[notions,operators,sets,keys,ff,adversary,primitives,complexity,asymptotics,lambda,landau,advantage]{cryptocode}
+\usepackage{xspace}
+\usepackage{units}
+\usepackage{nicefrac}
+\usepackage{gensymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[color=yellow!40]{todonotes}
+%\newunicodechar{ }{~}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+\newtheorem{corollary}{Corollary}
+\input{lab-header.tex}
+\author{Martin R. Albrecht, Léo Ducas and Guillaume Bonnoron}
+\date{22 March 2017}
+\title{Lab 1\\\medskip
+\large Constructions}
+\hypersetup{
+pdfauthor={Martin R. Albrecht, Léo Ducas and Guillaume Bonnoron},
+pdftitle={Lab 1},
+pdfkeywords={},
+pdfsubject={},
+pdfcreator={Emacs 25.1.1 (Org mode 9.0.5)},
+pdflang={English},
+colorlinks,
+citecolor=gray,
+filecolor=gray,
+linkcolor=gray,
+urlcolor=gray
+}
+\begin{document}
+
+\maketitle
+In this lab, we will implement elementary cryptographic primitives based on lattices, namely a public-key encryption scheme\footfullcite{STOC:Regev05} in a single bit version, multi-bit version and ring version\footfullcite{EC:LyuPeiReg10}. The key take-aways will be about random sampling in lattices, security evaluation and matrix manipulations. 
+
+% \section{Introduction}
+%
+% As a warm up, we ask you to play with the included \textit{Learning With Errors} oracle from Sage that we will use below to contruct the schemes.
+% \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+% \begin{lstlisting}
+% sage: from sage.crypto.lwe import *
+% \end{lstlisting}
+%
+% In this module you can find a generic LWE oracle, that allows you to choose all the parameters, together with oracles from the litterature: \texttt{Regev} or \texttt{LindnerPeikert} for example. We will first use the latter oracle
+%
+% \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+% \begin{lstlisting}
+% sage: R = Regev(n=16)
+% sage: R
+% LWE(16, 257, Discrete Gaussian sampler over the Integers with sigma =
+% 1.602003 and c = 257, 'uniform', None)
+% \end{lstlisting}
+%
+% We can see that \texttt{R} is an LWE oracle in dimension 16 with modulus 257, an discrete Gaussian error distribution of parameter 1.602003 centered in 0, a uniform secret distribution and no limit on the number of samples. Now we can call it to generate LWE samples:
+%
+% \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+% \begin{lstlisting}
+% sage: R2(), R2(), R2()
+% (((211, 28, 215, 246, 237, 82, 72, 185, 130, 206, 34, 9, 237, 218, 245, 188),
+%   236),
+%  ((22, 171, 61, 96, 62, 167, 14, 241, 181, 105, 140, 199, 59, 214, 35, 174),
+%   162),
+%  ((244, 219, 129, 167, 13, 103, 20, 129, 174, 146, 4, 225, 214, 239, 36, 85),
+%   154))
+% \end{lstlisting}
+%
+
+\section{Introduction}
+\label{sec:orgaad38e1}
+As a warm up, we ask you to use the \textit{Discrete Gaussian Sampler} from sage\footfullcite{C:DDLL13}. First import the correct code:
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+sage: from sage.stats.distributions.discrete_gaussian_integer \
+import DiscreteGaussianDistributionIntegerSampler
+\end{lstlisting}
+
+As its explicit name suggests, you can now generate lattice vectors from this sampler, providing it with the Gaussian parameter $\sigma$ of the distribution you wish to use.
+
+\textbf{Note: } The gaussian parameter should not be mistaken with the standard deviation. A Gaussian distribution with center $c$ and parameter $\sigma$ samples elements with a probability proportional to $\exp(-\pi\frac{(x-c)^2}{\sigma^2})$.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+sage: D = DiscreteGaussianDistributionIntegerSampler(sigma=2.0, c=5)
+sage: D
+Discrete Gaussian sampler over the Integers with sigma = 2.0 and c = 5
+\end{lstlisting}
+
+This create the sampler, that you can call to produce your integers. Here they are centered around 5, with gaussian parameter 2.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+sage: D(), D(), D(), D(), D(), D()
+(6, 4, 2, 6, 3, 3)
+\end{lstlisting}
+
+\subsection{Public-key Encryption - single bit}
+
+The public-key encryption scheme we want to implement goes as follow. Given a dimension $n$, a modulus $q$, we work in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$. We also need a discrete Gaussian distribution of parameter $\sigma$.
+
+\begin{itemize}
+  \item \underline{ppGen:} $\mathbf{A} \in \mathbb{Z}^{n\times n}_q$ a public uniformly random matrix.
+  \item \underline{KeyGen:} The public key is $\mathbf{b}^t = \mathbf{s}^t\mathbf{A} + \mathbf{e}^t \mod q$, with $\mathbf{s}, \mathbf{e} \in \mathbb{Z}^n_q$ sampled from the Gaussian distribution. The secret key is $\mathbf{s}$.
+  \item \underline{Enc:} To encrypt a bit $m$, consider $\mathbf{M} = \left[ \begin{smallmatrix}
+    \mathbf{A} \\
+    \mathbf{b}^t
+  \end{smallmatrix}\right] \in \mathbb{Z}^{(n+1)\times n}_q$ and compute
+  \begin{align*}
+    \mathbf{c} &= \mathbf{M}\cdot\mathbf{x} + \left(
+               \begin{smallmatrix}
+                 \mathbf{0} \\
+                 \mu \cdot \lfloor q/2 \rceil
+               \end{smallmatrix} \right)\\
+               &= \left(\begin{smallmatrix}
+                 \mathbf{A}\cdot \mathbf{x} \\
+                 \langle \mathbf{b}\cdot \mathbf{x}\rangle
+               \end{smallmatrix} \right) +
+               \left( 
+               \begin{smallmatrix}
+                 \mathbf{0} \\
+                 \mu \cdot \lfloor q/2 \rceil
+               \end{smallmatrix} \right) \in \mathbb{Z}^{n+1}_q
+  \end{align*}
+  where $\mathbf{x}$ is uniform in $\{0, 1\}^n$.
+  \item \underline{Dec:}  To decrypt, one computes: 
+\begin{align*}
+  (-\mathbf{s}, 1)^t \cdot \mathbf{c} &= (-\mathbf{s}, 1)^t \cdot \mathbf{M} \cdot \mathbf{x} + \mu \cdot \lfloor q/2 \rceil \\
+                                      &= \langle \mathbf{e}^t \cdot \mathbf{x} \rangle + \mu \cdot \lfloor q/2 \rceil \\
+                                      &\approx  \mu \cdot \lfloor q/2 \rceil
+\end{align*}
+If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It works if $\langle \mathbf{e} \cdot \mathbf{x} \rangle < q/4$ so $q$ and $\sigma$ should be chosen accordingly.
+\end{itemize}
+
+% In 2005, Regev introduced the \textit{Learning With Errors (LWE)} problem together with a public key encryption scheme. In this part our exercice will be to implement it (we recall below the details of the scheme). We have few parameters: a dimension $n$, a modulus $q$, an error distribution $\chi$ and a number of samples $m\approx (n+1) \log q$.
+%
+% \begin{itemize}
+% \item \textbf{KeyGen:} The secret key $\mathbf{s}$ is a uniform random element in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$ and the public key is generated by $m$ LWE samples $(\mathbf{a}_i, b_i = \langle \mathbf{s}, \mathbf{a}_i \rangle + e_i)$. A convenient way is to contruct the matrix $\mathbf{A} \in \mathbb{Z}^{m\times(n+1)}_q$ whose rows are the $\mathbf{a}_i$ and a column vector $\mathbf{b}$ whose coefficients are the $b_i$s. The public key is then $(\mathbf{A}, \mathbf{b})$.
+% \item \textbf{Enc:} To encrypt a bit $\mu$, one chooses a uniform $\mathbf{x}\in \{0, 1\}^m$ and compute $$ \mathbf{c} = (\mathbf{x}\cdot \mathbf{A}, \langle \mathbf{x}\cdot \mathbf{b}\rangle) + (\mathbf{0}, \mu \cdot \lfloor q/2 \rceil ) \in \mathbb{Z}^{n+1}_q$$
+% \item \textbf{Dec:} To decrypt, one computes: 
+% \begin{align*}
+%   (-\mathbf{s}, 1)^t \cdot \mathbf{c} &= (-\mathbf{s}, 1)^t \cdot \mathbf{A} \cdot \mathbf{x} + \mu \cdot \lfloor q/2 \rceil \\
+%                                       &= \langle \mathbf{e} \cdot \mathbf{x} \rangle + \mu \cdot \lfloor q/2 \rceil \\
+%                                       &\approx  \mu \cdot \lfloor q/2 \rceil
+% \end{align*}
+% If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It works if $\langle \mathbf{e} \cdot \mathbf{x} \rangle < q/4$ so $q$ and $\sigma$ should be chosen accordingly.
+% \end{itemize}
+%
+\textbf{Ex 1:} Using the Gaussian sampler from above, implement the whole scheme i.e. the public parameter and key generations, the encryption and the decryption.
+
+\subsection{Public-key Encryption - multi-bit}
+
+To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext\footfullcite{CCS:BCDMNN16}. In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a linear expansion in the size of the keys and ciphertexts.
+
+The generalization of the scheme is quite straightforward. The operations remain the same, the only differences is the shift from vectors of size $n$ to matrices of dimensions $n \times k$ for $\mathbf{s}, \mathbf{e}$ and $\mathbf{b}$ and $\mathbf{x}$. Thus $\mathbf{c}$ becomes a $(n+k) \times k$ matrix where the bottom $k\times k$ coefficients store the masked encryption of $k^2$ bits $\mu_i,j$.
+
+\textbf{Ex 2:} Adapt your previous code to handle multiple plaintext bits.
+
+\subsection{Public-key encryption - ring setting}
+
+As a last improvement, we will now shift our scheme from the generic lattice setting, $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice.
+
+\section{Security evaluation}
+
+Now that the scheme is working and fairly efficient, the question remains of its level of security. Here we have $n$ that determines both the modulus $q$ and the Gaussian parameter $\sigma$. So we will play with $n$, and later also with $q$ and $\sigma$, and explore the level of security that we obtain.
+
+For this work, we will use the estimator\footfullcite{EPRINT:AlbPlaSco15} that models the performance of (nearly) all existing attacks against LWE.
+
+\section{Example solutions}
+\subsection{Public-key Encryption - single bit}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from sage.stats.distributions.discrete_gaussian_integer \
+import DiscreteGaussianDistributionIntegerSampler
+
+# Init, set dimension
+n = 500
+q = next_prime(n^2)
+sigma = sqrt(n/(2*pi.n()))
+D = DiscreteGaussianDistributionIntegerSampler(sigma=sigma)
+ZZq = ZZ.quotient(q*ZZ)
+
+# ppGen
+A = random_matrix(ZZq, n)
+
+# KeyGen
+s = vector(ZZq, [D() for _ in range(n)])
+e = vector(ZZq, [D() for _ in range(n)])
+b = s * A + e
+
+# Encrypt bit m
+m = 1  # or 0
+M = A.stack(b)
+x = random_vector(n, 0, 2)
+c = M*x 
+c[n] = (c[n] + m*round(q/2)) % q
+
+# Decrypt
+d = list(-s)
+d.append(1)
+m_dec = vector(d) * c
+if round(q/4) < m_dec and m_dec < round(3*q/4):
+    print 1
+else:
+    print 0
+\end{lstlisting}
+
+\subsection{Public-key Encryption - multi-bit}
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+from sage.stats.distributions.discrete_gaussian_integer \
+import DiscreteGaussianDistributionIntegerSampler
+
+# Init, set dimension
+n = 500
+k = 4
+q = next_prime(n^2)
+sigma = sqrt(n/(2*pi.n()))
+D = DiscreteGaussianDistributionIntegerSampler(sigma=sigma)
+ZZq = ZZ.quotient(q*ZZ)
+
+# ppGen
+A = random_matrix(ZZq, n)
+
+# KeyGen
+s = matrix(ZZq, n, k, [D() for _ in range(n*k)])
+e = matrix(ZZq, n, k, [D() for _ in range(n*k)])
+b = s.transpose() * A + e.transpose()
+
+# Encrypt k^2 bits m
+m = random_matrix(ZZ, k, x=2)
+print m
+
+x = random_matrix(ZZ, n, k, x=2)
+m = zero_matrix(ZZq, n, k).stack(m)
+M = A.stack(b)
+c = (M*x + m * round(q/2)) % q
+
+# Decrypt
+d = -s.transpose()
+d = d.augment(identity_matrix(k))
+m_dec = d * c
+
+f = lambda x: 1 if round(q/4) < x and x < round(3*q/4) else 0
+print m_dec.apply_map(f)
+
+\end{lstlisting}
+
+\subsection{Public-key encryption - ring setting}
+
+\section{Security evaluation}
+
+\end{document}
