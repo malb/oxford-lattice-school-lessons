@@ -32,6 +32,12 @@
 \newtheorem{definition}{Definition}
 \newtheorem{remark}{Remark}
 \newtheorem{corollary}{Corollary}
+
+%% TODO NOTES
+
+\newcommand{\malb}[2][inline]{\todo[#1]{\textbf{malb:} #2}\xspace}
+
+
 \input{lab-header.tex}
 \author{Martin R. Albrecht, Léo Ducas and Guillaume Bonnoron}
 \date{22 March 2017}
@@ -89,7 +95,9 @@ In this lab, we will implement elementary cryptographic primitives based on latt
 
 \section{Introduction}
 \label{sec:orgaad38e1}
-As a warm up, we ask you to use the \textit{Discrete Gaussian Sampler} from sage\footfullcite{C:DDLL13}. First import the correct code:
+As a warm up, we ask you to use the \textit{Discrete Gaussian Sampler} from Sage.\footfullcite{C:DDLL13} First import the necessary class:
+
+\malb{I don't understand the citation here?}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -116,7 +124,9 @@ sage: D(), D(), D(), D(), D(), D()
 (6, 4, 2, 6, 3, 3)
 \end{lstlisting}
 
-\subsection{Public-key Encryption - single bit}
+\malb{In Sage \(\sigma\) is the standard deviation! That sampler will have stddev 2.0.}
+
+\subsection{Public-key Encryption --- single bit}
 
 The public-key encryption scheme we want to implement goes as follow. Given a dimension $n$, a modulus $q$, we work in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$. We also need a discrete Gaussian distribution of parameter $\sigma$.
 
@@ -144,7 +154,7 @@ The public-key encryption scheme we want to implement goes as follow. Given a di
                \end{smallmatrix} \right) \in \mathbb{Z}^{n+1}_q
   \end{align*}
   where $\mathbf{x}$ is uniform in $\{0, 1\}^n$.
-  \item \underline{Dec:}  To decrypt, one computes: 
+  \item \underline{Dec:}  To decrypt, compute: 
 \begin{align*}
   (-\mathbf{s}, 1)^t \cdot \mathbf{c} &= (-\mathbf{s}, 1)^t \cdot \mathbf{M} \cdot \mathbf{x} + \mu \cdot \lfloor q/2 \rceil \\
                                       &= \langle \mathbf{e}^t \cdot \mathbf{x} \rangle + \mu \cdot \lfloor q/2 \rceil \\
@@ -167,19 +177,21 @@ If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It wo
 % If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It works if $\langle \mathbf{e} \cdot \mathbf{x} \rangle < q/4$ so $q$ and $\sigma$ should be chosen accordingly.
 % \end{itemize}
 %
-\textbf{Ex 1:} Using the Gaussian sampler from above, implement the whole scheme i.e. the public parameter and key generations, the encryption and the decryption.
+\textbf{Ex 1:} Using the Gaussian sampler from above, implement the whole scheme i.e.~the public parameter and key generations, the encryption and the decryption.
 
-\subsection{Public-key Encryption - multi-bit}
+\subsection{Public-key Encryption --- multi-bit}
 
-To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext\footfullcite{CCS:BCDMNN16}. In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a linear expansion in the size of the keys and ciphertexts.
+To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext.\footfullcite{CCS:BCDMNN16} In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a linear expansion in the size of the keys and ciphertexts.
+
+\malb{This is older than Frodo, no?}
 
 The generalization of the scheme is quite straightforward. The operations remain the same, the only differences is the shift from vectors of size $n$ to matrices of dimensions $n \times k$ for $\mathbf{s}, \mathbf{e}$ and $\mathbf{b}$ and $\mathbf{x}$. Thus $\mathbf{c}$ becomes a $(n+k) \times k$ matrix where the bottom $k\times k$ coefficients store the masked encryption of $k^2$ bits $\mu_i,j$.
 
 \textbf{Ex 2:} Adapt your previous code to handle multiple plaintext bits.
 
-\subsection{Public-key encryption - ring setting}
+\subsection{Public-key encryption --- ring setting}
 
-As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice. For this, we will work in a polynomial ring, e.g $R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
+As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice. For this, we will work in a polynomial ring, e.g.~$R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
 
 In this setting, the scheme is adapted as follow:
 \begin{itemize}
@@ -207,18 +219,21 @@ Zq = ZZ.quotient(q*ZZ)
 Rq.<x> = Zq['x'].quotient_ring(x^n+1)
 P = DiscreteGaussianDistributionPolynomialSampler(Rq, n, sigma)
 P()
-
 \end{lstlisting}
+
+\malb{This is just a thin wrapper around the integer sampler, could also tell them to use integer sampler and cast to the polynomial ring}
 
 
 \section{Security evaluation}
 
 Now that the scheme is working and fairly efficient, the question remains of its level of security. Here we have $n$ that determines both the modulus $q$ and the Gaussian parameter $\sigma$. So we will play with $n$, and later also with $q$ and $\sigma$, and explore the level of security that we obtain.
 
-For this work, we will use the estimator\footfullcite{EPRINT:AlbPlaSco15} that models the performance of (nearly) all existing attacks against LWE.
+For this work, we will use the estimator\footfullcite{EPRINT:AlbPlaSco15} that models the performance of (nearly) all existing attacks against LWE\@.
+
+\malb{Maybe also Léo's code for comparison?}
 
 \section{Example solutions}
-\subsection{Public-key Encryption - single bit}
+\subsection{Public-key Encryption --- single bit}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -230,10 +245,10 @@ n = 500
 q = next_prime(n^2)
 sigma = sqrt(n/(2*pi.n()))
 D = DiscreteGaussianDistributionIntegerSampler(sigma=sigma)
-ZZq = ZZ.quotient(q*ZZ)
+ZZq = ZZ.quotient(q*ZZ) # IntegerModRing(q) or GF(q) also work
 
 # ppGen
-A = random_matrix(ZZq, n)
+A = random_matrix(ZZq, n) # I'd do random_matrix(ZZq, n, n) to be explicit, you'd also need m = 2nlog(q,2) to be secure or do the ring trick here too of adding small noise
 
 # KeyGen
 s = vector(ZZq, [D() for _ in range(n)])
@@ -243,9 +258,9 @@ b = s * A + e
 # Encrypt bit m
 m = 1  # or 0
 M = A.stack(b)
-x = random_vector(n, 0, 2)
+x = random_vector(n, 0, 2) # I'd do random_vector(ZZ, m, x=-1, y=2)
 c = M*x 
-c[n] = (c[n] + m*round(q/2)) % q
+c[n] = (c[n] + m*round(q/2)) % q # m*q//2
 
 # Decrypt
 d = list(-s)
@@ -256,6 +271,8 @@ if round(q/4) < m_dec and m_dec < round(3*q/4):
 else:
     print 0
 \end{lstlisting}
+
+\malb{I'd probably define classes}
 
 \subsection{Public-key Encryption - multi-bit}
 
@@ -340,3 +357,9 @@ print Rq(map(f, m_dec.list()))
 \section{Security evaluation}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% TeX-master: t
+%%% End:
