@@ -11,7 +11,7 @@
 
 #+TITLE: Lab 2
 #+SUBTITLE: Lattice Reduction & Attacks
-#+AUTHOR: Martin R. Albrecht and Léo Ducas
+#+AUTHOR: Martin R. Albrecht, Guillaume Bonnoron and Léo Ducas
 #+DATE: 23 March 2017
 
 In this lab, we will make intensive use of Fplll[fn:1] and Fpylll[fn:2]. Fplll is a C++11 library for operating on lattices using floating point arithmetic. It implements Gram-Schmidt orthogonalisation, LLL, BKZ, BKZ 2.0 footfullcite:AC:CheNgu11, Slide reduction footfullcite:STOC:GamNgu08 and Self-Dual BKZ footfullcite:EPRINT:MicWal15.

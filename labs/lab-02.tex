@@ -1,4 +1,4 @@
-% Created 2017-03-02 Thu 17:23
+% Created 2017-03-06 Mon 17:56
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,a4paper,nobib]{tufte-handout}
 \usepackage{fontspec}
@@ -33,12 +33,12 @@
 \newtheorem{remark}{Remark}
 \newtheorem{corollary}{Corollary}
 \input{lab-header.tex}
-\author{Martin R. Albrecht and Léo Ducas}
+\author{Martin R. Albrecht, Guillaume Bonnoron and Léo Ducas}
 \date{23 March 2017}
 \title{Lab 2\\\medskip
 \large Lattice Reduction \& Attacks}
 \hypersetup{
-pdfauthor={Martin R. Albrecht and Léo Ducas},
+pdfauthor={Martin R. Albrecht, Guillaume Bonnoron and Léo Ducas},
 pdftitle={Lab 2},
 pdfkeywords={},
 pdfsubject={},
@@ -62,7 +62,7 @@ Fpylll is a Python wrapper and extension of Fplll, making its data structures an
 That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome!\footnote{\url{https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md}}
 
 \section{Introduction}
-\label{sec:orgb108606}
+\label{sec:orgaf34b74}
 In this lab, we ask you to experiment with LLL and BKZ (2.0) as implemented in Fpylll. We start with a little tutorial on how to use this library. 
 
 To start, we first import the \texttt{fpylll} API into Sage’s main namespace:
@@ -75,7 +75,7 @@ from fpylll import *
 \textbf{Note} by calling \texttt{from fpylll import *} we overwite Sage’s own \texttt{set\_random\_seed}. You can still call it as \texttt{sage.all.set\_random\_seed}.
 
 \subsection{Integer Matrices}
-\label{sec:org0406669}
+\label{sec:orgd5f576d}
 
 To experiment, we generate a \(q\)-ary lattice of dimension 100 and determinant \(q^{50}\) where \(q\) is a 30-bit prime. Before we sample our basis, we set the random seed to ensure we can reproduce our experiments later.
 
@@ -88,7 +88,7 @@ A = IntegerMatrix.random(100, "qary", k=50, bits=30)
 \textbf{Reminder:} Objects and functions in Python/Sage can be interrogated to learn more about them such as what parameters they accept (for functions) or (often) their documentation.\footnote{\url{https://doc.sagemath.org/html/en/tutorial/tour\_help.html}}
 
 \subsection{Gram-Schmidt Orthogonalisation}
-\label{sec:orgf3848c2}
+\label{sec:orgd892a9e}
 
 To run LLL we have two choices. We can either run the high-level \texttt{LLL.reduction()} function or we can create the appropriate hierarchy of objects “by hand”. That is, algorithms are represented by objects with which we can interact. As this exercise is about dealing with those internal objects, we are going to pursue this strategy. We, hence, first create a \texttt{MatGSO} object, which takes care of computing the Gram-Schmidt orthogonalisation. 
 
@@ -146,7 +146,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{LLL}
-\label{sec:orgc9f9c1f}
+\label{sec:org8dc62f4}
 
 We can now create an LLL object which operates on GSO objects. All operations performed on GSO objects, e.g. \texttt{M}, are automatically also applied to the underlying integer matrix, e.g. \texttt{A}.
 
@@ -215,7 +215,7 @@ A[0].norm()^2
 \end{verbatim}
 
 \subsection{BKZ}
-\label{sec:orgf76851e}
+\label{sec:org91754e3}
 
 Calling BKZ works similarly: there is a high-level function \texttt{BKZ.reduction()} and a BKZ object \texttt{BKZ.Reduction}. However, in addition there are also several implementations of the BKZ algorithm in 
 
@@ -291,17 +291,17 @@ i & time & r\(_{\text{0}}\)\\
 \end{center}
 
 \section{Lattice Reduction}
-\label{sec:org3212838}
+\label{sec:orgb54b5bc}
 
 In this exercise, we ask you to verify various predictions made about lattice reduction using the implementations available in Fpylll.
 
 \subsection{root-Hermite factors}
-\label{sec:orgb7dbe12}
+\label{sec:org8fa2847}
 
 Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where \(\delta_0\) is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org95b4ccf}
+\label{sec:org68acf2d}
 
 Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \det(Λ)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where \(m\) is the dimension of the lattice, we get \(α = δ^{-2m/(m-1)}\).\footfullcite{RSA:LinPei11} Check how well this assumption holds for various block sizes of BKZ.
 
@@ -344,7 +344,7 @@ plt.close()
 \end{center} 
 
 \section{Dual Attack}
-\label{sec:orgde49a3c}
+\label{sec:org2768007}
 
 In this exercise, you are asked to break a decision-LWE instance using the dual lattice attack.
 
@@ -370,9 +370,9 @@ Note that this entails finding the optimal number of samples \(m\), i.e that \(m
 \appendix
 
 \section{Example Solutions}
-\label{sec:org14ce3ee}
+\label{sec:org27c5251}
 \subsection{root-Hermite factors}
-\label{sec:org6b24988}
+\label{sec:org4d90af3}
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -457,7 +457,7 @@ n: 130, bits: 40, β: 60, δ_0: 1.0114, pred: 2^22.12, real: 2^21.67
 \end{verbatim}
 
 \subsection{GS norms \& Geometric series assumption}
-\label{sec:org31f527c}
+\label{sec:orgb45daa2}
 
 \texttt{dump\_gso\_filename}
 
@@ -649,7 +649,7 @@ g
 \end{center}
 
 \subsection{Dual attack}
-\label{sec:org176a17e}
+\label{sec:org51e62a4}
 We will need to invert \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\]
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
