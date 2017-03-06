@@ -1,0 +1,43 @@
+\documentclass{standalone}
+\usepackage{pgfplots}
+\input{colors}
+\begin{document}
+\begin{tabular}{cc}
+
+\begin{tikzpicture}[scale=.15]
+  \clip(-9,-9)  rectangle (23.5,23.5);
+   \coordinate (Origin) at (0,0); 
+   \coordinate (Bone) at (8,-3);
+   \coordinate (Btwo) at (5,5);
+     \draw[style=help lines,color=blue!15] (-9,-9) grid[step=1cm] (23,23);
+    % \draw[style=help lines,thin,dotted] (-9,-9) grid[step=1cm] (23,23);
+  \node[draw,circle,inner sep=2pt] at (0,0) {};     
+  \draw [very thick,-latex,blue] (Origin)    -- (Bone) node [left] {$\vec b_1$};
+     \draw [very thick,-latex,blue] (Origin)   -- (Btwo) node [left] {$\vec b_2$};
+  \foreach \y in {-5,-4,...,5}{%Two indices running over each 
+      \foreach \x in {-5,-4,...,5}{% node on the grid we have drawn
+    \node[draw,circle,inner sep=.7pt,fill] at (8*\x-3*\y,-3*\x+8*\y) {};
+    }
+    }
+ \end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.15]
+  \clip(-9,-9)  rectangle (23.5,23.5);
+   \coordinate (Origin) at (0,0); 
+   \coordinate (Bone) at (21,-1);
+   \coordinate (Btwo) at (13,2);
+   \coordinate (p) at (13,13);
+     \draw[style=help lines,color=blue!15] (-9,-9) grid[step=1cm] (23,23);
+    % \draw[style=help lines,thin,dotted] (-9,-9) grid[step=1cm] (23,23);
+  \node[draw,circle,inner sep=2pt] at (0,0) {};      
+  \draw [very thick,-latex,red] (Origin)    -- (Bone) node [below] {$\vec b_1$};
+     \draw [very thick,-latex,red] (Origin)   -- (Btwo) node [above] {$\vec b_2$};
+  \foreach \y in {-5,-4,...,5}{%Two indices running over each 
+      \foreach \x in {-5,-4,...,5}{% node on the grid we have drawn
+    \node[draw,circle,inner sep=.7pt,fill] at (8*\x-3*\y,-3*\x+8*\y) {};
+    }
+    }
+ \end{tikzpicture} \\
+ Good Basis $\bblue{\vec G}$ of $L$ & Bad Basis $\rred{\vec B}$ of $L$
+\end{tabular}
+ \end{document}

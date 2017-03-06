@@ -1,0 +1,37 @@
+\documentclass{standalone}
+\usepackage{pgfplots}
+\input{colors}
+\begin{document}
+
+\begin{tikzpicture}[scale=.15]
+  \clip(-9,-7)  rectangle (20.5,20.5);
+  \coordinate (Origin) at (0,0); 
+  \coordinate (Bone) at (8,-3);
+  \coordinate (Btwo) at (5,5);
+  \coordinate (p) at (12,12);
+  \coordinate (v) at (10,10);
+  \draw[style=help lines,color=blue!15] (-9,-9) grid[step=1cm] (23,23);
+  \node[draw,circle,inner sep=2pt] at (0,0) {};     
+  \foreach \y in {-4,-3,...,5}
+    {
+    \foreach \x in {-4,-3,...,5}{
+        \node[draw,circle,inner sep=.7pt,fill] at (8*\x-3*\y,-3*\x+8*\y) {};
+        \node[draw,circle,inner sep=.9pt,fill,orangex] at (p) {};
+
+        % \draw[blue,thick] (8*\x-3*\y +13/2 + 8,-3*\x+8*\y +2/2 -3)  --
+        %       (8*\x-3*\y +13/2    ,-3*\x+8*\y +2/2   )  --
+        %       (8*\x-3*\y +13/2 + 5,-3*\x+8*\y +2/2 +5);
+
+    
+        }
+      }
+
+  \node[above] at (p) {$\oorange{\vec t}$};
+  \node[draw,circle,inner sep=2pt,orange] at (p) {};     
+
+  % \node[draw,circle,inner sep=.9pt,fill,purplex] at (v) {};
+  % \node[left] at (v) {$\ppurple{\vec v}$};
+  % \node[draw,circle,inner sep=2pt,purplex] at (v) {};     
+\end{tikzpicture} 
+
+\end{document}
