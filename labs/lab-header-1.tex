@@ -1,0 +1,64 @@
+% LaTeX header for org-mode lab assignments. 
+%
+% This file assumes
+%
+% - the standard org-mode prefix
+% - #+LATEX_CLASS: handout
+% - #+LATEX_CLASS_OPTIONS: [10pt,a4paper]
+% - (setq org-latex-default-packages-alist
+%      (remove* '("T1" "fontenc" t) org-latex-default-packages-alist :test 'equal))
+
+\usepackage{ifxetex}
+
+\ifxetex
+
+  \usepackage{unicodesymbols}
+  \renewcommand{\textls}[2][5]{%
+    \begingroup\addfontfeatures{LetterSpace=#1}#2\endgroup
+  }
+  \renewcommand{\allcapsspacing}[1]{\textls[15]{#1}}
+  \renewcommand{\smallcapsspacing}[1]{\textls[10]{#1}}
+  \renewcommand{\allcaps}[1]{\textls[15]{\MakeTextUppercase{#1}}}
+  \renewcommand{\smallcaps}[1]{\smallcapsspacing{\scshape\MakeTextLowercase{#1}}}
+  \renewcommand{\textsc}[1]{\smallcapsspacing{\textsmallcaps{#1}}}
+\fi
+
+\RequirePackage[backend=bibtex,
+            style=alphabetic,
+            maxnames=4,
+            citestyle=alphabetic]{biblatex}
+
+\bibliography{local.bib,abbrev3.bib,crypto_crossref.bib}
+
+% \setmonofont[BoldFont={Cousine Bold},
+%              ItalicFont={Cousine Italic},
+%              BoldItalicFont={Cousine Bold Italic},
+%              Scale=MatchLowercase]{Cousine}
+
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\footnotesize}
+  {}{}
+\makeatother
+
+\DeclareMathOperator{\Vol}{Vol}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+\setlength{\RaggedRightParindent}{0em}
+
+\usepackage{xcolor}
+
+\lstdefinelanguage{Sage}[]{Python}{morekeywords={True,False,sage,cdef,cpdef,ctypedef,self},sensitive=true}
+
+\lstset{showstringspaces=false,
+        aboveskip=0.75em,
+        basicstyle=\footnotesize\ttfamily,
+        keywordstyle=\bfseries\color{gray!40!black},
+        commentstyle=\itshape\color{gray!140!black},
+        identifierstyle=\color{gray!40!black},
+        stringstyle=\color{gray},
+        backgroundcolor=\color{gray!190!black},
+        frame=none,
+        xleftmargin=\parindent}
