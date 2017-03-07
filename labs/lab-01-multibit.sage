@@ -1,34 +1,46 @@
 from sage.stats.distributions.discrete_gaussian_integer import DiscreteGaussianDistributionIntegerSampler
 
-# Init, set dimension
-n = 16
-k = 2  # number of bits
-q = next_prime(n^2)
-sigma = sqrt(n/(2*pi.n()))
-D = DiscreteGaussianDistributionIntegerSampler(sigma=sigma)
-ZZq = ZZ.quotient(q*ZZ)
+class pke_multibit():
+  def __init__(self, dimension, packing):
+    self.n = dimension
+    self.k = packing
+    self.q = next_prime(self.n^2)
+    self.sigma = sqrt(self.n/(2*pi.n()))
+    self.D = DiscreteGaussianDistributionIntegerSampler(sigma=self.sigma)
+    self.Zq = IntegerModRing(self.q)
 
-# ppGen
-A = random_matrix(ZZq, n)
+  def pp_gen(self):
+    self.A = random_matrix(self.Zq, self.n, self.n)
 
-# KeyGen
-s = matrix(ZZq, n, k, [D() for _ in range(n*k)])
-e = matrix(ZZq, n, k, [D() for _ in range(n*k)])
-b = s.transpose() * A + e.transpose()
+  def keygen(self):
+    s = matrix(self.Zq, self.n, self.k, [self.D() for _ in range(self.n*self.k)])
+    e = matrix(self.Zq, self.n, self.k, [self.D() for _ in range(self.n*self.k)])
+    b = s.transpose() * self.A + e.transpose()
+    return s, b
 
-# Encrypt k bits m
-m = random_matrix(ZZ, k, x=2)
-print m
+  def encrypt(self, m, pk):
+    x = random_matrix(ZZ, self.n, self.k, x=2)
+    m = zero_matrix(self.Zq, self.n, self.k).stack(m)
+    M = self.A.stack(pk)
+    c = (M*x + m * (self.q//2)) % self.q
+    return c
 
-x = random_matrix(ZZ, n, k, x=2)
-m = zero_matrix(ZZq, n, k).stack(m)
-M = A.stack(b)
-c = (M*x + m * round(q/2)) % q
+  def decrypt(self, c, sk):
+    d = -sk.transpose()
+    d = d.augment(identity_matrix(self.k))
+    m_dec = d * c
+    return m_dec.apply_map(lambda x: 1 if self.q//4 < x and x < (3*self.q)//4 else 0)
 
-# Decrypt
-d = -s.transpose()
-d = d.augment(identity_matrix(k))
-m_dec = d * c
 
-f = lambda x: 1 if round(q/4) < x and x < round(3*q/4) else 0
-print m_dec.apply_map(f)
+dimension = 150
+packing = 4
+message = random_matrix(ZZ, packing, x=2)
+
+scheme = pke_multibit(dimension, packing)
+scheme.pp_gen()
+sk, pk = scheme.keygen()
+c = scheme.encrypt(message, pk)
+m_dec = scheme.decrypt(c, sk)
+
+print message
+print m_dec

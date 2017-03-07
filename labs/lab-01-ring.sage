@@ -1,31 +1,42 @@
 from sage.stats.distributions.discrete_gaussian_polynomial import DiscreteGaussianDistributionPolynomialSampler
 
-# Init, set dimension
-n = 16
-q = next_prime(n^2)
-sigma = sqrt(n/(2*pi.n()))
+class pke_ring():
+  def __init__(self, dimension):
+    self.n = dimension
+    self.q = next_prime(self.n^2)
+    self.sigma = sqrt(self.n/(2*pi.n()))
+    Zq = IntegerModRing(self.q)
+    self.Rq = PolynomialRing(Zq, 'x').quotient_ring(x^dimension+1)
+    self.P = DiscreteGaussianDistributionPolynomialSampler(self.Rq, self.n, self.sigma)
 
-ZZq = ZZ.quotient(q*ZZ)
-Rq.<x> = ZZq['x'].quotient_ring(x^n+1)
-P = DiscreteGaussianDistributionPolynomialSampler(Rq, n, sigma)
+  def pp_gen(self):
+    self.a = self.Rq.random_element()
 
-# ppGen
-a = Rq.random_element()
+  def keygen(self):
+    s = self.P()
+    e = self.P()
+    b = s * self.a + e
+    return s, b
 
-# KeyGen
-s = P()
-e = P()
-b = s * a + e
+  def encrypt(self, m, pk):
+    r = self.P()
+    c = (self.a*r + self.P(), pk*r + self.P() + self.Rq(m) * (self.q//2))
+    return c
 
-# Encrypt bit m
-m = Rq([randint(0, 1) for _ in range(n)])
-print m
+  def decrypt(self, c, sk):
+    m_dec = c[1] - sk * c[0]
+    return map(lambda x: 1 if self.q//4 < x and x < (3*self.q)//4 else 0, m_dec.list())
 
-r = P()
-c = (a*r + P(), b*r + P() + Rq(m) * round(q/2))
+dimension = 16
+message = [randint(0, 1) for _ in range(dimension)]
 
-# Decrypt
-m_dec = c[1] - s * c[0]
-f = lambda x: 1 if round(q/4) < x and x < round(3*q/4) else 0
-print Rq(map(f, m_dec.list()))
+scheme = pke_ring(dimension)
+scheme.pp_gen()
+sk, pk = scheme.keygen()
+c = scheme.encrypt(message, pk)
+m_dec = scheme.decrypt(c, sk)
+
+print message
+print m_dec
+
 
