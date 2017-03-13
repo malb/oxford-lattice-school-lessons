@@ -291,7 +291,7 @@ sol[:8]
 - preprocessing :: the more reduced the basis, the faster enumeration
 - complexity :: $d^{\Theta(d)}$, but fastest in practice.
 
-* BKZ
+* BKZ Refresher
 ** BKZ
 
 - Input basis is LLL reduced, the *first block* is $\vec{b}_1,\dots,\vec{b}_{β}$.
@@ -312,7 +312,9 @@ sol[:8]
 
 *** 
 
-fullcite:PhD:Chen13, implementation: https://github.com/fplll/fplll
+fullcite:PhD:Chen13,
+url: https://www.nofile.io/f/PvRtI1VlkJ,
+implementation: https://github.com/fplll/fplll
 
 ** root-Hermite Factors
 
@@ -729,9 +731,15 @@ Let’s find it.
 - Any algorithm which can solve κ-HSVP, such as a lattice reduction algorithm, can be used linearly many times to solve \(γ\)-uSVP with approximation factor $γ=κ^2$.footfullcite:Lovasz86
 - Whenever $κ > \sqrt{d}$ then any algorithm solving κ-HSVP can be used to solve γ-uSVP for $γ ≈ \sqrt{d} κ$.footfullcite:ISIT:LLLS11
 
+#+BEAMER: \pause
+
+*** In practice
+
+Algorithms behave better.
+
 ** Success Condition (2008)
 
-In practice, algorithms behave better. Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^d\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
+Lattice reduction is expected/observed footfullcite:EC:GamNgu08 to succeed if \[λ_2/λ_1 ≥ τ ⋅ δ_0^d\] where \(τ ≈ 0.3\) is a constant that depends on the algorithm.
 
 ** Success Condition (2013, 2016)
 
