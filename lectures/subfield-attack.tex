@@ -1,4 +1,4 @@
-% Created 2017-03-03 Fri 18:16
+% Created 2017-03-13 Mon 13:33
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation,smaller]{beamer}
 \RequirePackage{etex}
@@ -216,10 +216,13 @@ urlcolor=gray
 \end{frame}
 
 
-\section{Introduction}
-\label{sec:orgea42ddb}
+\begin{frame}[label={sec:org23e67ac}]{}
+\fullcite{EPRINT:AlbBaiDuc16}
+\end{frame}
 
-\begin{frame}[label={sec:orgfb2f314}]{NTRUEncrypt}
+\section{Introduction}
+\label{sec:org08df278}
+\begin{frame}[label={sec:orgb6b6515}]{NTRUEncrypt}
 \begin{description}
 \item[{Key Generation}] \(\cR = \Z[X]/(X^n+1)\), modulus \(q\), width parameter \(σ\)
 \begin{itemize}
@@ -247,7 +250,7 @@ urlcolor=gray
 \end{itemize}}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orge7bdbde}]{The NTRU lattice \(\Lambda^q_h\)}
+\begin{frame}[fragile,label={sec:orge0e2de7}]{The NTRU lattice \(\Lambda^q_h\)}
  \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 sage: K.<zeta> = CyclotomicField(8)
@@ -280,7 +283,7 @@ sage: block_matrix([[1, H],[0, q]])
 \end{small}
 \end{frame}
 
-\begin{frame}[label={sec:org85750ea}]{The NTRU lattice \(\Lambda^q_h\)}
+\begin{frame}[label={sec:orgbea7c1b}]{The NTRU lattice \(\Lambda^q_h\)}
 \begin{itemize}
 \item The lattice \(\Lambda^q_h\) defined by an NTRU instance for parameters \(\cR, q, σ\) has dimension \(2n\) and volume \(q^n\).
 \item If \(h\) were uniformly random, the Gaussian heuristic predicts that the shortest vectors of \(\Lambda_h^q\) have norm \(≈ \sqrt{n q}\).
@@ -288,14 +291,14 @@ sage: block_matrix([[1, H],[0, q]])
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org17dfeb5}]{NTRU}
+\begin{frame}[label={sec:orgfcde42e}]{NTRU}
 \begin{definition}[NTRU Assumption]
 It is hard to find a short vector in the \cR-module \[\Lambda_h^q = \{(x,y) \in \cR^2 \text{ s.t. } hx - y = 0 \bmod q\}\]
 with \(\cR = \Z[X]/(P(X))\) and the promise that a short solution \((f,g)\) — the private key — exists.\footfullcite{HofPipSil96} \footfullcite{HofPipSil98}
 \end{definition}
 \end{frame}
 
-\begin{frame}[label={sec:org6a11e82}]{NTRU Applications}
+\begin{frame}[label={sec:org160b35a}]{NTRU Applications}
 The NTRU assumption has been utilised for
 
 \begin{itemize}
@@ -305,7 +308,7 @@ The NTRU assumption has been utilised for
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org7b4f2bb}]{Lattice Attacks}
+\begin{frame}[label={sec:org0f239a3}]{Lattice Attacks}
 \begin{itemize}
 \item Recovering a short enough vector of some target norm \(τ\), potentially longer than \((f,g)\), is sufficient for an attack.\footfullcite{EC:CopSha97}
 
@@ -315,7 +318,7 @@ The NTRU assumption has been utilised for
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org0353fcd}]{Best Attacks}
+\begin{frame}[label={sec:org1eb6ca4}]{Best Attacks}
 \begin{description}
 \item[{Practical}] combined lattice-reduction and meet-in-the-middle attack \footfullcite{HofSilWhy06} of Howgrave-Graham. \footfullcite{C:HowgraveGraham07} \footfullcite{EPRINT:Wunderer16}
 
@@ -324,9 +327,9 @@ The NTRU assumption has been utilised for
 \end{frame}
 
 \section{Preliminaries}
-\label{sec:org52288f7}
+\label{sec:org9253576}
 
-\begin{frame}[label={sec:org045e7ab}]{Cyclotomic Number Fields and Subfields}
+\begin{frame}[label={sec:orgcecd824}]{Cyclotomic Number Fields and Subfields}
 \begin{itemize}
 \item I’ll focus on Cyclotomic number rings of degree \(n = 2^k\) for ease of exposure, but everything can be made general.
 
@@ -342,7 +345,7 @@ The NTRU assumption has been utilised for
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org320437c}]{Geometry}
+\begin{frame}[label={sec:org760b88e}]{Geometry}
 The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[\langle a , b\rangle = \sum_{i=0}^{n-1} a_i ⋅ b_i.\] 
 
 \begin{itemize}
@@ -350,18 +353,18 @@ The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[
 
 \item We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max |a_i|.\]
 
-\item It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
+\item It holds that \(\| a⋅b \| ≤ \sqrt{n} ⋅ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ \sqrt{n}^{r-1} {|a|}^r ≤ \sqrt{n}^{r-1} {\|a\|}^r.\]
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}[label={sec:org6390a05}]{Lattice Reduction}
+\begin{frame}[label={sec:orgb5003c2}]{Lattice Reduction}
 Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(Λ)\] for a computational cost \[\poly \cdot 2^{\Theta(\beta)},\] with \(λ_1(Λ)\) the length of a shortest vector of \(Λ\).\footfullcite{AC:CheNgu11}
 \end{frame}
 
 \section{Subfield Lattice Attack}
-\label{sec:org820daf2}
-\begin{frame}[label={sec:org16235ab}]{Overview}
+\label{sec:org6df4c2a}
+\begin{frame}[label={sec:org35fc3e2}]{Overview}
 \begin{displaymath} 
   \xymatrix{
     \K = \Q(ζ_m)   & & & \\
@@ -373,7 +376,7 @@ Lattice reduction algorithms produce vectors of length \[β^{Θ(n/β)} ⋅ λ_1(
 \end{displaymath}
 \end{frame}
 
-\begin{frame}[label={sec:orgb33a85a}]{1. Norming Down}
+\begin{frame}[label={sec:orgb4aae10}]{1. Norming Down}
 Define \(f' = \Norm_{\K/\L}(f)\), \(g' = \Norm_{\K/\L}(g)\), and  \(h' = \Norm_{\K/\L}(h)\), then \((f',g')\) is a vector of \(\Lambda^q_{h'}\) and it may be an unusually short one.
 
 \begin{table}[htbp]
@@ -389,13 +392,13 @@ Define \(f' = \Norm_{\K/\L}(f)\), \(g' = \Norm_{\K/\L}(g)\), and  \(h' = \Norm_{
 \end{table}
 \end{frame}
 
-\begin{frame}[label={sec:org4c0c881}]{1. Norming Down}
+\begin{frame}[label={sec:org81f26ab}]{1. Norming Down}
 We assume that the following lemma holds also for all reasonable distributions considered in cryptographic constructions:
 
 Let \(f\) be sampled from spherical Gaussians of variance \(\sigma^2\). Then, \[\|f'\| \leq {\sqrt{n}}^{r-1} ⋅ {\|f\|}^r\]
 \end{frame}
 
-\begin{frame}[label={sec:orgc29170b}]{2. Lattice Reduction in the Subfield}
+\begin{frame}[label={sec:orgcc9c6e0}]{2. Lattice Reduction in the Subfield}
 Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain a vector \((x',y') ∈ Λ_{h'}^q\) with
 
 \begin{tikzpicture}
@@ -426,7 +429,7 @@ Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}[label={sec:org479526c}]{The Right Kind of \((x',y')\)}
+\begin{frame}[label={sec:org74fda9c}]{The Right Kind of \((x',y')\)}
 \((x',y')\) is a solution in the subfield, how could that be useful?
 
 \pause
@@ -437,7 +440,7 @@ Run lattice reduction with block size \(β\) on lattice \(Λ_{h'}^q\), to obtain
 \end{enumerate}
 \end{frame}
 
-\begin{frame}[label={sec:org372573e}]{\((x',y') = v ⋅ (f',g')\)}
+\begin{frame}[label={sec:org3e33e14}]{\((x',y') = v ⋅ (f',g')\)}
 \begin{theorem}
 Let \(f',g' \in \cR'\) be such that \(⟨ f'⟩\) and \(⟨ g'⟩\) are coprime ideals and that \(h'⋅ f' = g' \bmod q\) for some \(h' \in \cR'\). If \((x',y') \in Λ_{h'}^q\) has length verifying
 \[\|(x',y') \| < \frac q {\|(f',g')\|},\]
@@ -445,7 +448,7 @@ then \((x',y') = v ⋅ (f',g')\) for some \(v ∈ \cR'\).
 \end{theorem}
 \end{frame}
 
-\begin{frame}[label={sec:orgec191e6}]{3. Lifting the Short Vector}
+\begin{frame}[label={sec:orgbfcf50a}]{3. Lifting the Short Vector}
 To lift the solution from the sub-ring \(\cR'\) to \(\cR\) compute \((x,y)\) as
 \begin{itemize}
 \item \(x = L(x')\)  and
@@ -454,7 +457,7 @@ To lift the solution from the sub-ring \(\cR'\) to \(\cR\) compute \((x,y)\) as
 where \(L\) is the canonical inclusion map.
 \end{frame}
 
-\begin{frame}[label={sec:org9d13319}]{Performance}
+\begin{frame}[label={sec:org500624a}]{Performance}
 Can solve in time complexity \(\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}\) when
 
 \begin{itemize}[<+->]
@@ -464,11 +467,9 @@ Can solve in time complexity \(\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}\) when
 \end{frame}
 
 
-\begin{frame}[label={sec:org5ae2a28}]{Fin}
+\begin{frame}[standout,label={sec:orgb817750}]{Fin}
 \begin{center}
 \Huge \alert{Thank You}
 \end{center}
-
-\fullcite{EPRINT:AlbBaiDuc16}
 \end{frame}
 \end{document}
