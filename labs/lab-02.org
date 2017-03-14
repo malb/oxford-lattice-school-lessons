@@ -18,9 +18,9 @@ In this lab, we will make intensive use of Fplll[fn:1] and Fpylll[fn:2]. Fplll i
 
 Fpylll is a Python wrapper and extension of Fplll, making its data structures and algorithms available in Python and Sage (7.4 and greater). It also (re-)implements some algorithms in Python to make their internals easily accessible, a feature we will make use of.
 
-*Note:* Both Fplll and Fpylll are evolving software projects. In particular, the current development versions of either library offer improvements over the latest stable released shipped with Sage. Thus, using Fpylll from within Sage and compiling your own version outside of Sage from GitHub will be different. We recommend, if at all possible, to use the latest development version.[fn:3]
+*Note:* Both Fplll and Fpylll are evolving software projects. In particular, the current development versions of either library offer improvements over the latest stable released shipped with Sage. Thus, using Fpylll from within Sage and using a version compiled by yourself (outside of Sage) from GitHub will be different. We recommend, if at all possible, to use the latest development version.[fn:3]
 
-That both libraries are evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome![fn:4]
+Both libraries being evolving software projects also means that (a) you will encounter bugs and (b) we need your help. For example, you will notice that some functions lack documentation, examples and tests. Contributions welcome![fn:4]
 
 * Introduction
 :PROPERTIES:
@@ -242,11 +242,11 @@ In this exercise, we ask you to verify various predictions made about lattice re
 
 ** root-Hermite factors
 
-Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^n ⋅ \Vol(L)^{1/n}\) where $\delta_0$ is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
+Recall that lattice reduction returns vectors such that \(\|v\| = δ_0^d ⋅ \Vol(L)^{1/d}\) where $\delta_0$ is the root-Hermite factor which depends on the algorith. For LLL it  is \(δ_0≈1.0219\) and for BKZ-\(k\) it is \[δ_0 ≈ \left( \frac{k}{2 π e} (π k)^{\frac{1}{k}}  \right)^{\frac{1}{2(k-1)}}.\] Experimentally measure root-Hermite factors for various bases and algorithms.
 
 ** GS norms & Geometric series assumption
 
-Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^m \det(Λ)^{1/m}\) and \(\det(Λ) = \prod_{i=1}^{m} \|b_i^*\|\) where $m$ is the dimension of the lattice, we get $α = δ^{-2m/(m-1)}$.footfullcite:RSA:LinPei11 Check how well this assumption holds for various block sizes of BKZ.
+Schnorr’s geometric series assumption (GSA) states that the norms of the Gram-Schmidt vectors after lattice reduction satisfy \[\|b_i^*\| = α^{i-1} ⋅ \|b_1\| \textnormal{ for some } 0 < α < 1.\] Combining this with the root-Hermite factor \(\|b_1\| = δ_0^d \det(Λ)^{1/d}\) and \(\det(Λ) = \prod_{i=1}^{d} \|b_i^*\|\) where $d$ is the dimension of the lattice, we get $α = δ^{-2d/(d-1)}$.footfullcite:RSA:LinPei11 Check how well this assumption holds for various block sizes of BKZ.
 
 That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms agains the GSA after each tour. You have several options to get to those norms:[fn:8]
 
@@ -255,6 +255,8 @@ That is, running several tours of BKZ 2.0, plot the logs of Gram-Schmidt norms 
 - Set up BKZ parameters to run one tour only an measure between BKZ calls.
 
 - Inherit from =fpylll.algorithms.bkz2.BKZReduction= and add the functionality to plot after each tour.
+
+To plot, you again have several options.
 
 If you are running from within Sage, you can simply call =line()= to plot, e.g. 
 
@@ -316,6 +318,7 @@ Get your name up here: https://www.latticechallenge.org/lwe_challenge/challenge.
 
 #+BEGIN_EXPORT latex
 \appendix
+\clearpage
 #+END_EXPORT
 
 * Example Solutions                                                   :solution:
@@ -718,7 +721,7 @@ histogram(l, color="#5DA5DA", edgecolor="#5DA5DA", bins=20)
 
 [fn:2] https://github.com/fplll/fpylll
 
-[fn:3] You can install the latest development versions of fplll/fpylll into Sage as well, if you run Sage locally, i.e. not on https://sagemath.com
+[fn:3] You can install the latest development versions of fplll/fpylll into Sage as well, if you run Sage locally, i.e. not on https://sagemath.com.
 
 [fn:4] https://github.com/fplll/fplll/blob/master/CONTRIBUTING.md
 

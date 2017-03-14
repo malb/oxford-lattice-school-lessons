@@ -29,8 +29,11 @@
 
 #+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
 
-* Introduction
+** 
 
+fullcite:EPRINT:AlbBaiDuc16
+
+* Introduction
 ** NTRUEncrypt
 
 - Key Generation :: $\cR = \Z[X]/(X^n+1)$, modulus $q$, width parameter $σ$
@@ -147,7 +150,7 @@ The ring \(\cR\) is viewed as a lattice by endowing it with the inner product \[
 
 - We will make use of the operator's norm \(|\cdot|\) defined by: \[|a| = \sup_{x \in \K^*} \|ax\|/\|x\| = \max |a_i|.\]
 
-- It holds that \(\| a⋅b \| ≤ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ {|a|}^r ≤ {\|a\|}^r.\]
+- It holds that \(\| a⋅b \| ≤ \sqrt{n} ⋅ |a| ⋅ \| b \|\) and \[|\Norm_{\K/\L}(a)| ≤ \sqrt{n}^{r-1} {|a|}^r ≤ \sqrt{n}^{r-1} {\|a\|}^r.\]
 
 
 ** Lattice Reduction
@@ -267,12 +270,13 @@ Can solve in time complexity $\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}$ when
 
 
 ** Fin
+:PROPERTIES:
+:BEAMER_OPT: standout
+:END:
 
 #+BEGIN_CENTER
 \Huge *Thank You*
 #+END_CENTER
-
-fullcite:EPRINT:AlbBaiDuc16
 
 * Build Artefacts                                                     :noexport:
 
