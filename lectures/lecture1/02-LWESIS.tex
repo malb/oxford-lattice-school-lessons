@@ -1,0 +1,169 @@
+%!TEX root = main.tex
+
+\section{The SIS-LWE Framework}
+
+\begin{frame}
+\frametitle{Construction of $q$-ary lattice (Primal / Construction A)}
+
+Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positives integers.
+
+The matrix $\vec A \in \Z_q^{m \times n}$ spans the $q$-ary lattice:
+\begin{align*}
+\Lambda_q(\vec A) := & \,\{\vec x \in \Z^m \, | \, \exists \vec y \in \Z_q^n, \, \vec x \equiv \vec A \vec y \bmod q\}  \\
+= & \,\, \vec A \cdot \Z_q^n + q \Z^m
+\end{align*}
+\begin{exampleblock}{Lattice parameters}
+Assuming $\vec A$ is full-rank:
+\begin{itemize}
+  \item $\dim(\vec A) = m$
+  \item $\vol(\vec A) = q^{m - n}$
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{Construction of $q$-ary lattice (Dual / Parity-Check)}
+
+Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positives integers. \\
+The matrix $\vec A^{\rred t} \in \Z_q^{\rred{n \times m}}$ is the parity-checks the lattice:
+\begin{align*}
+\Lambda_q^\bot(\vec A^{\rred t}) := & \,\{\vec x \in \Z^m \, | \vec A^{\rred t} \vec x \equiv \vec 0 \bmod q\}  \\
+= & \ker (\vec x \mapsto \vec A^{\rred t} \vec x \bmod q) \phantom{\Z_q^n}
+\end{align*}
+\begin{exampleblock}{Lattice parameters}
+Assuming $\vec A$ is full-rank:
+\begin{itemize}
+  \item $\dim(\vec A) = m$
+  \item $\vol(\vec A) = q^{\rred n}$
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Short Integer Solution Problem (SIS)}
+\begin{definition}[SIS assumption]
+  Given a random matrix 
+  Finding a small non-zero $\vec x \in \Z_q^n$ such that $\vec A \vec x \equiv \vec 0 \bmod q$ is {\bf hard}. \\
+\end{definition}
+\begin{exampleblock}{Lattice formulation}
+  Solving Approx-SVP in $\Lambda_q^\bot(\vec A^t)$ is {\bf hard}.
+\end{exampleblock}
+\pause
+\end{frame}
+
+\begin{frame}
+\frametitle{Simple application of SIS}
+Set $\mathcal S = \{0, 1\}^m$ and consider the function:
+\[
+  f_{\vec A}: \mathcal S \rightarrow \Z_q^n, \qquad \vec x \mapsto \vec A^t \vec x \bmod q
+\]
+
+\begin{exampleblock}{SIS $\Rightarrow$ Collision Resistant Hashing and One-Way Function}
+  \begin{itemize}
+    \item Finding collision\footnote{Collision must exist whenever $m > n \log_2 q$} is as hard as SIS \hfill {\scriptsize (take the difference)}
+  \end{itemize}
+  Moreover, if $m \gg n \log q$:
+  \begin{itemize}
+    \item $f_{\vec A}$ is highly surjective \hfill {\scriptsize (many pre-images exists)}
+    \item Finding pre-images is hard.
+  \end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Learning With Error problem (LWE)}
+Let $\chi$ be a distribution of small errors $\ll q$. 
+\begin{definition}[Decisional LWE]
+For $\vec A \gets \Z_q^{m \times n}$, $\vec s \gets \Z_q^{n}$, $\bblue{\vec e} \gets \chi^m$, \\ distinguishing $(\vec A, \vec A \vec s + \bblue{\vec e})$ from uniform is hard.
+\end{definition}
+\begin{definition}[Search LWE]
+For $\vec A \gets \Z_q^{m \times n}$, $\vec s \gets \Z_q^{n}$, $\bblue{\vec e} \gets \chi^m$, \\ given $(\vec A, \vec A \vec s + \bblue{\vec e})$, finding $\vec s$ is hard.
+\end{definition}
+Both problems are easily proved equivalent.
+\pause
+\begin{exampleblock}{Lattice formulation}
+  Solving BDD in $\Lambda_q(\vec A)$ is {\bf hard}.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{Simple application of LWE}
+Set $\mathcal S = \{-\sigma, \dots \sigma\}^m$ and consider the function:
+\[
+  g_{\vec A}: \Z_q^n \times \mathcal S \rightarrow \Z_q^m, \qquad (\vec s, \bblue{\vec e}) \mapsto \vec A \vec s + \bblue{\vec e} \bmod q
+\]
+
+\begin{exampleblock}{LWE $\Rightarrow$ Secret-Key Encryption}
+  Idea : Noisy one-time pad
+  \begin{itemize}
+    \item $Enc_{\vec s}(m\in\{0,1\} ) = (\vec a,\vec a^t \vec s + e + \lfloor \frac q 2 \rceil m)$ 
+    \item $Dec_{\vec s}(\vec a, b ) = \lfloor \frac 2 q (b - \vec a^t \vec s) \rfloor \bmod 2$ 
+  \end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{Public Key Encryption, [Regev, 2009]}
+$m \gg n \log q$.
+\begin{itemize}
+  \item $SK = \vec s \in \Z_q^m$
+  \item $PK = (\vec A; \vec b = \vec A \vec s + \bblue{\vec e}) \in \Z_q^{(n+1) \times m}$
+  \item $Enc(m) = (\bblue{\vec t^t} \cdot \vec A, \bblue{\vec t^t} \cdot \vec b + \lfloor \frac q 2 \rceil m + e)$, where $\vec t \gets \{0,1\}^{n+1}$
+  \item $Dec(\vec x^t, y):$ Compute $d = y - \vec x^t \vec s = \bblue{\vec t^t} \bblue{\vec e} + e + \lfloor \frac q 2 \rceil m$, return
+   $m = \lfloor \frac 2 q d \rfloor \bmod 2$
+\end{itemize}
+\pause
+\begin{exampleblock}{Proof sketch for CPA security}
+\begin{itemize}
+  \item Replace PK by uniform random $(\vec A, \vec b)$
+  \item Apply the left-over hash lemma on $\vec t$ over $(\mat A, \vec b)$
+  \item $Enc(m)$ is staitistically close to uniform.
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{PKE / Approx. Key-Exchange [Lindner Peikert 2011]}
+Using a Systematic-Normal form, one can assume that $\bblue{\vec s} \gets \chi^n$ is small as well.
+Take $m = n$.
+
+\begin{itemize}
+  \item $PK = \vec s \in \Z_q^n$
+  \item $SK = (\vec A; \vec b = \vec A \bblue{\vec s} + \bblue{\vec e}) \in \Z_q^{(n+1) \times n}$
+  \item $Enc(m) = (\vec A^t \bblue{\vec s'} + \bblue{\vec e'}, \vec b^t \bblue{\vec s'} + \bblue{\vec e'} + \bblue e + \lfloor \frac q 2 \rceil m)$
+
+  \item $Dec(\vec x, y):$ Compute $d = y - \vec x^t \vec s = \bblue{\vec s^t} \bblue{\vec e'} + \bblue{\vec s'^t} \bblue{\vec e} + e + \lfloor \frac q 2 \rceil m$, return
+   $m = \lfloor \frac 2 q d \rfloor \bmod 2$
+\end{itemize}
+\pause
+\begin{exampleblock}{Proof sketch for CPA security}
+\begin{itemize}
+  \item Replace PK by uniform random by LWE assumptuion
+  \item Replace $Enc(m)$  by uniform random by LWE assumptuion
+\end{itemize}
+\end{exampleblock}
+Can also be made an approximate key Exchange.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Chosen-Ciphertext Secure ?}
+Is the above CCA-secure ?
+\begin{alertblock}{ NO !}
+\end{alertblock}
+Generic Transform to CCA security in the Random Oracle Model?
+\pause
+\begin{exampleblock}{Yes}
+Correctness needs to hold with overwhelming probability. 
+\end{exampleblock}
+\pause
+And in the plain Model ?
+\begin{exampleblock}{Yes}
+But costly: requires Trapdoors (e.g [Micciancio Peikert 2012])
+Open question: Cramer-Shoup for lattices ?
+\end{exampleblock}
+
+
+
+\end{frame}
