@@ -23,6 +23,24 @@
 
 \begin{frame}
 \frametitle{Constructing a {\bf pseudorandom} lattice with a good basis}
+\begin{definition}[The Matrix-NTRU assumption]
+  For two small matrices $\bblue{\vec F}, \bblue{\vec G} \gets \chi^{n \times n}$, set $\vec H = \vec F\vec G^{-1} \bmod q$. \\
+  Distinguishing $\vec H$ from uniform is hard.
+\end{definition}
+\pause
+\begin{alertblock}{Do not overstreched !}
+  Recently discovered to be significantly weaker than LWE/RingLWE for certain regime of parameters. \hfill cf. Thursday.
+\end{alertblock}
+\pause
+
+\begin{itemize}
+  \item $(\bblue{\vec F}, \bblue{\vec G})$ is a good partial basis of the lattice.
+  \item It can be completed into a full good basis. {\scriptsize optimal params in [D. Prest Lyubashevski 2013]}
+  \item  $\vec H$ provably uniform for midly large $\bblue{\vec F}, \bblue{\vec G}$ [Stehle Steinfeld 2012]
+\end{itemize}
+
+
+
 
 
 
