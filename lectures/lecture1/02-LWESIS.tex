@@ -5,7 +5,7 @@
 \begin{frame}
 \frametitle{Construction of $q$-ary lattice (Primal / Construction A)}
 
-Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positives integers.
+Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positive integers.
 
 The matrix $\vec A \in \Z_q^{m \times n}$ spans the $q$-ary lattice:
 \begin{align*}
@@ -24,8 +24,8 @@ Assuming $\vec A$ is full-rank:
 \begin{frame}
 \frametitle{Construction of $q$-ary lattice (Dual / Parity-Check)}
 
-Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positives integers. \\
-The matrix $\vec A^{\rred t} \in \Z_q^{\rred{n \times m}}$ is the parity-checks the lattice:
+Let $q$ be a prime\footnote{Not necessarly, but simpler.} integer, and $n < m$ two positive integers. \\
+The matrix $\vec A^{\rred t} \in \Z_q^{\rred{n \times m}}$ is the parity-check of the lattice:
 \begin{align*}
 \Lambda_q^\bot(\vec A^{\rred t}) := & \,\{\vec x \in \Z^m \, | \vec A^{\rred t} \vec x \equiv \vec 0 \bmod q\}  \\
 = & \ker (\vec x \mapsto \vec A^{\rred t} \vec x \bmod q) \phantom{\Z_q^n}
@@ -43,7 +43,7 @@ Assuming $\vec A$ is full-rank:
 \begin{frame}
 \frametitle{The Short Integer Solution Problem (SIS)}
 \begin{definition}[SIS assumption]
-  Given a random matrix 
+  Given a random matrix $\vec A$ \\
   Finding a small non-zero $\vec x \in \Z_q^n$ such that $\vec A \vec x \equiv \vec 0 \bmod q$ is {\bf hard}. \\
 \end{definition}
 \pause
