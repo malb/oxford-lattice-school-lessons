@@ -177,7 +177,7 @@ If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It wo
 
 \subsection{Public-key Encryption --- multi-bit}
 
-To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext.\footfullcite{CCS:BCDMNN16} In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a factor $k$ expansion in the size of the keys and ciphertexts.
+To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext.\footfullcite{RSA:LinPei11}\footfullcite{EPRINT:ding12}\footfullcite{CCS:BCDMNN16} In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a factor $k$ expansion in the size of the keys and ciphertexts.
 
 \malb{This is older than Frodo, no?}
 
@@ -187,7 +187,7 @@ The generalization of the scheme is quite straightforward. The operations remain
 
 \subsection{Public-key encryption --- ring setting}
 
-As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to an ideal lattice. For this, we will work in a polynomial ring, e.g.~$R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
+As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to the ring setting. For this, we will work in a polynomial ring, e.g.~$R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
 
 In this setting, the scheme is adapted as follow:
 \begin{itemize}
