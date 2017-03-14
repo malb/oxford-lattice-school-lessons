@@ -7,7 +7,7 @@
 {\bf Sign}
 \begin{itemize}
   \item Hash the message to a random vector $\ppurple{\vec m}$.
-  \item apply \textsc{NearestPlane} with a good basis $\bblue{\vec G}$: \\
+  \item apply \textsc{GaussianSampling} with a good basis $\bblue{\vec G}$: \\
     \quad find $\oorange{\vec s} \in L$ close to $\ppurple{\vec m}$ .
 \end{itemize}
 \vspace{.2cm}
@@ -16,39 +16,75 @@
   \item check that $\oorange{\vec s} \in L$ using the bad basis $\rred{\vec B}$
     \item and that $\ppurple{\vec m}$ is close to $\oorange{\vec s}$.
 \end{itemize}
-\vspace{.2cm}
-\includegraphics{tikz_goodbadSIGN.pdf}
+
+
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Constructing a {\bf pseudorandom} lattice with a good basis}
+\frametitle{Ad-hoc construction of lattices with a good basis}
 \begin{definition}[The Matrix-NTRU assumption]
   For two small matrices $\bblue{\vec F}, \bblue{\vec G} \gets \chi^{n \times n}$, set $\vec H = \vec F\vec G^{-1} \bmod q$. \\
-  Distinguishing $\vec H$ from uniform is hard.
-\end{definition}
+  Distinguishing $\vec H$ from uniform is hard.\footnote{$\vec H$ is provably uniform for midly large $\bblue{\vec F}, \bblue{\vec G}$ [Stehle Steinfeld 2012]}
 \pause
 \begin{alertblock}{Do not overstreched !}
-  Recently discovered to be significantly weaker than LWE/RingLWE for certain regime of parameters. \hfill cf. Thursday.
+  Can be much weaker than (Ring) LWE for large $q$. \\
+   cf. Thursday : [A. Bai D. 2016, Kirchner Fouque 2016]
 \end{alertblock}
+
+\end{definition}
 \pause
 
 \begin{itemize}
   \item $(\bblue{\vec F}, \bblue{\vec G})$ is a good partial basis of the lattice.
-  \item It can be completed into a full good basis. {\scriptsize optimal params in [D. Prest Lyubashevski 2013]}
-  \item  $\vec H$ provably uniform for midly large $\bblue{\vec F}, \bblue{\vec G}$ [Stehle Steinfeld 2012]
+  \item It can be completed into a full good basis. \\ optimal parameters studied in [D. Prest Lyubashevski 2013]\footnote{IMHO: Precise parameter proposal not conservative enough}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Provably secure construction of lattices with a good basis}
+SoA: [Micciancio Peikert 2012] ``Simpler, Tighter, Faster, Smaller''.
+\begin{itemize}
+  \item Define a Gadget matrix $\vec G = [\vec I, 2\vec I, 4\vec I, \dots 2^k \vec I]$
+  \item Start from a truly random matrix $\vec A$
+  \item Extend $\vec A$ to $\vec A' = [\vec A | \vec R \vec A + \vec G]$ for a small matrix $\vec R$
+  \item $\vec A'$ is statistically uniform {\hfill \small (leftover hash lemma)}
+  \item $\vec R$ provides a good basis of $\Lambda^\bot(\vec A)$
 \end{itemize}
 
-
-
-
-
+\begin{itemize}
+\item[+] Many extensions (tags, basis delegation)
+\item[+] Very convenient for advanced crypto
+\item[--] Cumbersome for basic crypto
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Constructing a {\bf random} lattice with a good basis}
+\frametitle{Good Gaussian Sampling in Practice ?}
+\begin{itemize}
+  \item[+] Leads to the most compact lattice signature schemes
+  \item[+] Good asymptotic complexity \hfill{\scriptsize FFO [D. Prest 2016]}
+  \item[--] Requires Floating-Point Arithmetic
+\end{itemize}
+\vspace{.5cm}
+\pause
+Not so studied in practice so far \dots \\
+{\bf Wide impact:} signatures, homomorphic signatures, IBE, ABE, \dots
 
+\end{frame}
 
+\begin{frame}
+\frametitle{Solution 2: Fiat-Shamir transform}
 
+{\bf Idea: } [Lyubashevski, \dots, BLISS, TESLA] 
+\begin{itemize}
+  \item Prove knowledge of a short vector without revealing it 
+\end{itemize}
+
+\begin{itemize}
+  \item[+] No need for a full basis
+  \item[+] Sampling potentially simpler
+  \item[--] Larger signatures.
+\end{itemize}
 \end{frame}
