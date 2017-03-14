@@ -58,7 +58,7 @@ Therefore, it is somehow equivalent that
 \pause
 \begin{alertblock}{LLL-reduced basis (rule of thumb)}
 \vspace{-.5cm}
-  \[\kappa(\bblue{\vec G}) \approx (1.08)^{d}, \qquad \max_i \|\bblue{\vec g_i^\star}\| \approx (1.04)^d \cdot \vol(\Lambda)^{1/d}. \]
+  \[\kappa(\bblue{\vec G}) \approx (1.04)^{d}, \qquad \max_i \|\bblue{\vec g_i^\star}\| \approx (1.02)^d \cdot \vol(\Lambda)^{1/d}. \]
 \vspace{-.5cm}
 \end{alertblock}
 
@@ -83,10 +83,7 @@ Each Basis defines a {\bf parallelepipedic tiling}.
 \begin{frame}
 \frametitle{Round'off Algorithm}
 \begin{tabular}{ccc}
-\only<1-3>{\includegraphics{tikz_ro1.pdf}}
-\only<4->{\includegraphics{tikz_ro4.pdf}}
-
-& \raisebox{2cm}{
+\only<1-3>{\includegraphics{tikz_ro1.pdf}}\only<4->{\includegraphics{tikz_ro4.pdf}} & \raisebox{2cm}{
 $\begin{matrix}
 \uncover<2->{\times {\vec B}^{-1}} \\
 \longrightarrow \\
@@ -97,10 +94,7 @@ $\begin{matrix}
 \end{matrix}
 $}
 &
-\uncover<2->{
-  \only<1-2>{\includegraphics{tikz_ro2.pdf}}
-  \only<3->{\includegraphics{tikz_ro3.pdf}}  
- }
+\uncover<2->{\only<1-2>{\includegraphics{tikz_ro2.pdf}}\only<3->{\includegraphics{tikz_ro3.pdf}}}
 \end{tabular}
 \textsc{RoundOff} Algorithm [Lenstra,Babai]:
 \begin{itemize}
@@ -214,7 +208,7 @@ the distribution $\vec s - \vec m$ can be made {\bf independent} of $\bblue{\vec
   {\scriptsize Slow and memory heavy, even in the {\bf ring-setting} (NTRU, Ring-LWE)}
   \item{} [Peikert 2010] \\
   {\scriptsize Faster and less memory, but worse quality}
-  \item{} [DucPre15] (Fast Fourier Orthogonalization) \\
+  \item{} [D. Prest 15] (Fast Fourier Orthogonalization) \\
   {\scriptsize Fast and good quality for certain rings}
 
 \end{itemize}

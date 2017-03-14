@@ -1,0 +1,36 @@
+%!TEX root = main.tex
+
+\section{Signatures are tricky}
+
+\begin{frame}
+\frametitle{Solution 1: Hash-Then-Sign}
+{\bf Sign}
+\begin{itemize}
+  \item Hash the message to a random vector $\ppurple{\vec m}$.
+  \item apply \textsc{NearestPlane} with a good basis $\bblue{\vec G}$: \\
+    \quad find $\oorange{\vec s} \in L$ close to $\ppurple{\vec m}$ .
+\end{itemize}
+\vspace{.2cm}
+{\bf Verify}
+\begin{itemize}
+  \item check that $\oorange{\vec s} \in L$ using the bad basis $\rred{\vec B}$
+    \item and that $\ppurple{\vec m}$ is close to $\oorange{\vec s}$.
+\end{itemize}
+\vspace{.2cm}
+\includegraphics{tikz_goodbadSIGN.pdf}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Constructing a {\bf pseudorandom} lattice with a good basis}
+
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Constructing a {\bf random} lattice with a good basis}
+
+
+
+\end{frame}

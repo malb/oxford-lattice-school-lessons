@@ -1,0 +1,82 @@
+%!TEX root = main.tex
+
+\section{Encryption is easy}
+
+\begin{frame}
+\frametitle{Encryption is easy}
+
+{\bf Idea:}
+\begin{itemize}
+  \item Use one short lattice vector {\hfill \scriptsize(rather than a full good basis $\bblue{\vec B}$)}
+  \item This short vector is easy to hide: LWE as unique-SVP
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Public Key Encryption, [Regev 2005]}
+$m \gg n \log q$.
+\begin{itemize}
+  \item $SK = \vec s \in \Z_q^m$
+  \item $PK = (\vec A; \vec b = \vec A \vec s + \bblue{\vec e}) \in \Z_q^{(n+1) \times m}$
+  \item $Enc(m) = (\bblue{\vec t^t} \cdot \vec A, \bblue{\vec t^t} \cdot \vec b + \lfloor \frac q 2 \rceil m + e)$, where $\vec t \gets \{0,1\}^{n+1}$
+  \item $Dec(\vec x^t, y)$ Compute \[d = y - \vec x^t \vec s = \bblue{\vec t^t} \bblue{\vec e} + e + \lfloor \frac q 2 \rceil m\] and return
+   $m = \lfloor \frac 2 q d \rfloor \bmod 2$
+\end{itemize}
+\pause
+\begin{exampleblock}{Proof sketch for CPA security}
+\begin{itemize}
+  \item Replace PK by uniform random $(\vec A, \vec b)$
+  \item Apply the left-over hash lemma on $\vec t$ over $(\vec A, \vec b)$
+  \item $Enc(m)$ is statistically close to uniform.
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{PKE / Approx. Key-Exchange [Lindner Peikert 2011]}
+Using a Systematic-Normal form, one can assume that $\bblue{\vec s} \gets \chi^n$ is small as well.
+Take $m = n$.
+
+\begin{itemize}
+  \item $PK = \vec s \in \Z_q^n$
+  \item $SK = (\vec A; \vec b = \vec A \bblue{\vec s} + \bblue{\vec e}) \in \Z_q^{(n+1) \times n}$
+  \item $Enc(m) = (\vec A^t \bblue{\vec s'} + \bblue{\vec e'}, \vec b^t \bblue{\vec s'} + \bblue{\vec e'} + \bblue e + \lfloor \frac q 2 \rceil m)$
+
+  \item $Dec(\vec x, y):$ Compute \[d = y - \vec x^t \vec s = \bblue{\vec s^t} \bblue{\vec e'} + \bblue{\vec s'^t} \bblue{\vec e} + e + \lfloor \frac q 2 \rceil m\] and return
+   $m = \lfloor \frac 2 q d \rfloor \bmod 2$
+\end{itemize}
+\pause
+\begin{exampleblock}{Proof sketch for CPA security}
+\begin{itemize}
+  \item Replace PK by uniform random by LWE assumptuion
+  \item Replace $Enc(m)$  by uniform random by LWE assumptuion
+\end{itemize}
+\end{exampleblock}
+Can also be made an approximate key Exchange.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Chosen-Ciphertext Secure ?}
+
+Are the above CCA-secure ?
+\begin{alertblock}{NO !}
+It is Additively Homomorphic therefore can't be CCA2. \\
+CCA1 attacks left as an exercise.\footnote{Toy with the error and see if Dec. fails}
+\end{alertblock}
+
+Generic Transform to CCA security in the Random Oracle Model ?
+\pause
+\begin{exampleblock}{Yes [Peikert 2013]}
+Correctness needs to hold with overwhelming probability. 
+\end{exampleblock}
+\pause
+And in the plain Model ?
+\begin{exampleblock}{Yes}
+But costly: requires Trapdoors (e.g [Micciancio Peikert 2012])
+Open question: Cramer-Shoup for lattices ?
+\end{exampleblock}
+
+
+
+\end{frame}
