@@ -449,6 +449,10 @@ The log of the time complexity for running BKZ to achieve a root-Hermite factor 
 \end{align*}
 #+END_EXPORT
 
+** Here’s a Picture of a Kitten
+
+[[./kitten-01.jpg]]
+
 * LWE
 ** Learning with Errors
 
@@ -702,6 +706,10 @@ fullcite:EPRINT:ACFFP12
 
 fullcite:EPRINT:GuoJohSta16a
 
+** Here’s a Picture of a Kitten
+
+[[./kitten-02.jpg]]
+
 * Primal Lattice Attack (uSVP Version)
 ** Bounded Distance Decoding and unique SVP
 
@@ -807,8 +815,6 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 - Rescale the first part to have the same norm as the second.footfullcite:ACISP:BaiGal14 
   - When $\vec{s}_i \sample \{-1,0,1\}$, the volume of the lattice is scaled by $σ^n$.
   - When $\vec{s} \sample \{0,1\}$ the volume of the lattice is scaled by ${(2σ)}^n$ because we can scale by $2σ$ and then rebalance.
-
-
 ** Fin
 :PROPERTIES:
 :BEAMER_OPT: standout
@@ -817,6 +823,9 @@ This lemma assumes \(m = \sqrt{\frac{n \log q}{\log δ_0}}\) which maximises the
 #+BEGIN_CENTER
 \Huge *Thank You*
 #+END_CENTER
+
+#+ATTR_LATEX: :width 0.6\paperwidth
+[[./kitten-03.jpg]]
 
 * Build Artefacts                                                     :noexport:
 
