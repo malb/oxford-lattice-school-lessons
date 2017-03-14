@@ -26,7 +26,7 @@
 \begin{frame}
   \frametitle{An important invariant: the Volume}
 
-For any two bases $\bblue{\vec G}, \rred{\vec B}$, it holds that of a same lattice $\Lambda$:
+For any two bases $\bblue{\vec G}, \rred{\vec B}$ of the same lattice $\Lambda$:
 \[ \det(\bblue{\vec G}\bblue{\vec G}^t) = \det(\rred{\vec B}\rred{\vec B}^t).\]
 We can therefore define:
 \[ \vol(\Lambda) = \sqrt{\det(\bblue{\vec G}\bblue{\vec G}^t)}.\]
@@ -40,7 +40,7 @@ $\bblue{\vec G^\star}$ is ${\bf not}$ a basis of $\Lambda$, nevertheless:
 
 \begin{frame}
   \frametitle{What is a ``Good'' basis}
-Recall that, indepedently of the basis $\bblue{\vec G}$ it hold that:
+Recall that, independently of the basis $\bblue{\vec G}$ it hold that:
 \[\vol(\Lambda) = \prod \|\bblue{\vec g_i^\star}\|.\]
 
 Therefore, it is somehow equivalent that
@@ -69,7 +69,7 @@ Therefore, it is somehow equivalent that
 
 \begin{frame}
 \frametitle{Bases and Fundamental Domains}
-Each Basis defines a {\bf parallelepipedic tiling}.
+Each basis defines a {\bf parallelepipedic tiling}.
 % Les algorithmes de Babai découpent l'espace en domaines fondamentaux {\bf parallélépipédiques} selon une base donnée.
 \includegraphics{tikz_goodbadtiling.pdf}
 \\
@@ -136,7 +136,7 @@ Can this somehow be used as a trapdoor ?
 
 \begin{frame}
   \frametitle{Encryption from lattices (simplified)}
-  Using the (second) decoding algorithm, on can recover $\vec v, \vec e$ from $\vec w = \vec v + \vec e$ when 
+  Using the (second) decoding algorithm, one can recover $\vec v, \vec e$ from $\vec w = \vec v + \vec e$ when 
  \[ \|\vec e \| \leq \min \| \vec b_i^*\| \]
 
 
@@ -188,13 +188,13 @@ Decryption : $(\vec m', \vec e) = decode(\vec c)$\\
 
 
 \begin{frame}
-\frametitle{A statistical attack~[NguReg05,DucNgu12]}
+\frametitle{A statistical attack~[NguReg06,DucNgu12]}
 The difference $\vec s - \vec m$ is always inside the parallelepiped spanned by the good basis $\bblue{\vec G}$ (or its GSO $\bblue{\vec G^\star}$):
 \begin{figure}
 {\centering{\includegraphics[width=6cm]{img/learning.jpg}}}
 \end{figure}
 Each signatures $(\vec s,\vec m)$ leaks a bit of information about $\bblue{\vec G}$. \\
-{\bf Learning a parralepiped} from few signatures [Nguyen Regev 2006]: \\
+{\bf Learning a parallepiped} from few signatures [Nguyen Regev 2006]: \\
 $\quad \Rightarrow$ Total break of original GGH and NTRUSign schemes. \\
 \end{frame}
 
