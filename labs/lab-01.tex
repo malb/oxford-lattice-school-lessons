@@ -238,12 +238,20 @@ sage: set_verbose(1)
 sage: _ = estimate_lwe(n, alpha, q, skip="arora-gb")
 \end{lstlisting}
 
+In the code above
+
 \begin{itemize}
-	\item First, load the Sage Module. From a remote location like here, or from a local file.
+\item we loaded the Sage Module. From a remote location like here, or from a local file;
+\item set verbosity to something higher than zero to get more detailed input; and
+\item called a highlevel function to estimate the running time of various attacks.
 \end{itemize}
 
 \section{Example solutions}
 \subsection{Public-key Encryption --- single bit}
+\textbf{Ex 5:} Compare your results with those obtained by running the estimation scripts for \emph{A New Hope}.\footnote{\url{https://github.com/tpoeppelmann/newhope/tree/master/scripts}}
+
+\textbf{Ex 6:} Use monkey patching to modify the behaviour of the estimator.\footnote{\url{https://stackoverflow.com/questions/5626193/what-is-a-monkey-patch}} For example, replace the cost function for lattice reduction with a different cost function, say, a function which assumes only one SVP call is necessary for BKZ.\footfullcite{EPRINT:ADPS15}
+
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
