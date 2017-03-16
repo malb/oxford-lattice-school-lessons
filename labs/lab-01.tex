@@ -259,7 +259,7 @@ In the code above
 from sage.stats.distributions.discrete_gaussian_integer import \
 DiscreteGaussianDistributionIntegerSampler
 
-class pke_singlebit():
+class PKESingleBit(object):
   def __init__(self, dimension):
     self.n = dimension
     self.q = next_prime(self.n^2)
@@ -292,7 +292,7 @@ class pke_singlebit():
 
 dimension = 150
 message = randint(0, 1)
-scheme = pke_singlebit(dimension)
+scheme = PKESingleBit(dimension)
 scheme.pp_gen()
 sk, pk = scheme.keygen()
 c = scheme.encrypt(message, pk)
@@ -309,7 +309,7 @@ print m_dec
 from sage.stats.distributions.discrete_gaussian_integer import \
 DiscreteGaussianDistributionIntegerSampler
 
-class pke_multibit():
+class PKEMultiBit(object):
   def __init__(self, dimension, packing):
     self.n = dimension
     self.k = packing
@@ -346,7 +346,7 @@ dimension = 150
 packing = 4
 message = random_matrix(ZZ, packing, x=2)
 
-scheme = pke_multibit(dimension, packing)
+scheme = PKEMultiBit(dimension, packing)
 scheme.pp_gen()
 sk, pk = scheme.keygen()
 c = scheme.encrypt(message, pk)
@@ -364,7 +364,7 @@ print m_dec
 from sage.stats.distributions.discrete_gaussian_polynomial import \
  DiscreteGaussianDistributionPolynomialSampler
 
-class pke_ring():
+class PKERing(object):
   def __init__(self, dimension):
     self.n = dimension
     self.q = next_prime(self.n^2)
@@ -395,7 +395,7 @@ class pke_ring():
 dimension = 16
 message = [randint(0, 1) for _ in range(dimension)]
 
-scheme = pke_ring(dimension)
+scheme = PKERing(dimension)
 scheme.pp_gen()
 sk, pk = scheme.keygen()
 c = scheme.encrypt(message, pk)
