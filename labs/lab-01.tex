@@ -121,9 +121,9 @@ sage: D(), D(), D(), D(), D(), D()
 (6, 4, 2, 6, 3, 3)
 \end{lstlisting}
 
-\subsection{Public-key Encryption --- single bit}
+\subsection{Public-Key Encryption --- Single Bit}
 
-The public-key encryption scheme we want to implement goes as follow. Given a dimension $n$, a modulus $q$, we work in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$. We also need a discrete Gaussian distribution of stddev $\sigma$.
+The public-key encryption scheme we want to implement goes as follows. Given a dimension $n$, a modulus $q$, we work in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$. We also need a discrete Gaussian distribution of stddev $\sigma$.
 
 \begin{itemize}
   \item \underline{ppGen:} $\mathbf{A} \in \mathbb{Z}^{n\times n}_q$ a public uniformly random matrix.
@@ -174,7 +174,7 @@ If this is closer to 0 than to $\lfloor q/2 \rceil$ output 0, otherwise 1. It wo
 %
 \textbf{Ex 1:} Using the Gaussian sampler from above, implement the whole scheme i.e.~the public parameter and key generations, the encryption and the decryption.
 
-\subsection{Public-key Encryption --- multi-bit}
+\subsection{Public-Key Encryption --- Multi-Bit}
 
 To improve the efficiency of the encryption scheme, it is possible to encrypt multiple bits of plaintext in one ciphertext.\footfullcite{RSA:LinPei11}\footfullcite{EPRINT:ding12}\footfullcite{CCS:BCDMNN16} In the single bit setting, we had for 1 bit of plaintext: $n^2$ integers of public parameter, $n$ integers of public key and of secret key, and $n+1$ integers of ciphertext. With the multibit approach, we can encrypted $k^2$ bits for only a factor $k$ expansion in the size of the keys and ciphertexts.
 
@@ -184,7 +184,7 @@ The generalization of the scheme is quite straightforward. The operations remain
 
 \textbf{Ex 2:} Adapt your previous code to handle multiple plaintext bits.
 
-\subsection{Public-key encryption --- ring setting}
+\subsection{Public-Key encryption --- Ring Setting}
 
 As a last improvement, we will now shift our scheme from the generic lattice setting where $\mathbf{A}$ is uniformly random in $\mathbb{Z}^{n\times n}_q$ to the ring setting. For this, we will work in a polynomial ring, e.g.~$R = \mathbb{Z}_q[X]/(X^n+1)$ where $n$ is a power of 2 and $q$ is prime as before.
 
@@ -217,7 +217,7 @@ P()
 \end{lstlisting}
 
 
-\section{Security evaluation}
+\section{Security Evaluation}
 
 Now that the scheme is working and fairly efficient, the question remains of its level of security. Here we have $n$ that determines both the modulus $q$ and the standard deviation $\sigma$. So we will play with $n$, and later also with $q$ and $\sigma$, and explore the level of security that we obtain.
 
@@ -230,7 +230,8 @@ For this work, we will use the estimator\footfullcite{EPRINT:AlbPlaSco15} that m
   \item Can you adapt the choice of $q$ and $\sigma$ in our code to improve the security while maintaining correctness?
 \end{enumerate}
 
-\textbf{Note:} Below a quick introduction on using the estimator.
+To get you started, try:
+
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 sage: load("https://bitbucket.org/malb/lwe-estimator/raw/HEAD/estimator.py")
