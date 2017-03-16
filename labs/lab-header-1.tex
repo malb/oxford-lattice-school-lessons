@@ -11,7 +11,7 @@
 \usepackage{ifxetex}
 
 \ifxetex
-
+  \usepackage{fontspec}
   \usepackage{unicodesymbols}
   \renewcommand{\textls}[2][5]{%
     \begingroup\addfontfeatures{LetterSpace=#1}#2\endgroup
@@ -21,6 +21,12 @@
   \renewcommand{\allcaps}[1]{\textls[15]{\MakeTextUppercase{#1}}}
   \renewcommand{\smallcaps}[1]{\smallcapsspacing{\scshape\MakeTextLowercase{#1}}}
   \renewcommand{\textsc}[1]{\smallcapsspacing{\textsmallcaps{#1}}}
+
+\setmonofont[BoldFont={Cousine Bold},
+             ItalicFont={Cousine Italic},
+             BoldItalicFont={Cousine Bold Italic},
+             Scale=MatchLowercase]{Cousine}
+
 \fi
 
 \RequirePackage[backend=bibtex,
@@ -30,10 +36,6 @@
 
 \bibliography{local.bib,abbrev3.bib,crypto_crossref.bib}
 
-% \setmonofont[BoldFont={Cousine Bold},
-%              ItalicFont={Cousine Italic},
-%              BoldItalicFont={Cousine Bold Italic},
-%              Scale=MatchLowercase]{Cousine}
 
 \makeatletter
 \patchcmd{\@verbatim}
