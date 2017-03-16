@@ -227,7 +227,7 @@ Run lattice reduction with block size $β$ on lattice $Λ_{h'}^q$, to obtain a v
 
   \draw (3.5,4.5) node {$\|(x',y')\| ≤ β^{Θ(2n'/β)} ⋅ λ_1(Λ_{h'}^q)$};
   \draw (4.3,3.7) node {$≤ β^{Θ(n/(β r))} ⋅ \|(f',g')\|$};
-  \draw (4.25,2.9) node {$≤ β^{Θ(n/(β r))} ⋅ {(n\,σ)}^{o(r)}$};
+  \draw (4.25,2.9) node {$≤ β^{Θ(n/(β r))} ⋅ {(n\,σ)}^{Θ(r)}$};
 
 \end{tikzpicture}
 #+END_EXPORT
@@ -277,6 +277,10 @@ Can solve in time complexity $\mathsf{poly}(n ) \cdot 2^{\Theta(\beta)}$ when
 #+BEGIN_CENTER
 \Huge *Thank You*
 #+END_CENTER
+
+#+ATTR_LATEX: :width 0.6\paperwidth
+[[./kitten-04.jpg]]
+
 
 * Build Artefacts                                                     :noexport:
 
