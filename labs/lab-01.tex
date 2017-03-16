@@ -406,7 +406,29 @@ print message
 print m_dec
 \end{lstlisting}
 
-\section{Security evaluation}
+\section{Security Evaluation --- Monkey Patching}
+
+First download \lstinline{estimator.py}, then try:
+
+\begin{lstlisting}
+import estimator as est
+
+def bkz_runtime_k_sieve_bdgl16_asymptotic_1(k, n):
+    return est.bkz_runtime_k_sieve_bdgl16_asymptotic(k, 1)
+
+bkz_estimate = bkz_runtime_k_sieve_bdgl16_asymptotic_1
+args = {"optimisation_target":"sieve"}
+
+try:
+    est.bkz_runtime_k_sieve_asymptotic, bkz_estimate = \
+       bkz_estimate, est.bkz_runtime_k_sieve_asymptotic
+
+    print est.cost_str(est.sis(n, alpha, q, **args))
+
+finally:
+    est.bkz_runtime_k_sieve_asymptotic, bkz_estimate = \
+       bkz_estimate, est.bkz_runtime_k_sieve_asymptotic
+\end{lstlisting}
 
 \end{document}
 
