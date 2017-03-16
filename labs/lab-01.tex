@@ -322,8 +322,9 @@ class PKEMultiBit(object):
     self.A = random_matrix(self.Zq, self.n, self.n)
 
   def keygen(self):
-    s = matrix(self.Zq, self.n, self.k, [self.D() for _ in range(self.n*self.k)])
-    e = matrix(self.Zq, self.n, self.k, [self.D() for _ in range(self.n*self.k)])
+    Zq, n, k = self.Zq, self.n, self.k
+    s = matrix(Zq, n, k, [self.D() for _ in range(n*k)])
+    e = matrix(Zq, n, k, [self.D() for _ in range(n*k)])
     b = s.transpose() * self.A + e.transpose()
     return s, b
 
@@ -362,7 +363,7 @@ print m_dec
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 from sage.stats.distributions.discrete_gaussian_polynomial import \
- DiscreteGaussianDistributionPolynomialSampler
+ DiscreteGaussianDistributionPolynomialSampler as DGSPolySampler
 
 class PKERing(object):
   def __init__(self, dimension):
@@ -371,7 +372,7 @@ class PKERing(object):
     self.sigma = sqrt(self.n/(2*pi.n()))
     Zq = IntegerModRing(self.q)
     self.Rq = PolynomialRing(Zq, 'x').quotient_ring(x^dimension+1)
-    self.P = DiscreteGaussianDistributionPolynomialSampler(self.Rq, self.n, self.sigma)
+    self.P = DGSPolySampler(self.Rq, self.n, self.sigma)
 
   def pp_gen(self):
     self.a = self.Rq.random_element()
