@@ -104,7 +104,7 @@ import DiscreteGaussianDistributionIntegerSampler
 
 As its explicit name suggests, you can now generate integers from this sampler, providing it with the standard deviation $\sigma$ of the distribution you wish to use.
 
-\textbf{Note:} In cryptography, we commonly define a Gaussian distribution with center $c$ and parameter $s$ as the distribution where elements occur with a probability proportional to $\exp(-\pi\frac{{(x-c)}^2}{s^2})$. Sage defines a Gaussian distribution with center \(c\) and standard deviation \(\sigma\) as the distribution where elements occur with a probability proportional to $\exp(-\frac{{(x-c)}^2}{2s^2})$. Thus, the Gaussian width parameter \(s\) as used in cryptography relates to the standard deviation used in Sage as \(s = \sqrt{2\pi}\sigma\).
+\textbf{Note:} In cryptography, we commonly define a Gaussian distribution with center $c$ and parameter $s$ as the distribution where elements occur with a probability proportional to $\exp(-\pi\frac{{(x-c)}^2}{s^2})$. Sage defines a Gaussian distribution with center \(c\) and standard deviation \(\sigma\) as the distribution where elements occur with a probability proportional to $\exp(-\frac{{(x-c)}^2}{2\sigma^2})$. Thus, the Gaussian width parameter \(s\) as used in cryptography relates to the standard deviation used in Sage as \(s = \sqrt{2\pi}\sigma\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -113,7 +113,7 @@ sage: D
 Discrete Gaussian sampler over the Integers with sigma = 2.0 and c = 5
 \end{lstlisting}
 
-This creates the sampler, that you can then call to produce your integers. Here they are centered around 5, and stddev 2.
+This creates the sampler that you can then call to produce your integers. Here they are centered around 5 and have standard deviation 2.
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
@@ -219,7 +219,7 @@ P()
 
 \section{Security evaluation}
 
-Now that the scheme is working and fairly efficient, the question remains of its level of security. Here we have $n$ that determines both the modulus $q$ and the Gaussian parameter $\sigma$. So we will play with $n$, and later also with $q$ and $\sigma$, and explore the level of security that we obtain.
+Now that the scheme is working and fairly efficient, the question remains of its level of security. Here we have $n$ that determines both the modulus $q$ and the standard deviation $\sigma$. So we will play with $n$, and later also with $q$ and $\sigma$, and explore the level of security that we obtain.
 
 For this work, we will use the estimator\footfullcite{EPRINT:AlbPlaSco15} that models the performance of (nearly) all existing attacks against LWE\@. The project page presents a basic use of the estimator. The core components is the \texttt{estimate\_lwe()} function that computes estimated costs of several attacks (see the project page for the details on the attacks). This function takes as input the LWE parameters to assess : $n$ the dimension, $q$ the modulus and $\alpha = \sqrt{2\pi}\cdot \frac{\sigma}{q}$ which captures the error width with respect to $q$. 
 
