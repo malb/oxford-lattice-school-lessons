@@ -104,7 +104,7 @@ import DiscreteGaussianDistributionIntegerSampler
 
 As its explicit name suggests, you can now generate integers from this sampler, providing it with the standard deviation $\sigma$ of the distribution you wish to use.
 
-\textbf{Note: } A Gaussian distribution with center $c$ and parameter $\sigma$ samples elements with a probability proportional to $\exp(-\pi\frac{(x-c)^2}{\sigma^2})$.
+\textbf{Note:} In cryptography, we commonly define a Gaussian distribution with center $c$ and parameter $s$ as the distribution where elements occur with a probability proportional to $\exp(-\pi\frac{{(x-c)}^2}{s^2})$. Sage defines a Gaussian distribution with center \(c\) and standard deviation \(\sigma\) as the distribution where elements occur with a probability proportional to $\exp(-\frac{{(x-c)}^2}{2s^2})$. Thus, the Gaussian width parameter \(s\) as used in cryptography relates to the standard deviation used in Sage as \(s = \sqrt{2\pi}\sigma\).
 
 \lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
