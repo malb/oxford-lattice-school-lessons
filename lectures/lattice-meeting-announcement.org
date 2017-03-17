@@ -1,0 +1,75 @@
+# -*- eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
+#+OPTIONS: H:1 toc:nil num:t
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+
+#+LaTeX_CLASS: mbeamer
+#+PROPERTY: header-args:sage :tolatex lambda obj: r'(%s)' % latex(obj) :results raw
+
+#+TITLE: London-ish Lattice Coding & Crypto Meetings
+#+SUBTITLE:  
+#+AUTHOR: Martin R. Albrecht
+#+EMAIL: martin.albrecht@royalholloway.ac.uk
+#+DATE: 
+#+STARTUP: beamer indent
+#+LATEX_HEADER: \renewcommand{\maketitle}{}
+#+BIBLIOGRAPHY: local.bib,abbrev3.bib,crypto_crossref.bib,rfc.bib,jacm.bib
+
+* Next London-ish Lattice Coding & Crypto Meeting
+
+- When :: 10 May 2017, 10:30-18:30
+- Venue :: University College London
+- Speakers :: two coding theory, two crypto speakers:
+  - _Robert Fischer_: Lattice Reduction and Factorization for Equalization
+  - _Alexander May_: Recent Advances in Decoding Random Binary Linear Codes – and Their Implications to Crypto
+  - _Joseph Jean Boutros_: TBC
+  - _Thomas Johansson_: Code-BKW (tentative)
+- Website :: http://malb.io/discrete-subgroup/
+- List :: https://groups.google.com/forum/#!forum/london-ish-lattice-coding-crypto
+
+
+* Build Artefacts                                                                                   :noexport:
+
+** Emacs Config
+
+#+BEGIN_SRC emacs-lisp :tangle .dir-locals.el
+((magit-mode .
+((eval .
+(and
+(visual-line-mode 1)))))
+(bibtex-mode . ((fill-column . 10000)))
+(org-mode .
+((org-tags-column . -80)
+(eval .
+(and
+(visual-fill-column-mode t)
+(flyspell-mode t))))))
+#+END_SRC
+
+** Makefile
+
+#+BEGIN_SRC makefile :tangle Makefile
+EMACS=emacs
+EMACSFLAGS=--batch -l ~/.emacs.d/org-export-init.el
+LATEXMK=latexmk
+LATEXMKFLAGS=-xelatex
+
+%.pdf: %.tex
+$(LATEXMK) $(LATEXMKFLAGS) $<
+
+%.tex: %.org
+$(EMACS) $(EMACSFLAGS) $< -f org-latex-export-to-latex
+
+clean:
+rm -f *.bbl *.aux *.out *.synctex.gz *.log *.run.xml *.blg *-blx.bib *.fdb_latexmk *.fls *.toc *.vrb *.snm *.nav
+
+.PHONY: clean all
+.PRECIOUS: %.tex
+#+END_SRC
+
+** Autoexport to PDF
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda () (when (eq major-mode 'org-mode) (org-beamer-export-to-latex))) nil t)
+# End:
