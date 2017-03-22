@@ -18,7 +18,8 @@ class pke_ring():
     self.q = next_prime(self.n^2)
     self.sigma = sqrt(self.n/(2*pi.n()))
     Zq = IntegerModRing(self.q)
-    self.Rq = PolynomialRing(Zq, 'x').quotient_ring(x^dimension+1)
+    Pq.<y> = Zq['y']
+    self.Rq = Pq.quotient_ring(y^dimension+1)
     self.P = DiscreteGaussianDistributionPolynomialSampler(self.Rq, self.n, self.sigma)
 
   def pp_gen(self):
