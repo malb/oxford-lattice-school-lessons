@@ -1,6 +1,7 @@
 from sage.stats.distributions.discrete_gaussian_polynomial import DiscreteGaussianDistributionPolynomialSampler
-N = 8
-q = 50
+from sage.stats.distributions.discrete_gaussian_lattice import DiscreteGaussianDistributionLatticeSampler
+N = 128
+q = 2**10
 sigma = 1.17*sqrt(q/(2*N))
 R.<x> = ZZ['x']
 phi = x^N+1
@@ -24,12 +25,12 @@ def gen_basis(sk):
   AG = circ(sk[3])
   return block_matrix([[Ag,-Af],[AG,-AF]])
 
-def bar(p):
-  l = p.list()
-  p_bar = l[0]
-  for i in range(1, N):
-    p_bar = p_bar + l[N-i] * x^i
-  return p_bar
+#def bar(p):
+#  l = p.list()
+#  p_bar = l[0]
+#  for i in range(1, N):
+#    p_bar = p_bar + l[N-i] * x^i
+#  return p_bar
 
 def keygen():
   ok = False
@@ -78,23 +79,23 @@ def keygen():
 
 def sign(tag, sk):
   B = gen_basis(sk)
-  _ , M = B.gram_schmidt()
-  #print M
+
   tag = vector(tag.list())
-  #print "B"
-  #print B
-  #print "tag"
-  #print tag
-  #print "tag Zn"
-  #print tag * B^-1
-  #print "tag Zn rounded"
-  #print (tag * B^-1).apply_map(round) * B
-  return (tag * M^-1).apply_map(round) * M
+
+  S = DiscreteGaussianDistributionLatticeSampler(B, sigma = 1.5110 * sqrt(q), c=tag)
+  return S()
 
 def verify(tag, s, pk):
-  return (tag - (s[0] + pk*s[1] % phi)).norm(2)
+  if (s[0] + pk * s[1]) % q == 0:
+      print (tag - (s[0] + pk*s[1] % phi)).norm(2)
+      print 1.5110*sqrt(q)*2*sqrt(N)
+      if (tag - (s[0] + pk*s[1] % phi)).norm(2) < 1.5110*sqrt(q)*2*sqrt(2*N):
+        return True
+  return False
 
-tag = R.random_element(2*N-1, x=-q//2, y=q//2)
+tag = R.random_element(2*N-1, x=-N*q, y=N*q)
+print "tag", tag.list()
 sk, pk = keygen()
 s = sign(tag, sk)
+print "s", s
 print verify(tag, s, pk)

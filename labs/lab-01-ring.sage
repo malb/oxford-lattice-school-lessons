@@ -1,4 +1,16 @@
 from sage.stats.distributions.discrete_gaussian_polynomial import DiscreteGaussianDistributionPolynomialSampler
+def balance(e, q=None):
+  try:
+    p = parent(e).change_ring(ZZ)
+    return p([balance(e_) for e_ in e])
+  except (TypeError, AttributeError):
+    if q is None:
+      try:
+        q = parent(e).order()
+      except AttributeError:
+        q = parent(e).base_ring().order()
+    return ZZ(e)-q if ZZ(e)>q/2 else ZZ(e)
+
 
 class pke_ring():
   def __init__(self, dimension):
@@ -24,8 +36,8 @@ class pke_ring():
     return c
 
   def decrypt(self, c, sk):
-    m_dec = c[1] - sk * c[0]
-    return map(lambda x: 1 if self.q//4 < x and x < (3*self.q)//4 else 0, m_dec.list())
+    m_dec = (c[1] - sk * c[0]).list()
+    return map(lambda x: round(2/self.q * balance(x, self.q)) % 2, m_dec)
 
 dimension = 16
 message = [randint(0, 1) for _ in range(dimension)]

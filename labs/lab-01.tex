@@ -121,17 +121,36 @@ sage: D(), D(), D(), D(), D(), D()
 (6, 4, 2, 6, 3, 3)
 \end{lstlisting}
 
+
+Unfortunately for us, Sage prefers to represent number modulo $q$ in the range $[0, q-1]$ whereas as cryptographers we would rather have them in $[\lceil-q/2\rceil, \lfloor q/2\rfloor]$. In order to balance things, you might wish to use the function below.
+
+\lstset{language=sage,label= ,caption= ,captionpos=b,numbers=none}
+\begin{lstlisting}
+def balance(e, q=None):
+    try:
+        p = parent(e).change_ring(ZZ)
+        return p([balance(e_, q=q) for e_ in e])
+    except (TypeError, AttributeError):
+        if q is None:
+            try:
+                q = parent(e).order()
+            except AttributeError:
+                q = parent(e).base_ring().order()
+        return ZZ(e)-q if ZZ(e)>q/2 else ZZ(e)
+\end{lstlisting}
+
+
 \subsection{Public-Key Encryption --- Single Bit}
 
 The public-key encryption scheme we want to implement goes as follows. Given a dimension $n$, a modulus $q$, we work in $\mathbb{Z}^n_q = (\mathbb{Z}/q\mathbb{Z})^n$. We also need a discrete Gaussian distribution of stddev $\sigma$.
 
 \begin{itemize}
-  \item \underline{ppGen:} $\mathbf{A} \in \mathbb{Z}^{n\times n}_q$ a public uniformly random matrix.
-  \item \underline{KeyGen:} The public key is $\mathbf{b}^t = \mathbf{s}^t\mathbf{A} + \mathbf{e}^t \mod q$, with $\mathbf{s}, \mathbf{e} \in \mathbb{Z}^n_q$ sampled from the Gaussian distribution. The secret key is $\mathbf{s}$.
-  \item \underline{Enc:} To encrypt a bit $m$, consider $\mathbf{M} = \left[ \begin{smallmatrix}
+  \item \underline{ppGen:} $\mathbf{A} \in \mathbb{Z}^{n\times m}_q$ a public uniformly random matrix, with $m = 2 n \lceil\log q\rceil$.
+  \item \underline{KeyGen:} The public key is $\mathbf{b}^t = \mathbf{s}^t\mathbf{A} + \mathbf{e}^t \mod q$, with $\mathbf{s} \in \mathbb{Z}^n_q$ and $\mathbf{e} \in \mathbb{Z}^m_q$ sampled from the Gaussian distribution. The secret key is $\mathbf{s}$.
+  \item \underline{Enc:} To encrypt a bit $\mu$, consider $\mathbf{M} = \left[ \begin{smallmatrix}
     \mathbf{A} \\
     \mathbf{b}^t
-  \end{smallmatrix}\right] \in \mathbb{Z}^{(n+1)\times n}_q$ and compute
+  \end{smallmatrix}\right] \in \mathbb{Z}^{(n+1)\times m}_q$ and compute
   \begin{align*}
     \mathbf{c} &= \mathbf{M}\cdot\mathbf{x} + \left(
                \begin{smallmatrix}
@@ -148,7 +167,7 @@ The public-key encryption scheme we want to implement goes as follows. Given a d
                  \mu \cdot \lfloor q/2 \rceil
                \end{smallmatrix} \right) \in \mathbb{Z}^{n+1}_q
   \end{align*}
-  where $\mathbf{x}$ is uniform in $\{0, 1\}^n$.
+  where $\mathbf{x}$ is uniform in $\{0, 1\}^m$.
   \item \underline{Dec:}  To decrypt, compute: 
 \begin{align*}
   (-\mathbf{s}, 1)^t \cdot \mathbf{c} &= (-\mathbf{s}, 1)^t \cdot \mathbf{M} \cdot \mathbf{x} + \mu \cdot \lfloor q/2 \rceil \\
@@ -263,6 +282,7 @@ class PKESingleBit(object):
   def __init__(self, dimension):
     self.n = dimension
     self.q = next_prime(self.n^2)
+    self.m = 2*self.n*ceil(log(self.q, 2))
     self.sigma = sqrt(self.n/(2*pi.n()))
     self.D = DiscreteGaussianDistributionIntegerSampler(sigma=self.sigma)
     self.Zq = IntegerModRing(self.q)
@@ -272,13 +292,13 @@ class PKESingleBit(object):
 
   def keygen(self):
     s = vector(self.Zq, [self.D() for _ in range(self.n)])
-    e = vector(self.Zq, [self.D() for _ in range(self.n)])
+    e = vector(self.Zq, [self.D() for _ in range(self.m)])
     b = s * self.A + e
     return s, b
 
   def encrypt(self, m, pk):
     M = self.A.stack(pk)
-    x = random_vector(self.n, 0, 2)
+    x = random_vector(self.m, 0, 2)
     c = M*x 
     c[self.n] = (c[self.n] + m*self.q//2) % self.q
     return c
@@ -286,9 +306,8 @@ class PKESingleBit(object):
   def decrypt(self, c, sk):
     d = list(-sk)
     d.append(1)
-    m_dec = vector(d) * c
-    return 1 if self.q//4 < m_dec and m_dec < (3*self.q)//4 else 0
-
+    m_dec = balance (vector(d) * c, self.q)
+    return round(m_dec * 2/self.q) % 2
 
 dimension = 150
 message = randint(0, 1)
@@ -338,10 +357,8 @@ class PKEMultiBit(object):
   def decrypt(self, c, sk):
     d = -sk.transpose()
     d = d.augment(identity_matrix(self.k))
-    m_dec = d * c
-    f = lambda x: 1 if self.q//4 < x and x < (3*self.q)//4 else 0
-    return m_dec.apply_map(f)
-
+    m_dec = balance(d * c, self.q) * 2 / self.q
+    return m_dec.apply_map(lambda x: round(x)) % 2
 
 dimension = 150
 packing = 4
@@ -389,9 +406,8 @@ class PKERing(object):
     return c
 
   def decrypt(self, c, sk):
-    m_dec = c[1] - sk * c[0]
-    f = lambda x: 1 if self.q//4 < x and x < (3*self.q)//4 else 0
-    return map(f, m_dec.list())
+    m_dec = (c[1] - sk * c[0]).list()
+    return map(lambda x: round(2/self.q * balance(x, self.q)) % 2, m_dec)
 
 dimension = 16
 message = [randint(0, 1) for _ in range(dimension)]
