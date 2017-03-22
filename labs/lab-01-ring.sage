@@ -2,7 +2,7 @@ from sage.stats.distributions.discrete_gaussian_polynomial import DiscreteGaussi
 def balance(e, q=None):
   try:
     p = parent(e).change_ring(ZZ)
-    return p([balance(e_) for e_ in e])
+    return p([balance(e_, q=q) for e_ in e])
   except (TypeError, AttributeError):
     if q is None:
       try:
