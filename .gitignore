@@ -179,12 +179,5 @@ TSWLatexianTemp*
 # KBibTeX
 *~[0-9]*
 /Makefile
-/introduction.pdf
-/introduction.tex
-/labs/sage-introduction.pdf
-/labs/lab-02.pdf
 *.sage.py
-/lectures/lattice-reduction-and-attacks.pdf
-/lectures/subfield-attack.pdf
-/labs/lab-01.pdf
 /lectures/lattice-meeting-announcement.pdf
